@@ -2,7 +2,7 @@
   (executive-init)
   (not (domain-loaded))
 =>
-  (parse-pddl-domain (path-resolve "simple-agent/domain.pddl"))
+  (parse-pddl-domain (path-resolve "labcegor-agent/domain.pddl"))
   (assert (domain-loaded))
 )
 
@@ -15,14 +15,6 @@
 =>
   (modify ?p (sensed TRUE))
 )
-
-
-(defrule domain-set-value-predicates
-  ?p <- (domain-predicate (name mps-state|zone-content) (value-predicate FALSE))
-=>
-  (modify ?p (value-predicate TRUE))
-)
-
 
 (defrule domain-nowait-actions
   " Mark some actions that have a sensed effect as non-waiting. That means the effect is applied without sensing for it "

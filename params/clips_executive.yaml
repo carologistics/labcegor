@@ -40,14 +40,14 @@ clips_executive:
     automatic-goal-retraction: true
 
     # Directory where to look for CLIPS files
-    clips-dirs: ["@CONFDIR@/params", "/home/robotino/ros2/labcegor_ws/install/cx_bringup/share/cx_bringup"]
+    clips-dirs: ["@CONFDIR@/params", "/home/tarikwork/ros2/labcegor_ws/install/labcegor/share/labcegor"]
 
     # Agent name. On startup the clips-agent will try to resolve a file named
     # <agent name>.clp. It must be in the CLIPS path directories.
-    spec: simple-agent
+    spec: labcegor-agent
 
     specs:
-      simple-agent:
+      labcegor-agent:
         parameters:
           coordination:
             mutex:
@@ -61,19 +61,19 @@ clips_executive:
             - name: clips_protobuf
           stage-3:
             - name: domain
-              file: simple-agent/domain.clp
+              file: labcegor-agent/domain.clp
             - name: goal-reasoner
-              file: simple-agent/goal-reasoner.clp
+              file: labcegor-agent/goal-reasoner.clp
             - name: fixed-sequence
-              file: simple-agent/fixed-sequence.clp
+              file: labcegor-agent/fixed-sequence.clp
             - name: action-selection
-              file: simple-agent/action-selection.clp
+              file: labcegor-agent/action-selection.clp
             - name: action-execution
               files:
-                - simple-agent/print-action.clp
+                - labcegor-agent/print-action.clp
                 - skills-actions.clp
             - name: refbox-comm
-              file: simple-agent/refbox-comm-init.clp
+              file: labcegor-agent/refbox-comm-init.clp
           # Map plan actions to skill strings.
         action-mapping:
           gowait:

@@ -70,7 +70,7 @@ if(BUILD_TESTING)
 endif()
 
 install(DIRECTORY launch params DESTINATION share/${PROJECT_NAME})
-install(DIRECTORY src/simple-agent DESTINATION share/${PROJECT_NAME})
+install(DIRECTORY src/labcegor-agent DESTINATION share/${PROJECT_NAME})
 
 install(TARGETS
   plansys_node
