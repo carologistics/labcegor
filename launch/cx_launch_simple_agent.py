@@ -11,7 +11,7 @@ from launch_ros.actions import Node
 def generate_launch_description():
     bringup_dir = get_package_share_directory('cx_bringup')
     cx_dir = get_package_share_directory('cx_clips_executive')
-    labcegor_dir = get_package_share_directory('cx_bringup')
+    labcegor_dir = get_package_share_directory('labcegor')
 
     namespace = LaunchConfiguration('namespace')
     cx_params_file = LaunchConfiguration('cx_params_file')
@@ -28,12 +28,12 @@ def generate_launch_description():
 
     declare_model_file_cmd = DeclareLaunchArgument(
         'model_file',
-        default_value=os.path.join(cx_dir + "/simple-agent/domain.pddl"),
+        default_value=os.path.join(labcegor_dir + "/simple-agent/domain.pddl"),
         description='PDDL Model file')
 
     declare_log_level_ = DeclareLaunchArgument(
         "log_level",
-        default_value='debug',
+        default_value='info',
         description="Logging level for cx_node executable",
     )
 
@@ -43,22 +43,23 @@ def generate_launch_description():
 
     declare_cx_params_file = DeclareLaunchArgument(
         'cx_params_file',
-        default_value=os.path.join(bringup_dir, 'params', 'cx_params.yaml'),
+        default_value=os.path.join(labcegor_dir, 'params', 'cx_params.yaml'),
         description='Path to the ROS2 cx_params.yaml file')
 
     declare_clips_executive_params_file = DeclareLaunchArgument(
         'clips_executive_params_file',
         default_value=os.path.join(
-            bringup_dir, 'params', 'clips_executive.yaml'),
+            labcegor_dir, 'params', 'clips_executive.yaml'),
         description='Path to Clips Executive params file')
 
     cx_node = Node(
-        package='cx_bringup',
+        package='labcegor',
         executable='cx_node',
         output='screen',
         emulate_tty=True,
         namespace=namespace,
         parameters=[
+            {"agent_dir":labcegor_dir},
             cx_params_file,
             clips_executive_params_file
         ],
