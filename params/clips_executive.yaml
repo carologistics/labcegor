@@ -76,7 +76,9 @@ clips_executive:
               file: simple-agent/refbox-comm-init.clp
           # Map plan actions to skill strings.
         action-mapping:
-          gowait: skill{}
+          gowait:
+            mapped-to: say{text="hello world"}
+            executor: fawkes_skiller
 
         parameters:
           simtest:
