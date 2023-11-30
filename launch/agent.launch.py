@@ -59,8 +59,8 @@ def generate_launch_description():
             cx_params_file,
             clips_executive_params_file
         ],
-        arguments=['--ros-args', '--log-level', log_level]
-        # arguments=[('--ros-args --log-level debug')]
+        # arguments=['--ros-args', '--log-level', log_level]
+        arguments=[('--ros-args --log-level debug')]
     )
 
     robot1_dummy_node = Node(

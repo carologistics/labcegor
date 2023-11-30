@@ -26,7 +26,6 @@ clips_executive:
     # You need to manually cleanup goals (and associated data such as
     # plans) to keep things tidy.
     automatic-goal-retraction: true
-
     init:
       # Files are relative pathes to the share directory of the cx_clips_executive
       # and the path specified through agent_dir
@@ -42,6 +41,7 @@ clips_executive:
           - core/wm-domain-sync.clp
       - name: domain
         file: labcegor-agent/domain.clp
+        # file: labcegor-agent/simple_moving_domain.clp
       - name: goal-reasoner
         file: labcegor-agent/goal-reasoner.clp
       - name: fixed-sequence
