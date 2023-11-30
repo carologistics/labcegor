@@ -13,7 +13,6 @@ def generate_launch_description():
     cx_dir = get_package_share_directory('cx_clips_executive')
     labcegor_dir = get_package_share_directory('labcegor')
 
-    namespace = LaunchConfiguration('namespace')
     cx_params_file = LaunchConfiguration('cx_params_file')
     log_level = LaunchConfiguration('log_level')
     model_file = LaunchConfiguration('model_file')
@@ -37,10 +36,6 @@ def generate_launch_description():
         description="Logging level for cx_node executable",
     )
 
-    declare_namespace_ = DeclareLaunchArgument(
-        'namespace', default_value='',
-        description='Default namespace')
-
     declare_cx_params_file = DeclareLaunchArgument(
         'cx_params_file',
         default_value=os.path.join(labcegor_dir, 'params', 'cx_params.yaml'),
@@ -53,13 +48,14 @@ def generate_launch_description():
         description='Path to Clips Executive params file')
 
     cx_node = Node(
-        package='labcegor',
+        package='cx_bringup',
         executable='cx_node',
         output='screen',
         emulate_tty=True,
-        namespace=namespace,
         parameters=[
             {"agent_dir":labcegor_dir},
+            {"clips_executive_config": clips_executive_params_file},
+            {"clips_features_manager_config": cx_params_file},
             cx_params_file,
             clips_executive_params_file
         ],
@@ -82,7 +78,6 @@ def generate_launch_description():
         name='cx_lifecycle_manager',
         output='screen',
         emulate_tty=True,
-        namespace=namespace,
         parameters=[{"node_names_to_manage": lc_nodes}]
     )
 
@@ -92,7 +87,6 @@ def generate_launch_description():
     ld.add_action(stdout_linebuf_envvar)
     ld.add_action(declare_log_level_)
 
-    ld.add_action(declare_namespace_)
     ld.add_action(declare_cx_params_file)
     ld.add_action(declare_clips_executive_params_file)
     ld.add_action(declare_model_file_cmd)
