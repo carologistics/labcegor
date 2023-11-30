@@ -1,3 +1,4 @@
+
 (defrule load-domain
   (executive-init)
   (not (domain-loaded))
@@ -215,3 +216,6 @@
   )
   (assert (domain-facts-loaded))
 )
+
+
+; (watch all)
