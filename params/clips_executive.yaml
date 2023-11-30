@@ -1,37 +1,25 @@
-# %YAML 1.2
-# %TAG ! tag:fawkesrobotics.org,cfg/
+clips_manager:
+  ros__parameters:
+    # logs clips activities in a file at the location of ros logs.
+    log_clips_to_file: true
+    # CLIPS events to log.
+    watch: [rules, facts]
+
 clips_executive:
   ros__parameters:
-    # If true, will enable watching of facts and rules
-    debug:
-      enable: true
-
-      # debug level is a number of: 0 ~ none, 1 ~ minimal, 2 ~ more, 3 ~ maximum
-      level: 3
-
-      # If CLIPS debugging is enabled, certain rules and facts can be excluded
-      # from watching, e.g. if they are showing up at too high frequencies or
-      # are not of interest.
-      unwatch-facts: ["time"]
-      unwatch-rules: ["time-retract"]
-
-    # automatically pre-require redefine-warning feature? Enabling
-    # this in the plugin instead of in the initial code (init.clp) is
-    # beneficial because it already catches errors in said file.
-    request-redefine-warning-feature: true
+    # If CLIPS debugging is enabled, certain rules and facts can be excluded
+    # from watching, e.g. if they are showing up at too high frequencies or
+    # are not of interest.
+    unwatch_facts: ["time"]
+    unwatch_rules: ["time-retract"]
 
     # If set to true, will trigger the assertion of a (time (now)) fact in
     # each loop. This can be used to trigger loop events in CLIPS.
-    assert-time-each-loop: true
-
-    # If set to true will force the acquisition of the skiller control.
-    # This is particularly useful to kick an SkillGUI which is holding
-    # the lock just due to an oversight.
-    steal-skiller-control: true
+    assert_time_each_loop: true
 
     # Sets the frequency, in which the clips agenda is being refresh
     # inside the CX (in HZ)
-    refresh-rate: 1
+    refresh_rate: 1
 
     # If set to true, goals will be cleaned automatically when they
     # reach the RETRACTED state. Disabling be useful for debugging.
@@ -39,60 +27,52 @@ clips_executive:
     # plans) to keep things tidy.
     automatic-goal-retraction: true
 
-    # Directory where to look for CLIPS files
-    clips-dirs: ["@CONFDIR@/params", "/home/tarikwork/ros2/labcegor_ws/install/labcegor/share/labcegor"]
+    init:
+      # Files are relative pathes to the share directory of the cx_clips_executive
+      # and the path specified through agent_dir
+      # These files are loaded from the cx_clips_executive package
+      - name: clips-executive
+        files:
+          - core/plan.clp
+          - core/goal.clp
+          - core/domain.clp
+          - core/skills.clp
+          - core/skills-actions.clp
+          - core/worldmodel.clp
+          - core/wm-config.clp
+          - core/wm-domain-sync.clp
+      - name: domain
+        file: labcegor-agent/domain.clp
+      - name: goal-reasoner
+        file: labcegor-agent/goal-reasoner.clp
+      - name: fixed-sequence
+        file: labcegor-agent/fixed-sequence.clp
+      - name: action-selection
+        file: labcegor-agent/action-selection.clp
+      - name: action-execution
+        files:
+          - labcegor-agent/print-action.clp
+      - name: refbox-comm
+        file: labcegor-agent/refbox-comm-init.clp
+       # Map plan actions to skill strings.
+    action_mapping:
+      gowait:
+        mapped_to: say{text="hello world"}
+        executor: fawkes_skiller
 
-    # Agent name. On startup the clips-agent will try to resolve a file named
-    # <agent name>.clp. It must be in the CLIPS path directories.
-    spec: labcegor-agent
+    parameters:
+      simtest:
+        enabled: false
+        testbed: FULL  # defined in simtest.clp
+      rcll:
+        peer-address: 172.26.255.255
+        peer-recv-port: 4444
+        peer-send-port: 4445
+        cyan-recv-port: 4441
+        magenta-recv-port: 4442
+        cyan-send-port: 4446
+        magenta-send-port: 4447
 
-    specs:
-      labcegor-agent:
-        parameters:
-          coordination:
-            mutex:
-              renew-interval: 5
-              max-age-sec: 15
-
-        init:
-          stage-1:
-            - name: clips_pddl_parser
-            - name: skill_execution
-            - name: clips_protobuf
-          stage-3:
-            - name: domain
-              file: labcegor-agent/domain.clp
-            - name: goal-reasoner
-              file: labcegor-agent/goal-reasoner.clp
-            - name: fixed-sequence
-              file: labcegor-agent/fixed-sequence.clp
-            - name: action-selection
-              file: labcegor-agent/action-selection.clp
-            - name: action-execution
-              files:
-                - labcegor-agent/print-action.clp
-                - skills-actions.clp
-            - name: refbox-comm
-              file: labcegor-agent/refbox-comm-init.clp
-          # Map plan actions to skill strings.
-        action-mapping:
-          gowait:
-            mapped-to: say{text="hello world"}
-            executor: fawkes_skiller
-
-        parameters:
-          simtest:
-            enabled: false
-            testbed: FULL  # defined in simtest.clp
-          rcll:
-            peer-address: 172.26.255.255
-            peer-recv-port: 4444
-            peer-send-port: 4445
-            cyan-recv-port: 4441
-            magenta-recv-port: 4442
-            cyan-send-port: 4446
-            magenta-send-port: 4447
-
-            team-name: Carologistics
-            crypto-key: randomkey
-            cipher: "aes-128-cbc"
+        team-name: Carologistics
+        crypto-key: randomkey
+        cipher: "aes-128-cbc"
