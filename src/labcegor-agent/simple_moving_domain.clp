@@ -1,7 +1,7 @@
 (defrule load-domain
     (not (domain-loaded))
   => 
-    (parse-pddl-domain (path-resolve "labcegor/simple-moving-domain.pddl"))
+    (parse-pddl-domain (path-resolve "labcegor-agent/simple_moving_domain.pddl"))
     (assert (domain-loaded))
 )
 
@@ -64,4 +64,5 @@
         (domain-fact (name connected) (param-values pos-3-3 pos-2-3))
         (domain-fact (name connected) (param-values pos-3-3 pos-2-2))
     )
+    (assert (domain-facts-loaded))
 )
