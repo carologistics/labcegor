@@ -69,6 +69,10 @@
 	(modify ?g (mode DISPATCHED))
 )
 
+; (facts)
+; (rules)
+; (watch all)
+
 ; #  Goal Monitoring
 (defrule goal-reasoner-completed
 	?g <- (goal (id ?goal-id) (mode FINISHED) (outcome COMPLETED))
