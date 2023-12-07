@@ -62,6 +62,18 @@ def generate_launch_description():
         arguments=['--ros-args', '--log-level', log_level]
         # arguments=[('--ros-args --log-level debug')]
     )
+    refbox_node = Node(
+            package='labcegor',  # Replace with the actual package name
+            executable='refbox.py',
+            name='refbox_node',
+            output='screen',  # Show the output in the terminal
+            emulate_tty=True,  # Emulate a terminal to support interactive commands
+            parameters=[
+                # Add any parameters your script might use
+                {'terminal': 'gnome-terminal'},
+                {'shell': 'bash'}
+            ],
+        )
 
     robot1_dummy_node = Node(
         package='cx_example_skill_nodes',
@@ -94,5 +106,6 @@ def generate_launch_description():
     ld.add_action(robot1_dummy_node)
     ld.add_action(cx_node)
     ld.add_action(cx_lifecycle_manager)
+    ld.add_action(refbox_node)
 
     return ld
