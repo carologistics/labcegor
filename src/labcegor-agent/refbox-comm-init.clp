@@ -19,102 +19,62 @@
 ;
 ; Read the full text in the LICENSE.GPL file in the doc directory.
 ;
-
-(defrule refbox-init
-  "Initialization of refbox related facts."
-  (executive-init)
-  (time $?now)
-  (not (wm-fact (id "/refbox/team-color")))
-  =>
-  (assert
-    (wm-fact (id "/refbox/team-color") )
-    (wm-fact (id "/refbox/points/MAGENTA") (type UINT) (value 0) )
-    (wm-fact (id "/refbox/points/CYAN") (type UINT) (value 0) )
-    (wm-fact (id "/refbox/phase")  (value PRE_GAME) )
-    (wm-fact (id "/refbox/state")  (value WAIT_START) )
-    (wm-fact (id "/game/state")  (value WAIT_START) )
-    (wm-fact (id "/refbox/game-time")  (type UINT) (is-list TRUE) (values 0 0))
-    (wm-fact (key refbox beacon seq) (type UINT) (value 1))
-  )
-)
-
-(defrule refbox-beacon-init
-  (wm-fact (key central agent robot args? r ?robot))
-  (not (timer (name ?timer-name&:(eq ?timer-name (sym-cat refbox-beacon-timer- ?robot)))))
-  =>
-  (assert (timer (name (sym-cat refbox-beacon-timer- ?robot))
-                 (time 0.0)
-          )
-          (wm-fact (key refbox robot task seq args? r ?robot) (type UINT) (value 1))
-  )
+(deftemplate refbox-peer
+  (slot name (type SYMBOL))
+  (slot peer-id (type INTEGER))
 )
 
 (defrule refbox-comm-enable-public
   "Enable peer connection to the unencrypted refbox channel"
   ; (declare (salience ?*PRIORITY-LOW*))
   (executive-init)
-  (wm-fact (id "/config/rcll/peer-address") (value ?peer-address))
-  (wm-fact (id "/config/rcll/peer-port") (value ?peer-port&~0))
-  (not (wm-fact (id "/refbox/comm/peer-enabled") (value TRUE)))
+  (not (executive-finalize))
+  (confval (path "/clips_executive/parameters/rcll/peer-address") (value ?peer-address))
+  (confval (path "/clips_executive/parameters/rcll/peer-port") (value ?peer-port&~0))
+  (not (refbox-peer (name refbox-public)))
   =>
   (printout t "Enabling remote peer (public)" crlf)
   (bind ?peer-id (pb-peer-create ?peer-address ?peer-port))
-  (assert (wm-fact (id "/refbox/comm/peer-enabled") (value TRUE) (type BOOL))
-          (wm-fact (id "/refbox/comm/peer-id/public") (value ?peer-id) (type INT))
-   )
+  (assert (refbox-peer (name refbox-public) (peer-id ?peer-id)))
 )
 
 (defrule refbox-comm-enable-local-public
   "Enable local peer connection to the unencrypted refbox channel"
   (executive-init)
-  (wm-fact (id "/config/rcll/peer-address") (value ?peer-address))
-  (wm-fact (id "/config/rcll/peer-send-port") (value ?peer-send-port))
-  (wm-fact (id "/config/rcll/peer-recv-port") (value ?peer-recv-port))
-  (not (wm-fact (id "/refbox/comm/peer-enabled") (value TRUE)))
+  (not (executive-finalize))
+  (confval (path "/clips_executive/parameters/rcll/peer-address") (value ?peer-address))
+  (confval (path "/clips_executive/parameters/rcll/peer-send-port") (value ?peer-send-port))
+  (confval (path "/clips_executive/parameters/rcll/peer-recv-port") (value ?peer-recv-port))
+  (not (refbox-peer (name refbox-public)))
   =>
   (printout t "Enabling local peer (public)" crlf)
   (bind ?peer-id (pb-peer-create-local ?peer-address ?peer-send-port ?peer-recv-port))
-  (assert (wm-fact (id "/refbox/comm/peer-enabled") (value TRUE) (type BOOL))
-          (wm-fact (id "/refbox/comm/peer-id/public") (value ?peer-id) (type INT))
-   )
+  (assert (refbox-peer (name refbox-public) (peer-id ?peer-id)))
 )
 
 (defrule refbox-comm-close-local-public
   "Disable the local peer connection on finalize"
   (executive-finalize)
-  ?pe <- (wm-fact (id "/refbox/comm/peer-enabled") (value TRUE))
-  (wm-fact (id "/refbox/comm/peer-id/public") (value ?peer-id) (type INT))
+  ?pe <- (refbox-peer (name refbox-public) (peer-id ?peer-id))
   =>
   (printout t "Closing local peer (public)" crlf)
   (pb-peer-destroy ?peer-id)
-  (modify ?pe (value FALSE))
-)
-
-
-(defrule refbox-comm-close-public
-  "Disable the remote peer connection on finalize"
-  (executive-finalize)
-  ?pe <- (wm-fact (id "/refbox/comm/peer-enabled") (value TRUE) (type BOOL))
-  (wm-fact (id "/refbox/comm/peer-id/public") (value ?peer-id) (type INT))
-  =>
-  (printout t "Closing remote peer (public)" crlf)
-  (pb-peer-destroy ?peer-id)
-  (modify ?pe (value FALSE))
+  (retract ?pe)
 )
 
 (defrule refbox-comm-enable-local-team-private
   "Enable local peer connection to the encrypted team channel"
   (executive-init)
-  (wm-fact (id "/refbox/comm/peer-enabled") (value TRUE))
-  (wm-fact (id "/refbox/team-color") (value ?team-color&:(neq ?team-color nil)))
-  (wm-fact (id "/config/rcll/peer-address") (value ?address))
-  (wm-fact (id "/config/rcll/crypto-key") (value ?key))
-  (wm-fact (id "/config/rcll/cipher") (value ?cipher))
-  (wm-fact (id "/config/rcll/cyan-recv-port") (value ?cyan-recv-port))
-  (wm-fact (id "/config/rcll/cyan-send-port") (value ?cyan-send-port))
-  (wm-fact (id "/config/rcll/magenta-recv-port") (value ?magenta-recv-port))
-  (wm-fact (id "/config/rcll/magenta-send-port") (value ?magenta-send-port))
-  (not (wm-fact (id "/refbox/comm/private-peer-enabled") (value TRUE) ))
+  (team-color ?team-color)
+  (refbox-peer (name refbox-public))
+  (confval (path "/clips_executive/parameters/rcll/peer-address") (value ?address))
+  (confval (path "/clips_executive/parameters/rcll/crypto-key") (value ?key))
+  (confval (path "/clips_executive/parameters/rcll/cipher") (value ?cipher))
+  (confval (path "/clips_executive/parameters/rcll/cyan-recv-port") (value ?cyan-recv-port))
+  (confval (path "/clips_executive/parameters/rcll/cyan-send-port") (value ?cyan-send-port))
+  (confval (path "/clips_executive/parameters/rcll/magenta-recv-port") (value ?magenta-recv-port))
+  (confval (path "/clips_executive/parameters/rcll/magenta-send-port") (value ?magenta-send-port))
+  (not (refbox-peer (name refbox-private)))
   =>
   (if (eq ?team-color CYAN)
     then
@@ -124,22 +84,20 @@
       (printout t "Enabling local peer (magenta only)" crlf)
       (bind ?peer-id (pb-peer-create-local-crypto ?address ?magenta-send-port ?magenta-recv-port ?key ?cipher))
     )
-  (assert (wm-fact (id "/refbox/comm/private-peer-enabled") (value TRUE) (type BOOL))
-          (wm-fact (id "/refbox/comm/peer-id/private") (value ?peer-id) (type INT))
-    )
+  (assert (refbox-peer (name refbox-private) (peer-id ?peer-id)))
 )
 
 (defrule refbox-comm-enable-team-private
   "Enable local peer connection to the encrypted team channel"
   (executive-init)
-  (wm-fact (id "/refbox/comm/peer-enabled") (value TRUE))
-  (wm-fact (id "/refbox/team-color") (value ?team-color&:(neq ?team-color nil)))
-  (wm-fact (id "/config/rcll/peer-address") (value ?address))
-  (wm-fact (id "/config/rcll/crypto-key") (value ?key))
-  (wm-fact (id "/config/rcll/cipher") (value ?cipher))
-  (wm-fact (id "/config/rcll/cyan-port") (value ?cyan-port&~0))
-  (wm-fact (id "/config/rcll/magenta-port") (value ?magenta-port&~0))
-  (not (wm-fact (id "/refbox/comm/private-peer-enabled") (value TRUE) ))
+  (team-color ?team-color)
+  (refbox-peer (name refbox-public))
+  (confval (path "/clips_executive/parameters/rcll/peer-address") (value ?address))
+  (confval (path "/clips_executive/parameters/rcll/crypto-key") (value ?key))
+  (confval (path "/clips_executive/parameters/rcll/cipher") (value ?cipher))
+  (confval (path "/clips_executive/parameters/rcll/cyan-port") (value ?cyan-port&~0))
+  (confval (path "/clips_executive/parameters/rcll/magenta-port") (value ?magenta-port&~0))
+  (not (refbox-peer (name refbox-private)))
   =>
   (if (eq ?team-color CYAN)
     then
@@ -149,18 +107,5 @@
       (printout t "Enabling remote peer (magenta only)" crlf)
       (bind ?peer-id (pb-peer-create-crypto ?address ?magenta-port ?key ?cipher))
     )
-  (assert (wm-fact (id "/refbox/comm/private-peer-enabled") (value TRUE) (type BOOL))
-          (wm-fact (id "/refbox/comm/peer-id/private") (value ?peer-id) (type INT))
-    )
-)
-
-(defrule refbox-comm-close-private
-  "Disable the local private peer connection on finalize"
-  (executive-finalize)
-  ?pe <- (wm-fact (id "/refbox/comm/private-peer-enabled") (value TRUE) (type BOOL))
-  (wm-fact (id "/refbox/comm/peer-id/private") (value ?peer-id) (type INT))
-  =>
-  (printout t "Closing local private peer" crlf)
-  (pb-peer-destroy ?peer-id)
-  (modify ?pe (value FALSE))
+  (assert (refbox-peer (name refbox-private) (peer-id ?peer-id)))
 )
