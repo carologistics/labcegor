@@ -38,7 +38,6 @@ clips_executive:
           - core/skills.clp
           - core/skills-actions.clp
           - core/worldmodel.clp
-          - core/wm-config.clp
           - core/wm-domain-sync.clp
       - name: domain
         file: labcegor-agent/domain.clp
