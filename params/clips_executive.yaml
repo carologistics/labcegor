@@ -40,8 +40,8 @@ clips_executive:
           - core/worldmodel.clp
           - core/wm-domain-sync.clp
       - name: domain
-        file: labcegor-agent/domain.clp
-        # file: labcegor-agent/simple_moving_domain.clp
+        # file: labcegor-agent/domain.clp
+        file: labcegor-agent/simple_moving_domain.clp
       - name: goal-reasoner
         file: labcegor-agent/goal-reasoner.clp
       - name: fixed-sequence
@@ -57,6 +57,9 @@ clips_executive:
     action_mapping:
       gowait:
         mapped_to: say{text="hello world"}
+        executor: dummy_skiller
+      move:
+        mapped_to: say{text="hello world!"}
         executor: dummy_skiller
 
     parameters:
