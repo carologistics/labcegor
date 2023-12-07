@@ -19,15 +19,16 @@
 		(modify ?pa (id ?pa-index) (plan-id ?plan-id) (goal-id ?goal-id))
 	)
 )
-
+; TODO: how to continuously move?
+ 
 (defrule goal-expander-demo-goal
-	?g <- (goal (id ?goal-id) (class DEMO-GOAL) (mode SELECTED) (parent ?parent)
+	?g <- (goal (id ?goal-id) (class DEMO-GOAL-SIMPLE) (mode SELECTED) (parent ?parent)
 	            (params target-pos ?zone robot ?robot))
 
-	(wm-fact (key domain fact at args? r ?robot m ?curr-loc side ?curr-side))
+	(wm-fact (key domain fact at args? r ?robot x ?curr-loc))
 	=>
-	(plan-assert-sequential (sym-cat DEMO-GOAL-PLAN- (gensym*)) ?goal-id robot1
-		(plan-assert-action gowait  ?robot ?curr-loc ?curr-side ?zone)
+	(plan-assert-sequential (sym-cat DEMO-GOAL-PLAN- (gensym*)) ?goal-id ?robot
+		(plan-assert-action move  ?curr-loc ?zone ?robot)
 		;(plan-assert-action wp-put ?robot ?wp ?mps INPUT (get-wp-complexity ?wp))
 	)
 	(modify ?g (mode EXPANDED))
