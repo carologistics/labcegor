@@ -58,7 +58,7 @@ clips_executive:
     action_mapping:
       gowait:
         mapped_to: say{text="hello world"}
-        executor: fawkes_skiller
+        executor: dummy_skiller
 
     parameters:
       simtest:
