@@ -25,10 +25,11 @@ class RefboxNode(Node):
                 tab_name = f"-n \"{tab_names[i]}\"" if tab_names else ""
                 term_command += f"; {terminal} new-window {tab_name} '{shell} -i -c \"{cmd}\"; {terminal} set-window-option -g remain-on-exit on'"
         else:  # Assuming gnome-terminal as the default
-            term_command = f"{terminal} "
+            term_command = f"{terminal} --maximize -- {shell} -i -c \""
             for i, cmd in enumerate(commands):
-                tab_name = f"--title=\"{tab_names[i]}\"" if tab_names else ""
-                term_command += f" --tab {tab_name} -e '{shell} -i -c \"{cmd} ; echo -n \\\"Press ENTER to exit...\\\" && read -n 1 -s -r\"'"
+                tab_name = f"--title=\\\"{tab_names[i]}\\\"" if tab_names else ""
+                term_command += f"{terminal} --tab {tab_name} -e '{shell} -i -c \\\"{cmd} ; echo -n \\\"Press ENTER to exit...\\\" && read -n 1 -s -r\\\"'"
+            term_command+="\""
 
         return term_command
 
