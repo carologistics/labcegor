@@ -55,9 +55,9 @@ clips_executive:
         file: labcegor-agent/refbox-comm-init.clp
       - name: refbox-recv
         file: labcegor-agent/refbox-recv-messages.clp
-      - name: refbox-send
-        file: labcegor-agent/refbox-send-messages.clp
-       # Map plan actions to skill strings.
+      # - name: refbox-send
+      #   file: labcegor-agent/refbox-send-messages.clp
+      # Map plan actions to skill strings.
     action_mapping:
       gowait:
         mapped_to: say{text="hello world"}
