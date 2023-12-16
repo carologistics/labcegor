@@ -40,6 +40,7 @@
     (wm-fact (id "/refbox/phase")  (value PRE_GAME) )
     (wm-fact (id "/refbox/state")  (value WAIT_START) )
     (wm-fact (id "/game/state")  (value WAIT_START) )
+    (wm-fact (key refbox beacon seq) (type UINT) (value 1))
   )
 )
 
