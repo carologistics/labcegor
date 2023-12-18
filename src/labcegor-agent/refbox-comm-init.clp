@@ -109,3 +109,18 @@
     )
   (assert (refbox-peer (name refbox-private) (peer-id ?peer-id)))
 )
+
+(defrule refbox-beacon-init
+  (time $?now)
+  (wm-fact (key central agent robot args? r ?robot))
+  ; (not (timer (name ?timer-name&:(eq ?timer-name (sym-cat refbox-beacon-timer- ?robot)))))
+  (not (wm-fact (key refbox robot task seq args? r ?robot)))
+  =>
+  (assert ;(timer (name (sym-cat refbox-beacon-timer- ?robot))
+          ;       (time 00)
+          ;)
+          (wm-fact (key config agent team) (value "carologistic"))
+          (wm-fact (key refbox robot task seq args? r ?robot) (type UINT) (value 1))
+  )
+)
+
