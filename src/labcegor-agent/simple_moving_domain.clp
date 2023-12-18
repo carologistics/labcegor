@@ -1,11 +1,14 @@
+; (defglobal ?*robot-name-list* = (create$))
+
 (defrule load-domain
     (not (domain-loaded))
     ; ?r_phase <- (refbox-phase (value SETUP))
-    ?r_phase <- (wm-fact (id "/refbox/phase") (value SETUP))
+    ?r_phase <- (wm-fact (id "/refbox/phase") (value $?))
+    ?r_state <- (wm-fact (id "/refbox/state") (value $?))
   => 
     (parse-pddl-domain (path-resolve "labcegor-agent/simple_moving_domain.pddl"))
     (assert (domain-loaded))
-    (retract ?r_phase)
+    (retract ?r_state ?r_phase)
     (printout t "successfully load domain" crlf)
 )
 
@@ -18,10 +21,20 @@
     =>
     (printout t "in the production phase, start initializing domain facts ..." crlf)
     (retract ?r_phase2 ?r_state2)
-    ; (retract ?r_phase2)
+
     (foreach ?robot (create$ robot1 robot2 robot3)
         (assert (domain-fact (name at) (param-values ?robot start-pos)))
+        ; (bind ?*robot-name-list* (insert$ ?*robot-name-list* 1 ?robot))
+        (assert (wm-fact (key central agent robot args? r ?robot)))
         )
+
+    ; (do-for-all-facts ((?robot ?robot-value) (IN ?robot (create$ robot1 robot2 robot3)))
+    ;     (assert (domain-fact (name at) (param-values ?robot start-pos)))
+    ;     (bind ?*robot-name-list* (insert$ ?*robot-name-list* 1 ?robot))
+    ; )
+    
+    ; (assert (wm-fact (key central agent robot) (values ?*robot-name-list*)))
+    
     (assert 
         (domain-fact (name connected) (param-values start-pos pos-2-1))
         (domain-fact (name connected) (param-values start-pos pos-1-2))
