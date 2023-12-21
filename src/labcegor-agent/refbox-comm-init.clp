@@ -65,7 +65,7 @@
 (defrule refbox-comm-enable-local-team-private
   "Enable local peer connection to the encrypted team channel"
   (executive-init)
-  (team-color ?team-color)
+  ; (team-color ?team-color)
   (refbox-peer (name refbox-public))
   (confval (path "/clips_executive/parameters/rcll/peer-address") (value ?address))
   (confval (path "/clips_executive/parameters/rcll/crypto-key") (value ?key))
@@ -76,14 +76,17 @@
   (confval (path "/clips_executive/parameters/rcll/magenta-send-port") (value ?magenta-send-port))
   (not (refbox-peer (name refbox-private)))
   =>
-  (if (eq ?team-color CYAN)
-    then
-      (printout t "Enabling local peer (cyan only)" crlf)
-      (bind ?peer-id (pb-peer-create-local-crypto ?address ?cyan-send-port ?cyan-recv-port ?key ?cipher))
-      else
-      (printout t "Enabling local peer (magenta only)" crlf)
-      (bind ?peer-id (pb-peer-create-local-crypto ?address ?magenta-send-port ?magenta-recv-port ?key ?cipher))
-    )
+  ;(if (eq ?team-color CYAN)
+  ;  then
+  ;    (printout t "Enabling local peer (cyan only)" crlf)
+  ;    (bind ?peer-id (pb-peer-create-local-crypto ?address ?cyan-send-port ?cyan-recv-port ?key ?cipher))
+  ;    else
+  ;    (printout t "Enabling local peer (magenta only)" crlf)
+  ;    (bind ?peer-id (pb-peer-create-local-crypto ?address ?magenta-send-port ?magenta-recv-port ?key ?cipher))
+  ;  )
+
+  (printout t "Enabling local peer (cyan only)" crlf)
+  (bind ?peer-id (pb-peer-create-local-crypto ?address ?cyan-send-port ?cyan-recv-port ?key ?cipher))
   (assert (refbox-peer (name refbox-private) (peer-id ?peer-id)))
 )
 

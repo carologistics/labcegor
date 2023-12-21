@@ -1,19 +1,6 @@
 ;;; last modify Dec18 2023, by cyuan
 ;;; assert fact rather than use wm-fact, but not work in game-state switching, and need to additionally move recv information part in front of domain load in clips_executive.yaml
 
-;(deftemplate refbox-phase
-;   (slot value (type SYMBOL))
-;)
-
-;(deftemplate refbox-state
-;   (slot value (type SYMBOL))
-;)
-
-;(deftemplate game-state
-;   (slot value (type SYMBOL))
-;)
-
-
 (defrule refbox-recv-BeaconSignal
   ?pf <- (protobuf-msg (type "llsf_msgs.BeaconSignal") (ptr ?p))
   (time $?now)
@@ -69,31 +56,39 @@
 )
 
 
-; how to use ?
-(defrule refbox-recv-RobotInfo
-  ?pf <- (protobuf-msg (type "llsf_msgs.RobotInfo") (ptr ?r))
-  =>
-  (foreach ?p (pb-field-list ?r "robots")
-    (bind ?state (sym-cat (pb-field-value ?p "state")))
-    (bind ?robot (sym-cat (pb-field-value ?p "name")))
-    (bind ?old-state nil)
-    (do-for-fact ((?wm wm-fact)) (wm-key-prefix ?wm:key (create$ monitoring state args? r ?robot))
-      (bind ?old-state ?wm:value)
-      (retract ?wm)
-    )
-    (assert (wm-fact (key monitoring state args? r ?robot) (is-list FALSE) (type SYMBOL) (value ?state)))
-    (if (and (eq ?old-state MAINTENANCE)
-             (eq ?state ACTIVE))
-     then
-      (assert (wm-fact (key central agent robot-waiting args? r ?robot)))
-    )
-    (if (and (eq ?old-state ACTIVE)
-             (neq ?state ACTIVE))
-     then
-      (assert (reset-robot-in-wm ?robot))
-    )
-  )
-)
+;; how to use ?
+;(defrule refbox-recv-RobotInfo
+;  ?pf <- (protobuf-msg (type "llsf_msgs.RobotInfo") (ptr ?r))
+;  =>
+;  (foreach ?p (pb-field-list ?r "robots")
+;    (bind ?state (sym-cat (pb-field-value ?p "state")))
+;    (bind ?robot (sym-cat (pb-field-value ?p "name")))
+;    (bind ?old-state nil)
+;    (do-for-fact ((?wm wm-fact)) (wm-key-prefix ?wm:key (create$ monitoring state args? r ?robot))
+;      (bind ?old-state ?wm:value)
+;      (retract ?wm)
+;    )
+;    (assert (wm-fact (key monitoring state args? r ?robot) (is-list FALSE) (type SYMBOL) (value ?state)))
+;    (if (and (eq ?old-state MAINTENANCE)
+;             (eq ?state ACTIVE))
+;     then
+;      (assert (wm-fact (key central agent robot-waiting args? r ?robot)))
+;    )
+;    (if (and (eq ?old-state ACTIVE)
+;             (neq ?state ACTIVE))
+;     then
+;      (assert (reset-robot-in-wm ?robot))
+;    )
+;  )
+;)
+
+
+;(defrule refbox-recv-demo
+;  ?pb-msg <- (protobuf-msg (type "llsf_msgs.MachineInfo") (ptr ?p))
+;  =>
+;  (printout t "success" crlf)
+;)
+  
 
 
 ; receive machine information, how to use that ?
@@ -101,29 +96,34 @@
   ?pb-msg <- (protobuf-msg (type "llsf_msgs.MachineInfo") (ptr ?p))
   ; (wm-fact (id "/refbox/team-color") (value ?team-color&:(neq ?team-color nil)))
   =>
+  ; (retract ?pb-msg)
   ; (printout t "***** Received MachineInfo *****" crlf)
   (bind ?machines (create$)) ;keep track of the machines that actually exist
-
+  
   (foreach ?m (pb-field-list ?p "machines")
     (bind ?m-name (sym-cat (pb-field-value ?m "name")))
     (bind ?machines (insert$ ?machines(+ (length$ ?machines) 1) ?m-name))
     (bind ?m-type (sym-cat (pb-field-value ?m "type")))
     (bind ?m-team (sym-cat (pb-field-value ?m "team_color")))
     (bind ?m-state (sym-cat (pb-field-value ?m "state")))
-    (if (not (any-factp ((?wm-fact wm-fact))
-              (and  (wm-key-prefix ?wm-fact:key (create$ domain fact mps-state))
-                    (eq ?m-name (wm-key-arg ?wm-fact:key m)))))
-      then
-      (if (eq ?team-color ?m-team) then
-        (assert (wm-fact (key domain fact mps-state args? m ?m-name s ?m-state) (type BOOL) (value TRUE) ))
-      )
+    
+    (assert (wm-fact (key machine name) (value ?m-name)))    
+    (assert (wm-fact (key machine state) (value ?m-state)))   ;     
+
+    ;(if (not (any-factp ((?wm-fact wm-fact))
+    ;          (and  (wm-key-prefix ?wm-fact:key (create$ domain fact mps-state))
+    ;                (eq ?m-name (wm-key-arg ?wm-fact:key m)))))
+    ;  then
+      ;(if (eq ?team-color ?m-team) then
+      ;  (assert (wm-fact (key domain fact mps-state args? m ?m-name s ?m-state) (type BOOL) (value TRUE) ))
+      ;)
     ; set available rings for ring-stations
-      (if (eq ?m-type RS) then
-        (progn$ (?rc (pb-field-list ?m "ring_colors"))
-          (assert (wm-fact (key domain fact rs-ring-spec args? m ?m-name r ?rc rn NA) (type BOOL) (value TRUE)))
-        )
-      )
-    )
+    ;  (if (eq ?m-type RS) then
+    ;    (progn$ (?rc (pb-field-list ?m "ring_colors"))
+    ;      (assert (wm-fact (key domain fact rs-ring-spec args? m ?m-name r ?rc rn NA) (type BOOL) (value TRUE)))
+    ;    )
+    ;  )
+    ;)
    (do-for-fact ((?wm-fact wm-fact))
                   (and  (wm-key-prefix ?wm-fact:key (create$ domain fact mps-state))
                         (eq ?m-name (wm-key-arg ?wm-fact:key m))
