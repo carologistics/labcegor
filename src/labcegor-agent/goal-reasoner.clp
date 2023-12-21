@@ -30,7 +30,11 @@
 	(not (goal-already-tried))
 	(domain-facts-loaded)
 	=>
-	(assert (goal (id DEMO-GOAL) (class DEMO-GOAL) (params target-pos M-Z43 robot robot1)))
+	; (assert (goal (id DEMO-GOAL) (class DEMO-GOAL) (params target-pos M-Z43 robot robot1)))
+	
+	; FIXME: simple-goal-reasoner
+	(assert (goal (id DEMO-GOAL-SIMPLE) (class DEMO-GOAL-SIMPLE) (params target-pos pos-1-1 robot robot1)))
+        
 	; This is just to make sure we formulate the goal only once.
 	; In an actual domain this would be more sophisticated.
 	(assert (goal-already-tried))
@@ -42,7 +46,8 @@
 ; a planner to determine the required steps.
 (defrule goal-reasoner-select
 	?g <- (goal (id ?goal-id) (mode FORMULATED))
-	(not (goal (id DEMO-GOAL) (mode ~FORMULATED)))
+	; (not (goal (id DEMO-GOAL) (mode ~FORMULATED)))
+	(not (goal (id DEMO-GOAL-SIMPLE) (mode ~FORMULATED)))
 	=>
 	(modify ?g (mode SELECTED))
 	(assert (goal-meta (goal-id ?goal-id)))
@@ -52,6 +57,13 @@
 ; A goal might actually be expanded into multiple plans, e.g., by
 ; different planners. This step would allow to commit one out of these
 ; plans.
+;(defrule goal-reasoner-expand
+;	?g <- (goal (mode SELECTED))
+;	=>
+;	(modify ?g (mode EXPANDED))
+;)
+
+
 (defrule goal-reasoner-commit
 	?g <- (goal (mode EXPANDED))
 	=>
@@ -73,9 +85,20 @@
 ; (rules)
 ; (watch all)
 
+;(defrule goal-reasoner-execution
+;	?g <- (goal (mode DISPATCHED) (params target-pos pos-3-3 robots [robot1 robot2 robot3]))
+;	=>
+;	; execution, how ?
+;	(modify ?g (mode FINISHED) (outcome COMPLETED))
+;)
+	
+
 ; #  Goal Monitoring
 (defrule goal-reasoner-completed
 	?g <- (goal (id ?goal-id) (mode FINISHED) (outcome COMPLETED))
+
+	; ?g <- (goal (id ?goal-id) (mode FINISHED) (params ))
+
 	?gm <- (goal-meta (goal-id ?goal-id))
 	=>
 	(printout t "Goal '" ?goal-id "' has been completed, cleaning up" crlf)

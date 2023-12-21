@@ -7,6 +7,7 @@
 	=>
 	(bind ?severity (plan-action-arg severity ?param-names ?param-values info))
 	(bind ?text     (plan-action-arg text ?param-names ?param-values ""))
+        ; (printout t "----------------" crlf)
 	(printout ?severity ?text crlf)
 	; (modify ?pa (state FINAL))
 )
