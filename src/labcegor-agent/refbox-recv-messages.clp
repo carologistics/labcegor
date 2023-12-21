@@ -99,7 +99,7 @@
 ; receive machine information, how to use that ?
 (defrule refbox-recv-MachineInfo
   ?pb-msg <- (protobuf-msg (type "llsf_msgs.MachineInfo") (ptr ?p))
-  (wm-fact (id "/refbox/team-color") (value ?team-color&:(neq ?team-color nil)))
+  ; (wm-fact (id "/refbox/team-color") (value ?team-color&:(neq ?team-color nil)))
   =>
   ; (printout t "***** Received MachineInfo *****" crlf)
   (bind ?machines (create$)) ;keep track of the machines that actually exist
