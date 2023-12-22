@@ -1,5 +1,12 @@
 ;;; last modify Dec18 2023, by cyuan
 ;;; assert fact rather than use wm-fact, but not work in game-state switching, and need to additionally move recv information part in front of domain load in clips_executive.yaml
+;(deftemplate refbox-machine-info
+;  (slot name (type SYMBOL))
+;  (slot team (type SYMBOL))
+;  (slot type (type SYMBOL))
+;  (slot state (type SYMBOL))
+;)
+
 
 (defrule refbox-recv-BeaconSignal
   ?pf <- (protobuf-msg (type "llsf_msgs.BeaconSignal") (ptr ?p))
@@ -107,23 +114,23 @@
     (bind ?m-team (sym-cat (pb-field-value ?m "team_color")))
     (bind ?m-state (sym-cat (pb-field-value ?m "state")))
     
-    (assert (wm-fact (key machine name) (value ?m-name)))    
-    (assert (wm-fact (key machine state) (value ?m-state)))   ;     
+    ; (assert (wm-fact (key machine name) (value ?m-name)))    
+    ; (assert (wm-fact (key machine state) (value ?m-state)))   ; 
 
-    ;(if (not (any-factp ((?wm-fact wm-fact))
-    ;          (and  (wm-key-prefix ?wm-fact:key (create$ domain fact mps-state))
-    ;                (eq ?m-name (wm-key-arg ?wm-fact:key m)))))
-    ;  then
-      ;(if (eq ?team-color ?m-team) then
-      ;  (assert (wm-fact (key domain fact mps-state args? m ?m-name s ?m-state) (type BOOL) (value TRUE) ))
-      ;)
+    (if (not (any-factp ((?wm-fact wm-fact))
+              (and  (wm-key-prefix ?wm-fact:key (create$ domain fact mps-state))
+                    (eq ?m-name (wm-key-arg ?wm-fact:key m)))))
+      then
+      (if (eq ?team-color ?m-team) then
+        (assert (wm-fact (key domain fact mps-state args? m ?m-name s ?m-state) (type BOOL) (value TRUE) ))
+      )
     ; set available rings for ring-stations
-    ;  (if (eq ?m-type RS) then
-    ;    (progn$ (?rc (pb-field-list ?m "ring_colors"))
-    ;      (assert (wm-fact (key domain fact rs-ring-spec args? m ?m-name r ?rc rn NA) (type BOOL) (value TRUE)))
-    ;    )
-    ;  )
-    ;)
+      (if (eq ?m-type RS) then
+        (progn$ (?rc (pb-field-list ?m "ring_colors"))
+          (assert (wm-fact (key domain fact rs-ring-spec args? m ?m-name r ?rc rn NA) (type BOOL) (value TRUE)))
+        )
+      )
+    )
    (do-for-fact ((?wm-fact wm-fact))
                   (and  (wm-key-prefix ?wm-fact:key (create$ domain fact mps-state))
                         (eq ?m-name (wm-key-arg ?wm-fact:key m))
