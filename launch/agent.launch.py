@@ -106,6 +106,6 @@ def generate_launch_description():
     ld.add_action(robot1_dummy_node)
     ld.add_action(cx_node)
     ld.add_action(cx_lifecycle_manager)
-    ld.add_action(refbox_node)
+    #ld.add_action(refbox_node)
 
     return ld
