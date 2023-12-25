@@ -23,21 +23,18 @@
 	?*GOAL-MAX-TRIES* = 2
 )
 
-; #  Goal Creation
+
 (defrule goal-reasoner-create
 	(domain-loaded)
 	(not (goal))
 	(not (goal-already-tried))
 	(domain-facts-loaded)
+        ?tmp <- (wm-fact (key domain object mps-location) (name ?next-machine-location))
 	=>
-	; (assert (goal (id DEMO-GOAL) (class DEMO-GOAL) (params target-pos M-Z43 robot robot1)))
-	
-	; FIXME: simple-goal-reasoner
-	(assert (goal (id DEMO-GOAL-SIMPLE) (class DEMO-GOAL-SIMPLE) (params target-pos pos-1-1 robot robot1)))
         
-	; This is just to make sure we formulate the goal only once.
-	; In an actual domain this would be more sophisticated.
-	(assert (goal-already-tried))
+        (retract ?tmp)
+        (assert (goal (id DEMO-GOAL-SIMPLE) (class DEMO-GOAL-SIMPLE) (params target-pos ?next-machine-location robot robot1)))
+        (assert (goal-already-tried))
 )
 
 
@@ -46,8 +43,8 @@
 ; a planner to determine the required steps.
 (defrule goal-reasoner-select
 	?g <- (goal (id ?goal-id) (mode FORMULATED))
-	; (not (goal (id DEMO-GOAL) (mode ~FORMULATED)))
-	(not (goal (id DEMO-GOAL-SIMPLE) (mode ~FORMULATED)))
+	(not (goal (id DEMO-GOAL) (mode ~FORMULATED)))
+	; (not (goal (id DEMO-GOAL-SIMPLE) (mode ~FORMULATED)))
 	=>
 	(modify ?g (mode SELECTED))
 	(assert (goal-meta (goal-id ?goal-id)))
@@ -63,6 +60,11 @@
 ;	(modify ?g (mode EXPANDED))
 ;)
 
+; (defrule goal-reasoner-expand
+; 	?g <- (goal (id VISITALL1) (mode SELECTED))
+;         =>
+;         (pddl-request-plan VISITALL1 "visited LOC1")
+; )
 
 (defrule goal-reasoner-commit
 	?g <- (goal (mode EXPANDED))
@@ -81,9 +83,6 @@
 	(modify ?g (mode DISPATCHED))
 )
 
-; (facts)
-; (rules)
-; (watch all)
 
 ;(defrule goal-reasoner-execution
 ;	?g <- (goal (mode DISPATCHED) (params target-pos pos-3-3 robots [robot1 robot2 robot3]))

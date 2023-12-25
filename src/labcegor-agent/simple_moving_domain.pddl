@@ -6,25 +6,19 @@
   )
 
   (:constants
-    start-pos - location 
-    pos-1-2 - location
-    pos-1-3 - location
-    pos-2-1 - location
-    pos-2-2 - location
-    pos-2-3 - location
-    pos-3-1 - location
-    pos-3-2 - location
-    pos-3-3 - location
+    START - location
+    LOC1 - location
+    LOC2 - location
   )
 
   (:predicates
     (at ?r - robot ?x - location)
-    (connected ?x - location ?y - location)
+    (visited ?x - location)
   )
 
   (:action move
     :parameters (?from - location ?to - location ?r - robot)
-    :precondition (and (at ?r ?from) (connected ?from ?to))
-    :effect (and (not (at ?r ?from)) (at ?r ?to))
+    :precondition (and (at ?r ?from))
+    :effect (and (not (at ?r ?from)) (at ?r ?to) (visited ?from))
   )
 )
