@@ -24,16 +24,22 @@
 )
 
 
+(deftemplate mps-is-visited
+  (slot name (type SYMBOL))
+)
+
 (defrule goal-reasoner-create
 	(domain-loaded)
 	(not (goal))
 	(not (goal-already-tried))
 	(domain-facts-loaded)
         ?tmp <- (wm-fact (key domain object mps-location) (name ?next-machine-location))
+        (not (mps-is-visited (name ?next-machine-location)))
+
 	=>
-        
         (retract ?tmp)
         (assert (goal (id DEMO-GOAL-SIMPLE) (class DEMO-GOAL-SIMPLE) (params target-pos ?next-machine-location robot robot1)))
+        (assert (mps-is-visited (name ?next-machine-location)))
         (assert (goal-already-tried))
 )
 
