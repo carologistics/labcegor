@@ -16,18 +16,19 @@ def generate_launch_description():
     cx_params_file = LaunchConfiguration('cx_params_file')
     log_level = LaunchConfiguration('log_level')
     model_file = LaunchConfiguration('model_file')
+    dummy_skiller_file = LaunchConfiguration('dummy_skiller_file')
 
     clips_executive_params_file = LaunchConfiguration(
         'clips_executive_params_file')
 
-    lc_nodes = ["clips_features_manager", "clips_executive"]
+    lc_nodes = ["clips_features_manager", "clips_executive", "domain_expert", "problem_expert", "planner"]
 
     stdout_linebuf_envvar = SetEnvironmentVariable(
         'RCUTILS_CONSOLE_STDOUT_LINE_BUFFERED', '1')
 
     declare_model_file_cmd = DeclareLaunchArgument(
         'model_file',
-        default_value=os.path.join(labcegor_dir + "/simple-agent/domain.pddl"),
+        default_value=os.path.join(labcegor_dir + "/clips/labcegor-agent/simple_moving_domain.pddl"),
         description='PDDL Model file')
 
     declare_log_level_ = DeclareLaunchArgument(
@@ -45,6 +46,12 @@ def generate_launch_description():
         'clips_executive_params_file',
         default_value=os.path.join(
             labcegor_dir, 'params', 'clips_executive.yaml'),
+        description='Path to Clips Executive params file')
+
+    declare_dummy_skiller_file = DeclareLaunchArgument(
+        'dummy_skiller_file',
+        default_value=os.path.join(
+            bringup_dir, 'params', 'dummy_skiller.yaml'),
         description='Path to Clips Executive params file')
 
     cx_node = Node(
@@ -81,7 +88,25 @@ def generate_launch_description():
         name='robot1_skills_node',
         output='screen',
         emulate_tty=True,
-        parameters=[{"robot_id": "robot1"}]
+        parameters=[{"robot_id": "robot1"}, dummy_skiller_file]
+    )
+
+    robot2_dummy_node = Node(
+        package='cx_example_skill_nodes',
+        executable='dummy_skill_node',
+        name='robot2_skills_node',
+        output='screen',
+        emulate_tty=True,
+        parameters=[{"robot_id": "robot2"}, dummy_skiller_file]
+    )
+
+    robot3_dummy_node = Node(
+        package='cx_example_skill_nodes',
+        executable='dummy_skill_node',
+        name='robot3_skills_node',
+        output='screen',
+        emulate_tty=True,
+        parameters=[{"robot_id": "robot3"}, dummy_skiller_file]
     )
 
     cx_lifecycle_manager = Node(
@@ -92,7 +117,17 @@ def generate_launch_description():
         emulate_tty=True,
         parameters=[{"node_names_to_manage": lc_nodes}]
     )
-
+    
+    plansys2_node_cmd = Node(
+        package='cx_bringup',
+        executable='plansys_node',
+        output='screen',
+        parameters=[
+            {
+                'model_file': model_file,
+            },
+            cx_params_file
+        ])
     # The lauchdescription to populate with defined CMDS
     ld = LaunchDescription()
 
@@ -101,11 +136,12 @@ def generate_launch_description():
 
     ld.add_action(declare_cx_params_file)
     ld.add_action(declare_clips_executive_params_file)
+    ld.add_action(declare_dummy_skiller_file)
     ld.add_action(declare_model_file_cmd)
 
     ld.add_action(robot1_dummy_node)
     ld.add_action(cx_node)
     ld.add_action(cx_lifecycle_manager)
-    ld.add_action(refbox_node)
-
+    #ld.add_action(refbox_node)
+    ld.add_action(plansys2_node_cmd)
     return ld

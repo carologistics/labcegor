@@ -1,0 +1,18 @@
+robot1_skill_node:
+  ros__parameters:
+    exec_times:
+      gowait:
+        time: 3.0
+
+robot2_skill_node:
+  ros__parameters:
+    exec_times:
+      gowait:
+        time: 3.0
+
+
+robot3_skill_node:
+  ros__parameters:
+    exec_times:
+      gowait:
+        time: 3.0

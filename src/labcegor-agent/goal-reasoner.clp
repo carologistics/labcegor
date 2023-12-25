@@ -33,7 +33,7 @@
 	; (assert (goal (id DEMO-GOAL) (class DEMO-GOAL) (params target-pos M-Z43 robot robot1)))
 	
 	; FIXME: simple-goal-reasoner
-	(assert (goal (id DEMO-GOAL-SIMPLE) (class DEMO-GOAL-SIMPLE) (params target-pos pos-1-1 robot robot1)))
+	(assert (goal (id VISITALL1) (class VISITALL) (params)))
         
 	; This is just to make sure we formulate the goal only once.
 	; In an actual domain this would be more sophisticated.
@@ -47,7 +47,7 @@
 (defrule goal-reasoner-select
 	?g <- (goal (id ?goal-id) (mode FORMULATED))
 	; (not (goal (id DEMO-GOAL) (mode ~FORMULATED)))
-	(not (goal (id DEMO-GOAL-SIMPLE) (mode ~FORMULATED)))
+	(not (goal (id VISITALL1) (mode ~FORMULATED)))
 	=>
 	(modify ?g (mode SELECTED))
 	(assert (goal-meta (goal-id ?goal-id)))
@@ -63,6 +63,11 @@
 ;	(modify ?g (mode EXPANDED))
 ;)
 
+(defrule goal-reasoner-expand
+	?g <- (goal (id VISITALL1) (mode SELECTED))
+        =>
+        (pddl-request-plan VISITALL1 "(and (visited LOC1))")
+)
 
 (defrule goal-reasoner-commit
 	?g <- (goal (mode EXPANDED))
