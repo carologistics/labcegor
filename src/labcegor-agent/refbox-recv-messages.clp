@@ -121,9 +121,9 @@
               (and  (wm-key-prefix ?wm-fact:key (create$ domain fact mps-state))
                     (eq ?m-name (wm-key-arg ?wm-fact:key m)))))
       then
-      (if (eq ?team-color ?m-team) then
-        (assert (wm-fact (key domain fact mps-state args? m ?m-name s ?m-state) (type BOOL) (value TRUE) ))
-      )
+      ;(if (eq ?team-color ?m-team) then
+      ;  (assert (wm-fact (key domain fact mps-state args? m ?m-name s ?m-state) (type BOOL) (value TRUE) ))
+      ;)
     ; set available rings for ring-stations
       (if (eq ?m-type RS) then
         (progn$ (?rc (pb-field-list ?m "ring_colors"))

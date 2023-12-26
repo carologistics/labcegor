@@ -33,14 +33,13 @@
 	(not (goal))
 	(not (goal-already-tried))
 	(domain-facts-loaded)
-        ?tmp <- (wm-fact (key domain object mps-location) (name ?next-machine-location))
-        (not (mps-is-visited (name ?next-machine-location)))
-
+        ?tmp <- (wm-fact (key domain fact mps-location args? loc ?next-machine-location))
+        (not (wm-fact (key domain fact visited args? r robot1 loc ?next-machine-location)))
 	=>
         (retract ?tmp)
         (assert (goal (id DEMO-GOAL-SIMPLE) (class DEMO-GOAL-SIMPLE) (params target-pos ?next-machine-location robot robot1)))
-        (assert (mps-is-visited (name ?next-machine-location)))
         (assert (goal-already-tried))
+        (assert (wm-fact (key domain fact visited args? r robot1 loc ?next-machine-location)))
 )
 
 
