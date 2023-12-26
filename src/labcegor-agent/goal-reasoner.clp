@@ -35,11 +35,18 @@
 	(domain-facts-loaded)
         ?tmp <- (wm-fact (key domain fact mps-location args? loc ?next-machine-location))
         (not (wm-fact (key domain fact visited args? r robot1 loc ?next-machine-location)))
+        (not (wm-fact (key domain fact visited args? r robot2 loc ?next-machine-location)))
+        (not (wm-fact (key domain fact visited args? r robot3 loc ?next-machine-location)))
 	=>
         (retract ?tmp)
-        (assert (goal (id DEMO-GOAL-SIMPLE) (class DEMO-GOAL-SIMPLE) (params target-pos ?next-machine-location robot robot1)))
+        ;(assert (goal (id DEMO-GOAL-SIMPLE) (class DEMO-GOAL-SIMPLE) (params target-pos ?next-machine-location robot robot1)))
+        (assert (goal (id DEMO-GOAL-SIMPLE-robot1) (class DEMO-GOAL-SIMPLE-robot1) (params target-pos ?next-machine-location robot robot1)))
+        (assert (goal (id DEMO-GOAL-SIMPLE-robot2) (class DEMO-GOAL-SIMPLE-robot2) (params target-pos ?next-machine-location robot robot2)))
+        (assert (goal (id DEMO-GOAL-SIMPLE-robot3) (class DEMO-GOAL-SIMPLE-robot3) (params target-pos ?next-machine-location robot robot3)))
         (assert (goal-already-tried))
         (assert (wm-fact (key domain fact visited args? r robot1 loc ?next-machine-location)))
+        (assert (wm-fact (key domain fact visited args? r robot2 loc ?next-machine-location)))
+        (assert (wm-fact (key domain fact visited args? r robot3 loc ?next-machine-location)))
 )
 
 
