@@ -92,6 +92,17 @@ def generate_launch_description():
         emulate_tty=True,
         parameters=[{"node_names_to_manage": lc_nodes}]
     )
+    
+    plansys2_node_cmd = Node(
+        package='cx_bringup',
+        executable='plansys_node',
+        output='screen',
+        parameters=[
+            {
+                'model_file': model_file,
+            },
+            cx_params_file
+        ])
 
     # The lauchdescription to populate with defined CMDS
     ld = LaunchDescription()
@@ -107,5 +118,6 @@ def generate_launch_description():
     ld.add_action(cx_node)
     ld.add_action(cx_lifecycle_manager)
     #ld.add_action(refbox_node)
+    ld.add_action(plansys2_node_cmd)
 
     return ld
