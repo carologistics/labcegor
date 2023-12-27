@@ -26,10 +26,9 @@
         (assert (domain-object (name ?robot) (type robot)))
         (assert (domain-fact (name at) (param-values ?robot START)))
         (assert (wm-fact (key central agent robot args? r ?robot)))
-
         (assert (domain-fact (name visited) (param-values ?robot START)))
-        )
-
+     )
+    
     ; (do-for-all-facts ((?robot ?robot-value) (IN ?robot (create$ robot1 robot2 robot3)))
     ;     (assert (domain-fact (name at) (param-values ?robot start-pos)))
     ;     (bind ?*robot-name-list* (insert$ ?*robot-name-list* 1 ?robot))
