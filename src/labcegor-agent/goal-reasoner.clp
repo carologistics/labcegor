@@ -32,24 +32,21 @@
   (slot robot (type SYMBOL))
 )
 
+;(deffunction)
 (defrule goal-reasoner-create
 	(domain-loaded)
 	(not (goal))
 	;(not (goal-already-tried))
 	(domain-facts-loaded)
-        ?tmp <- (wm-fact (key domain fact mps-location args? loc ?next-machine-location))
-        (not (wm-fact (key domain fact visited args? loc ?next-machine-location)))
-        ; (domain-object (name ?robot) (type robot))
-        (wm-fact (key domain fact at args? r ?robot x ?loc))        
-        =>
-        (retract ?tmp)
-        ;(assert (goal (id DEMO-GOAL-SIMPLE) (class DEMO-GOAL-SIMPLE) (params target-pos ?next-machine-location robot robot1)))
-        (assert (goal (id DEMO-GOAL-SIMPLE-robot1) (class DEMO-GOAL-SIMPLE-robot1) (params target-pos ?next-machine-location robot ?robot)))
-        ;(assert (goal-already-tried))
-        (assert (wm-fact (key domain fact visited args? r ?robot loc ?next-machine-location)))
-        ; (assert (wm-fact (key domain fact at args? r ?robot ?next-machine-location)))
-        ;(assert (wm-fact (key domain fact visited args? r robot2 loc ?next-machine-location)))
-        ;(assert (wm-fact (key domain fact visited args? r robot3 loc ?next-machine-location)))
+    ?tmp <- (wm-fact (key domain fact mps-location args? loc ?next-machine-location))
+    (not (wm-fact (key domain fact visited args? loc ?next-machine-location)))
+    (wm-fact (key domain fact at args? r ?robot x ?loc))
+	;(not (wm-fact (key robot assign) (value ?robot)))
+    =>
+    (retract ?tmp)
+	(bind ?id (sym-cat DEMO-GOAL-SIMPLE- (gensym*)))  
+    (assert (goal (id ?id) (class DEMO-GOAL-SIMPLE-robot1) (params target-pos ?next-machine-location robot ?robot)))
+    (assert (wm-fact (key domain fact visited args? r ?robot loc ?next-machine-location)))
 )
 
 
@@ -57,12 +54,14 @@
 ; We can choose one or more goals for expansion, e.g., calling
 ; a planner to determine the required steps.
 (defrule goal-reasoner-select
-	?g <- (goal (id ?goal-id) (mode FORMULATED))
+	(wm-fact (key domain fact at args? r ?robot x ?loc))
+	?g <- (goal (id ?goal-id) (mode FORMULATED)(params target-pos ?target))
 	(not (goal (id DEMO-GOAL) (mode ~FORMULATED)))
 	; (not (goal (id DEMO-GOAL-SIMPLE) (mode ~FORMULATED)))
 	=>
 	(modify ?g (mode SELECTED))
-	(assert (goal-meta (goal-id ?goal-id)))
+	(assert (goal-meta (goal-id ?goal-id)(assigned-to ?robot)))
+	;(assert (wm-fact (key robot assign) (value ?robot)))
 )
 
 ; #  Commit to goal (we "intend" it)

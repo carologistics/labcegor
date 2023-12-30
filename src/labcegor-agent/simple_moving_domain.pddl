@@ -4,6 +4,7 @@
     location - object
     robot - object
     team-color - object
+    mps - object
     mps-side - object
     mps-typename - object
   )
