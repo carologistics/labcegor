@@ -4,6 +4,7 @@
     location - object
     robot - object
     team-color - object
+    mps - object
     mps-side - object
     mps-typename - object
   )
@@ -24,6 +25,7 @@
     (mps-team ?m - mps ?col - team-color)
     (mps-type ?m - mps ?t - mps-typename)
     (mps-location ?loc - location)
+    (robot-at-loc ?r - robot ?loc - location)
   )
 
   (:action move

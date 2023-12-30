@@ -23,33 +23,21 @@
 	?*GOAL-MAX-TRIES* = 2
 )
 
-
-;(deftemplate mps-is-visited
-;  (slot name (type SYMBOL))
-;)
-
-(deftemplate robot-move-lasttime
-  (slot robot (type SYMBOL))
-)
-
 (defrule goal-reasoner-create
 	(domain-loaded)
 	(not (goal))
-	;(not (goal-already-tried))
 	(domain-facts-loaded)
-        ?tmp <- (wm-fact (key domain fact mps-location args? loc ?next-machine-location))
-        (not (wm-fact (key domain fact visited args? loc ?next-machine-location)))
-        ; (domain-object (name ?robot) (type robot))
+        (wm-fact (key domain fact mps-location args? loc ?next-machine-location))
         (wm-fact (key domain fact at args? r ?robot x ?loc))        
+        (not (wm-fact (key domain fact visited args? r ?robot loc ?next-machine-location)))
+        (not (wm-fact (key robot assign) (value ?robot)))
+        (not (key domain fact at args? r ?other-robot ?loc ?next-machine-location)) ; if target position is free
+        ; (not (wm-fact (key domain fact robot-at-loc args? r ?other-robot loc ?next-machine-location))) ; if no other robot in this position
+        ; ?rl <- (wm-fact (key robot-at-loc args? r ?robot loc ?loc))
         =>
-        (retract ?tmp)
-        ;(assert (goal (id DEMO-GOAL-SIMPLE) (class DEMO-GOAL-SIMPLE) (params target-pos ?next-machine-location robot robot1)))
-        (assert (goal (id DEMO-GOAL-SIMPLE-robot1) (class DEMO-GOAL-SIMPLE-robot1) (params target-pos ?next-machine-location robot ?robot)))
-        ;(assert (goal-already-tried))
+        (assert (goal (id DEMO-GOAL-SIMPLE) (class DEMO-GOAL-SIMPLE) (params target-pos ?next-machine-location robot ?robot)))
         (assert (wm-fact (key domain fact visited args? r ?robot loc ?next-machine-location)))
-        ; (assert (wm-fact (key domain fact at args? r ?robot ?next-machine-location)))
-        ;(assert (wm-fact (key domain fact visited args? r robot2 loc ?next-machine-location)))
-        ;(assert (wm-fact (key domain fact visited args? r robot3 loc ?next-machine-location)))
+        ; (retract ?rl)
 )
 
 
@@ -57,12 +45,14 @@
 ; We can choose one or more goals for expansion, e.g., calling
 ; a planner to determine the required steps.
 (defrule goal-reasoner-select
-	?g <- (goal (id ?goal-id) (mode FORMULATED))
+	?g <- (goal (id ?goal-id) (mode FORMULATED) (params target-pos ?target robot ?robot))
 	(not (goal (id DEMO-GOAL) (mode ~FORMULATED)))
 	; (not (goal (id DEMO-GOAL-SIMPLE) (mode ~FORMULATED)))
 	=>
 	(modify ?g (mode SELECTED))
 	(assert (goal-meta (goal-id ?goal-id)))
+        (assert (wm-fact (key robot assign) (value ?robot)))
+        ; (assert (wm-fact (key domain fact robot-at-loc args? r ?robot loc ?target)))
 )
 
 ; #  Commit to goal (we "intend" it)
@@ -113,9 +103,9 @@
 
 ; #  Goal Monitoring
 (defrule goal-reasoner-completed
-	?g <- (goal (id ?goal-id) (mode FINISHED) (outcome COMPLETED))
+	?g <- (goal (id ?goal-id) (mode FINISHED) (outcome COMPLETED) (params target-pos ?target robot ?robot))
 	?gm <- (goal-meta (goal-id ?goal-id))
-	;?rb <- (wm-fact (key robot-is-busy) (value ?robot))
+        ?ra <- (wm-fact (key robot assign) (value ?robot))
         =>
 	(printout t "Goal '" ?goal-id "' has been completed, cleaning up" crlf)
 	(delayed-do-for-all-facts ((?p plan)) (eq ?p:goal-id ?goal-id)
@@ -124,8 +114,8 @@
 		)
 		(retract ?p)
 	)
-	; (retract ?g ?gm ?rb)
-	(retract ?g ?gm)
+	(retract ?g ?gm ?ra)
+        ; (printout t "robot: " ?robot "is at position: " ?target crlf)
 )
 
 (defrule goal-reasoner-failed

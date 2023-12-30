@@ -27,6 +27,7 @@
         (assert (domain-fact (name at) (param-values ?robot START)))
         (assert (wm-fact (key central agent robot args? r ?robot)))
         (assert (domain-fact (name visited) (param-values ?robot START)))
+        (assert (domain-fact (name robot-at-loc) (param-values ?robot START)))
      )
     
     ; (do-for-all-facts ((?robot ?robot-value) (IN ?robot (create$ robot1 robot2 robot3)))
@@ -70,6 +71,13 @@
         (assert (domain-fact (name mps-location) (param-values ?mps-side)))
       )
     )
+
+    ;(do-for-all-facts ((?wm-fact wm-fact))
+    ;  (wm-key-prefix ?wm-fact:key (create$ domain fact mps-side-free)
+    ;  )
+    ;  (printout t "mps side free: " ?wm-fact crlf)
+
+    ;)
 
     (assert (domain-fact (name mps-team) (param-values ?bs ?team-color))
             (domain-fact (name mps-team) (param-values ?ds ?team-color))
