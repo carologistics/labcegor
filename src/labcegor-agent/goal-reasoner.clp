@@ -66,7 +66,7 @@
 (defrule goal-reasoner-expand
 	?g <- (goal (id VISITALL1) (mode SELECTED))
         =>
-        (pddl-request-plan VISITALL1 "visited LOC1")
+        (pddl-request-plan VISITALL1 "(and (visited LOC1))")
 )
 
 (defrule goal-reasoner-commit

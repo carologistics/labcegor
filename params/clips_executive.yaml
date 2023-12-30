@@ -40,7 +40,7 @@ clips_executive:
           - core/worldmodel.clp
           - core/wm-domain-sync.clp
           - core/pddl.clp
-          - core/pddl-init.clp
+          #- core/pddl-init.clp
       - name: domain
         file: labcegor-agent/domain2.clp
         #file: labcegor-agent/simple_moving_domain.clp

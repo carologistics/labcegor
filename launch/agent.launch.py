@@ -27,7 +27,7 @@ def generate_launch_description():
 
     declare_model_file_cmd = DeclareLaunchArgument(
         'model_file',
-        default_value=os.path.join(labcegor_dir + "/simple-agent/domain.pddl"),
+        default_value=os.path.join(labcegor_dir + "/clips/labcegor-agent/simple_moving_domain.pddl"),
         description='PDDL Model file')
 
     declare_log_level_ = DeclareLaunchArgument(
@@ -93,16 +93,6 @@ def generate_launch_description():
         parameters=[{"node_names_to_manage": lc_nodes}]
     )
     
-    plansys2_node_cmd = Node(
-        package='cx_bringup',
-        executable='plansys_node',
-        output='screen',
-        parameters=[
-            {
-                'model_file': model_file,
-            },
-            cx_params_file
-        ])
 
     # The lauchdescription to populate with defined CMDS
     ld = LaunchDescription()
@@ -118,6 +108,5 @@ def generate_launch_description():
     ld.add_action(cx_node)
     ld.add_action(cx_lifecycle_manager)
     #ld.add_action(refbox_node)
-    ld.add_action(plansys2_node_cmd)
 
     return ld
