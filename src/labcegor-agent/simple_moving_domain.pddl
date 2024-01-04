@@ -19,7 +19,7 @@
 
   (:predicates
     (at ?r - robot ?x - location)
-    (visited ?r - robot ?loc - location)
+    (visited ?loc - location)
     (mps-side-free ?m - mps ?side - mps-side)
     (mps-side-approachable ?m - location ?side - mps-side)
     (mps-team ?m - mps ?col - team-color)

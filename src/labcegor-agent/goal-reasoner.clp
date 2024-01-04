@@ -23,21 +23,33 @@
 	?*GOAL-MAX-TRIES* = 2
 )
 
+(defrule random_select
+  ?temp <- (wm-fact (key all robot) (values $?robot-list))
+  =>
+  (bind ?list-len (length $?robot-list))
+  (bind ?robot (nth$ (random 1 ?list-len) $?robot-list))
+  (assert (wm-fact (key robot) (values ?robot))) ;
+  (retract ?temp)
+
+)
+
+
 (defrule goal-reasoner-create
 	(domain-loaded)
 	(not (goal))
 	(domain-facts-loaded)
-        (wm-fact (key domain fact mps-location args? loc ?next-machine-location))
-        (wm-fact (key domain fact at args? r ?robot x ?loc))        
-        (not (wm-fact (key domain fact visited args? r ?robot loc ?next-machine-location)))
-        (not (wm-fact (key robot assign) (value ?robot)))
-        (not (key domain fact at args? r ?other-robot ?loc ?next-machine-location)) ; if target position is free
-        ; (not (wm-fact (key domain fact robot-at-loc args? r ?other-robot loc ?next-machine-location))) ; if no other robot in this position
-        ; ?rl <- (wm-fact (key robot-at-loc args? r ?robot loc ?loc))
-        =>
-        (assert (goal (id DEMO-GOAL-SIMPLE) (class DEMO-GOAL-SIMPLE) (params target-pos ?next-machine-location robot ?robot)))
-        (assert (wm-fact (key domain fact visited args? r ?robot loc ?next-machine-location)))
-        ; (retract ?rl)
+	(wm-fact (key domain fact mps-location args? loc ?next-machine-location))
+	;(wm-fact (key domain fact at args? r ?robot x ?loc))
+	?tmp <- (wm-fact (key robot) (values ?robot))
+	(not (wm-fact (key domain fact visited args? loc ?next-machine-location)))
+	(not (wm-fact (key robot assign) (value ?robot)))
+	(not (key domain fact at args? r ?other-robot ?loc ?next-machine-location)) ; if target position is free
+	; (not (wm-fact (key domain fact robot-at-loc args? r ?other-robot loc ?next-machine-location))) ; if no other robot in this position
+	; ?rl <- (wm-fact (key robot-at-loc args? r ?robot loc ?loc))
+	=>
+	(assert (goal (id DEMO-GOAL-SIMPLE) (class DEMO-GOAL-SIMPLE) (params target-pos ?next-machine-location robot ?robot)))
+	(assert (wm-fact (key domain fact visited args? loc ?next-machine-location)))
+	(retract ?tmp)	
 )
 
 
@@ -51,8 +63,8 @@
 	=>
 	(modify ?g (mode SELECTED))
 	(assert (goal-meta (goal-id ?goal-id)))
-        (assert (wm-fact (key robot assign) (value ?robot)))
-        ; (assert (wm-fact (key domain fact robot-at-loc args? r ?robot loc ?target)))
+    (assert (wm-fact (key robot assign) (value ?robot)))
+    ;(assert (wm-fact (key domain fact robot-at-loc args? r ?robot loc ?target)))
 )
 
 ; #  Commit to goal (we "intend" it)
@@ -115,7 +127,7 @@
 		(retract ?p)
 	)
 	(retract ?g ?gm ?ra)
-        ; (printout t "robot: " ?robot "is at position: " ?target crlf)
+    (assert (wm-fact (key all robot) (values robot1 robot2 robot3)))
 )
 
 (defrule goal-reasoner-failed
