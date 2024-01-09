@@ -15,7 +15,7 @@
 
 (defrule domain-load-initial-facts
     (domain-loaded)
-    ?r_phase2 <- (wm-fact (id "/refbox/phase") (value PRODUCTION))
+    ?r_phase2 <- (wm-fact (id "/refbox/phase") (value SETUP))
     ?r_state2 <- (wm-fact (key refbox state) (value $?))
     (not (domain-init))
     =>

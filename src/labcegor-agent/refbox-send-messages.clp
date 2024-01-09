@@ -69,24 +69,22 @@
 
 
 (defrule action-send-beacon-signal
-  (time $?now)
+  (time ?now)
 
-  (not (wm-fact (id "/simulator/comm/peer-id/public")))
   ?bs <- (wm-fact (key refbox beacon seq) (value ?seq))
   (wm-fact (key central agent robot args? r ?robot))
   (wm-fact (key refbox robot task seq args? r ?robot) (value ?task-seq))
   (wm-fact (key config agent team)  (value ?team-name))
   ?r-peer <- (refbox-peer (name refbox-public) (peer-id ?peer-id))
-  (wm-fact (key refbox phase) (value SETUP))
+  (wm-fact (key refbox phase) (value SETUP|PRODUCTION))
+  ?tf <- (timer (name refbox-beacon) (time ?t&:(> (- ?now ?t) 1)) (seq ?seq))
   =>
-  (printout t "in the setup phase, sending beacon signal ......" crlf)
-  (retract ?r-peer)
   (bind ?bs (modify ?bs (value (+ ?seq 1))))
 
   (bind ?beacon (pb-create "llsf_msgs.BeaconSignal"))
   (bind ?beacon-time (pb-field-value ?beacon "time"))
-  (pb-set-field ?beacon-time "sec" ?now)
-  (pb-set-field ?beacon-time "nsec" ?now) ; ......
+  (pb-set-field ?beacon-time "sec" (integer ?now))
+  (pb-set-field ?beacon-time "nsec" (integer (mod (* ?now 1000000) 1000000)))
   (pb-set-field ?beacon "time" ?beacon-time) ; destroys ?beacon-time!
   (pb-set-field ?beacon "peer_name" ?robot)
   (bind ?name-length (str-length (str-cat ?robot)))
@@ -94,8 +92,11 @@
   (pb-set-field ?beacon "number" ?robot-number)
   (pb-set-field ?beacon "team_name" ?team-name)
 
+  (pb-set-field ?beacon "team_color" CYAN)
+
   (pb-set-field ?beacon "seq" ?seq)
   (pb-broadcast ?peer-id ?beacon)
   (pb-destroy ?beacon)
+  (modify ?tf (time ?now) (seq (+ ?seq 1)))
 )
 
