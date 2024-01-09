@@ -2,25 +2,22 @@
 
 (defrule load-domain
     (not (domain-loaded))
-    ; ?r_phase <- (refbox-phase (value SETUP))
-    ?r_phase <- (wm-fact (id "/refbox/phase") (value $?))
-    ?r_state <- (wm-fact (id "/refbox/state") (value $?))
+    (wm-fact (id "/refbox/phase") (value $?))
+    (wm-fact (id "/refbox/state") (value $?))
   => 
     (parse-pddl-domain (path-resolve "labcegor-agent/simple_moving_domain.pddl"))
     (assert (domain-loaded))
-    (retract ?r_state ?r_phase)
     (printout t "successfully load domain" crlf)
 )
 
 
 (defrule domain-load-initial-facts
     (domain-loaded)
-    ?r_phase2 <- (wm-fact (id "/refbox/phase") (value SETUP))
-    ?r_state2 <- (wm-fact (key refbox state) (value $?))
+    (wm-fact (id "/refbox/phase") (value SETUP))
+    (wm-fact (key refbox state) (value $?))
     (not (domain-init))
     =>
     (printout t "in the production phase, start initializing domain facts ..." crlf)
-    (retract ?r_phase2 ?r_state2)
 
     (foreach ?robot (create$ robot1 robot2 robot3)
         (assert (domain-object (name ?robot) (type robot)))
@@ -105,4 +102,5 @@
             (domain-facts-loaded)
             (domain-init)
     )
+    (printout t "initialization complete." crlf)
 )

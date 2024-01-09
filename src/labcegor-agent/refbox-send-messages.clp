@@ -78,6 +78,7 @@
   ?r-peer <- (refbox-peer (name refbox-public) (peer-id ?peer-id))
   (wm-fact (key refbox phase) (value SETUP|PRODUCTION))
   ?tf <- (timer (name refbox-beacon) (time ?t&:(> (- ?now ?t) 1)) (seq ?seq))
+  (wm-fact (id "/refbox/team-color") (value ?team-color&:(neq ?team-color nil)))
   =>
   (bind ?bs (modify ?bs (value (+ ?seq 1))))
 
@@ -91,12 +92,11 @@
   (bind ?robot-number (string-to-field (sub-string ?name-length ?name-length (str-cat ?robot))))
   (pb-set-field ?beacon "number" ?robot-number)
   (pb-set-field ?beacon "team_name" ?team-name)
-
-  (pb-set-field ?beacon "team_color" CYAN)
-
+  
+  (pb-set-field ?beacon "team_color" ?team-color)
+  
   (pb-set-field ?beacon "seq" ?seq)
   (pb-broadcast ?peer-id ?beacon)
   (pb-destroy ?beacon)
-  (modify ?tf (time ?now) (seq (+ ?seq 1)))
 )
 

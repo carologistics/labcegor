@@ -35,6 +35,7 @@
 
 
 (defrule goal-reasoner-create
+        (wm-fact (id "/refbox/phase") (value PRODUCTION))
 	(domain-loaded)
 	(not (goal))
 	(domain-facts-loaded)

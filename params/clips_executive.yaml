@@ -74,7 +74,7 @@ clips_executive:
         peer-address: 172.26.255.255
         peer-recv-port: 4444
         peer-send-port: 4455
-        cyan-recv-port: 4441
+        cyan-recv-port: 4451
         magenta-recv-port: 4442
         cyan-send-port: 4456
         magenta-send-port: 4447

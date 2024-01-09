@@ -1,12 +1,4 @@
 ;;; last modify Dec18 2023, by cyuan
-;;; assert fact rather than use wm-fact, but not work in game-state switching, and need to additionally move recv information part in front of domain load in clips_executive.yaml
-;(deftemplate refbox-machine-info
-;  (slot name (type SYMBOL))
-;  (slot team (type SYMBOL))
-;  (slot type (type SYMBOL))
-;  (slot state (type SYMBOL))
-;)
-
 
 (defrule refbox-recv-BeaconSignal
   ?pf <- (protobuf-msg (type "llsf_msgs.BeaconSignal") (ptr ?p))
@@ -21,16 +13,11 @@
   (executive-init)
   (time $?now)
   ; (not (refbox-phase (value ?old_phase)))
-  (not (wm-fact (id "/refbox/phase")))
-  ; (not (wm-fact (id "/refbox/state"))) 
-  
-  ; (not (refbox-state (value ?new_state)))
-  ; (not (wm-fact (key refbox state) (value ?old-state))) 
+  ; (not (wm-fact (id "/refbox/phase")))
+  (not (wm-fact (id "/refbox/team-color")))
   =>
   (assert
-    ; (refbox-phase (value PRE_GAME))
-    ; (refbox-state (value WAIT_START))
-    ; (game-state (value WAIT_START))
+    (wm-fact (id "/refbox/team-color") )
     (wm-fact (id "/refbox/phase")  (value PRE_GAME) )
     (wm-fact (id "/refbox/state")  (value WAIT_START) )
     (wm-fact (id "/game/state")  (value WAIT_START) )
@@ -40,63 +27,44 @@
 
 (defrule refbox-recv-GameState
   ?pf <- (protobuf-msg (type "llsf_msgs.GameState") (ptr ?p) (rcvd-from ?host ?port))
-  ; ?rp <- (refbox-phase (value ?phase))
-  ; ?rs <- (refbox-state (value ?state))
   ?rp <- (wm-fact (id "/refbox/phase")  (value ?phase) )
   ?rs <- (wm-fact (id "/refbox/state")  (value ?state) )
+  ?tc <- (wm-fact (id "/refbox/team-color")  (value ?team-color))
+  (wm-fact (key config agent team)  (value ?team-name) )
   =>
   (retract ?pf)
 
+  ; for debug
+  ;(bind ?team-name "Carologistics")
+  ;(bind ?team-color CYAN)
+  
   (bind ?new-state (pb-field-value ?p "state"))
   (bind ?new-phase (pb-field-value ?p "phase"))
+  (bind ?new-team-color ?team-color)
+
+  (if (and (pb-has-field ?p "team_cyan")
+           (eq (pb-field-value ?p "team_cyan") ?team-name))
+    then (bind ?new-team-color CYAN))
+  (if (and (pb-has-field ?p "team_magenta")
+           (eq (pb-field-value ?p "team_magenta") ?team-name))
+    then (bind ?new-team-color MAGENTA))
+
+  (if (neq ?new-team-color ?team-color) then
+    (printout warn "Switching team color from " ?team-color " to " ?new-team-color crlf)
+    (retract ?tc)
+    (assert (wm-fact (id "/refbox/team-color") (value ?new-team-color)))
+  )
+
   (if (neq ?phase ?new-phase) then
     (retract ?rp)
-    ; (assert (refbox-phase (value ?new-phase)))
     (assert  (wm-fact (id "/refbox/phase")  (value ?new-phase) ))
   )
   (if (neq ?state ?new-state) then
     (retract ?rs)
-    ; (assert (refbox-state (value ?new-state)))
     (assert  (wm-fact (id "/refbox/state")  (value ?new-state) ))
   )
   (bind ?time (pb-field-value ?p "game_time"))
 )
-
-
-;; how to use ?
-;(defrule refbox-recv-RobotInfo
-;  ?pf <- (protobuf-msg (type "llsf_msgs.RobotInfo") (ptr ?r))
-;  =>
-;  (foreach ?p (pb-field-list ?r "robots")
-;    (bind ?state (sym-cat (pb-field-value ?p "state")))
-;    (bind ?robot (sym-cat (pb-field-value ?p "name")))
-;    (bind ?old-state nil)
-;    (do-for-fact ((?wm wm-fact)) (wm-key-prefix ?wm:key (create$ monitoring state args? r ?robot))
-;      (bind ?old-state ?wm:value)
-;      (retract ?wm)
-;    )
-;    (assert (wm-fact (key monitoring state args? r ?robot) (is-list FALSE) (type SYMBOL) (value ?state)))
-;    (if (and (eq ?old-state MAINTENANCE)
-;             (eq ?state ACTIVE))
-;     then
-;      (assert (wm-fact (key central agent robot-waiting args? r ?robot)))
-;    )
-;    (if (and (eq ?old-state ACTIVE)
-;             (neq ?state ACTIVE))
-;     then
-;      (assert (reset-robot-in-wm ?robot))
-;    )
-;  )
-;)
-
-
-;(defrule refbox-recv-demo
-;  ?pb-msg <- (protobuf-msg (type "llsf_msgs.MachineInfo") (ptr ?p))
-;  =>
-;  (printout t "success" crlf)
-;)
-  
-
 
 ; receive machine information, how to use that ?
 (defrule refbox-recv-MachineInfo
