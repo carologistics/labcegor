@@ -66,7 +66,6 @@
   "Enable local peer connection to the encrypted team channel"
   (executive-init)
   ; (team-color ?team-color)
-  ; (wm-fact (id "/refbox/team-color") (value ?team-color))
   (wm-fact (id "/refbox/team-color") (value ?team-color&:(neq ?team-color nil)))
   (refbox-peer (name refbox-public))
   (confval (path "/clips_executive/parameters/rcll/peer-address") (value ?address))
@@ -89,8 +88,8 @@
 (defrule refbox-comm-enable-team-private
   "Enable local peer connection to the encrypted team channel"
   (executive-init)
-  (team-color ?team-color)
-  ; (wm-fact (id "/refbox/team-color") (value ?team-color&:(neq ?team-color nil)))
+  ; (team-color ?team-color)
+  (wm-fact (id "/refbox/team-color") (value ?team-color&:(neq ?team-color nil)))
   (refbox-peer (name refbox-public))
   (confval (path "/clips_executive/parameters/rcll/peer-address") (value ?address))
   (confval (path "/clips_executive/parameters/rcll/crypto-key") (value ?key))
