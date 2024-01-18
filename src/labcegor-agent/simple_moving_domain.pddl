@@ -7,6 +7,9 @@
     mps - object
     mps-side - object
     mps-typename - object
+    base-color - object
+    ring-color - object
+    cap-color - object
   )
 
   (:constants
@@ -15,6 +18,7 @@
     LOC2 - location
     INPUT OUTPUT WAIT - mps-side
     BS CS DS RS SS - mps-typename
+    C0 C1 C2 C3 - complexity
   )
 
   (:predicates
@@ -26,6 +30,8 @@
     (mps-type ?m - mps ?t - mps-typename)
     (mps-location ?loc - location)
     (robot-at-loc ?r - robot ?loc - location)
+    (robot-grip-free ?r - robot)
+    (robot-grip-busy ?r - robot)
   )
 
   (:action move
@@ -33,4 +39,17 @@
     :precondition (and (at ?r ?from))
     :effect (and (not (at ?r ?from)) (at ?r ?to))
   )
+
+  (:action pick
+    :parameters (?r - robot)
+    :precondition (and (robot-grip-free ?r))
+    :effect (and (not (robot-grip-free ?r)) (robot-grip-busy ?r))
+  )
+
+  (:action place
+    :parameters (?r - robot)
+    :precondition (and (robot-grip-busy ?r))
+    :effect (and (not (robot-grip-busy ?r)) (robot-grip-free ?r))
+  )
+
 )
