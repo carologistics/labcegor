@@ -3,28 +3,53 @@
   (:types
     location - object
     robot - object
+    team-color - object
+    mps - object
+    mps-side - object
+    mps-typename - object
+    base-color - object
+    ring-color - object
+    cap-color - object
   )
 
   (:constants
-    start-pos - location 
-    pos-1-2 - location
-    pos-1-3 - location
-    pos-2-1 - location
-    pos-2-2 - location
-    pos-2-3 - location
-    pos-3-1 - location
-    pos-3-2 - location
-    pos-3-3 - location
+    START - location
+    LOC1 - location
+    LOC2 - location
+    INPUT OUTPUT WAIT - mps-side
+    BS CS DS RS SS - mps-typename
+    C0 C1 C2 C3 - complexity
   )
 
   (:predicates
     (at ?r - robot ?x - location)
-    (connected ?x - location ?y - location)
+    (visited ?loc - location)
+    (mps-side-free ?m - mps ?side - mps-side)
+    (mps-side-approachable ?m - location ?side - mps-side)
+    (mps-team ?m - mps ?col - team-color)
+    (mps-type ?m - mps ?t - mps-typename)
+    (mps-location ?loc - location)
+    (robot-at-loc ?r - robot ?loc - location)
+    (robot-grip-free ?r - robot)
+    (robot-grip-busy ?r - robot)
   )
 
   (:action move
     :parameters (?from - location ?to - location ?r - robot)
-    :precondition (and (at ?r ?from) (connected ?from ?to))
+    :precondition (and (at ?r ?from))
     :effect (and (not (at ?r ?from)) (at ?r ?to))
   )
+
+  (:action pick
+    :parameters (?r - robot)
+    :precondition (and (robot-grip-free ?r))
+    :effect (and (not (robot-grip-free ?r)) (robot-grip-busy ?r))
+  )
+
+  (:action place
+    :parameters (?r - robot)
+    :precondition (and (robot-grip-busy ?r))
+    :effect (and (not (robot-grip-busy ?r)) (robot-grip-free ?r))
+  )
+
 )

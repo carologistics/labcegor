@@ -22,7 +22,7 @@
 ; TODO: how to continuously move?
  
 (defrule goal-expander-demo-goal
-	?g <- (goal (id ?goal-id) (class DEMO-GOAL-SIMPLE) (mode SELECTED) (parent ?parent)
+	?g <- (goal (id ?goal-id) (class ?class) (mode SELECTED) (parent ?parent)
 	            (params target-pos ?zone robot ?robot))
 
 	(wm-fact (key domain fact at args? r ?robot x ?curr-loc))

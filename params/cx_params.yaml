@@ -21,6 +21,6 @@ clips_features_manager:
         feature_parameters: ["protobuf_path"]
         protobuf_path:
           # This path assumes relativeness to the workspace
-          value: "src/labcegor/proto"
+          value: "proto"
           type: "string"
 
