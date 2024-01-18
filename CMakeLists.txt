@@ -21,6 +21,7 @@ endif()
 
 install(FILES launch/refbox.py DESTINATION lib/${PROJECT_NAME})
 install(DIRECTORY launch params DESTINATION share/${PROJECT_NAME})
+install(DIRECTORY proto DESTINATION share/${PROJECT_NAME})
 install(DIRECTORY src/labcegor-agent DESTINATION share/${PROJECT_NAME}/clips)
 
 ament_export_dependencies(${dependencies})
