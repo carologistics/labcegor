@@ -33,3 +33,56 @@
 	)
 	(modify ?g (mode EXPANDED))
 )
+
+
+(defrule goal-expander-FILL-CAP
+  ?g <- (goal (id ?goal-id) (class FILL-CAP) (mode SELECTED) (params ))
+  =>
+  ; get cap from CS shelf side, move, and put to CS input side
+)
+
+
+
+(defrule goal-expander-CLEAR-MPS ; payment
+  ?g <- (goal (id ?goal-id) (class CLEAR-MPS))
+  =>
+  ; robot picks up the wp from CS output side, move to RS, and put in slide(input) RS
+
+)
+
+
+
+;(defrule goal-expander-BSOUT
+;  ?g <- (goal (id ?goal-id) (class BSOUT))
+;
+;  =>
+;  ; robot picks up the wp from BS output side
+;
+;)
+
+
+
+(defrule goal-expander-GET-BASE-TO-RS
+  ?g <- (goal (id ?goal-id) (class GET-BASE-TO-RS))
+
+  =>
+  ; take the base from BS, move to RS, 
+
+)
+
+
+
+
+
+; 
+
+(defrule goal-expander-FILL-RS
+  ?g <- (goal (id ?goal-id) (class FILL-RS))
+  =>
+  ; robot puts wp into RS input side, 
+
+)
+
+
+
+

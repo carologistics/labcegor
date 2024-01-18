@@ -34,6 +34,11 @@
 )
 
 
+(deftemplate ring-spec
+  (slot color (type SYMBOL))
+  (slot cost (type INTEGER))
+)
+
 (defrule refbox-recv-BeaconSignal
   ?pf <- (protobuf-msg (type "llsf_msgs.BeaconSignal") (ptr ?p))
   (time $?now)
@@ -183,5 +188,18 @@
    (retract ?o1)
   )
   (retract ?pb-msg)
+)
+
+(defrule refbox-recv-RingInfo
+  ?pb-msg <- (protobuf-msg (type "llsf_msgs.RingInfo") (ptr ?p))
+  =>
+  (foreach ?r (pb-field-list ?p "rings")
+    (bind ?color (pb-field-value ?r "ring_color"))
+    (bind ?raw-material (pb-field-value ?r "raw_material"))
+    (assert (ring-spec (color ?color) (cost ?raw-material)))
+  )
+  (delayed-do-for-all-facts ((?rs1 ring-spec) (?rs2 ring-spec)) (and (< (fact-index ?rs1) (fact-index ?rs2)) (eq ?rs1:color ?rs2:color))
+   (retract ?rs1)
+  )
 )
 
