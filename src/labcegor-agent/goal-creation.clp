@@ -48,7 +48,7 @@
   (assert (goal (id (sym-cat CLEAR-MPS- (gensym*)))
                 (class CLEAR-MPS) (sub-type SIMPLE)
                 (priority ?prio)
-                (parent ?production-id)
+                (parent ?goal-id)
                 (params robot ?robot
                         mps ?mps
                         wp ?wp
@@ -94,6 +94,7 @@
   (wm-fact (key refbox team-color) (value ?team-color))
   
   (wm-fact (key domain fact self args? r ?robot))
+  (wm-fact (key domain fact wp-for args? wp ?wp r ?robot))
   (not (wm-fact (key domain fact holding args? r ?robot wp ?wp-h)))
 
   ;RS 
