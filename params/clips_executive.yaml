@@ -42,6 +42,16 @@ clips_executive:
       - name: domain
         # file: labcegor-agent/domain.clp
         file: labcegor-agent/simple_moving_domain.clp
+      - name: refbox-comm
+        file: labcegor-agent/refbox-comm-init.clp
+      - name: refbox-recv
+        file: labcegor-agent/refbox-recv-messages.clp
+      - name: refbox-send
+        file: labcegor-agent/refbox-send-messages.clp
+      - name: order-expansion
+        file: labcegor-agent/order-expansion.clp
+      - name: goal-creation
+        file: labcegor-agent/goal-creation.clp
       - name: goal-reasoner
         file: labcegor-agent/goal-reasoner.clp
       - name: fixed-sequence
@@ -51,13 +61,7 @@ clips_executive:
       - name: action-execution
         files:
           - labcegor-agent/print-action.clp
-      - name: refbox-comm
-        file: labcegor-agent/refbox-comm-init.clp
-      - name: refbox-recv
-        file: labcegor-agent/refbox-recv-messages.clp
-      - name: refbox-send
-        file: labcegor-agent/refbox-send-messages.clp
-      # Map plan actions to skill strings.
+     # Map plan actions to skill strings.
     action_mapping:
       gowait:
         mapped_to: say{text="hello world"}
@@ -65,6 +69,12 @@ clips_executive:
       move:
         mapped_to: say{text="hello world!"}
         executor: dummy_skiller
+      pick:
+        mapped_to: say{text='hello world!'}
+        executor: dummy_skiller
+      place:
+        mapped_to: say{text='hello world!'}
+        execuator: dummy_skiller
 
     parameters:
       simtest:
