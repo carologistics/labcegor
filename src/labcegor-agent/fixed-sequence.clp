@@ -19,7 +19,6 @@
 		(modify ?pa (id ?pa-index) (plan-id ?plan-id) (goal-id ?goal-id))
 	)
 )
-; TODO: how to continuously move?
  
 (defrule goal-expander-demo-goal
 	?g <- (goal (id ?goal-id) (class ?class) (mode SELECTED) (parent ?parent)
@@ -33,6 +32,33 @@
 	)
 	(modify ?g (mode EXPANDED))
 )
+
+
+(defrule goal-expander-first-bs-rs-run
+  ?g <- (goal (id ?goal-id) (mode SELECTED) (class bs-run-firstrun) (params robot ?robot
+                                                                              bs ?bs
+                                                                              bs-side ?bs-side
+                                                                              rs ?rs
+                                                                              rs-side ?rs-side
+                                                                              wp ?wp
+									      ring ?ring))
+  (wm-fact (key domain fact at args? r ?robot x ?curr-loc))
+  =>
+  (bind ?zone-bs-side (sym-cat ?bs ?bs-side))
+  (bind ?zone-rs-side (sym-cat ?rs INPUT))
+  (bind ?zone-rs-side2 (sym-cat ?rs OUTPUT))
+  (bind ?wp-added (sym-cat ?wp ?ring))
+  (plan-assert-sequential (sym-cat DEMO-GOAL-PLAN- (gensym*)) ?goal-id ?robot
+		(plan-assert-action move ?curr-loc ?zone-bs-side ?robot)
+                (plan-assert-action pick ?robot ?wp)
+                (plan-assert-action move ?zone-bs-side ?zone-rs-side ?robot)
+                (plan-assert-action place ?robot ?wp ?zone-rs-side)
+                (plan-assert-action move ?zone-rs-side ?zone-rs-side2 ?robot)
+  		(plan-assert-action pick ?robot ?wp-added)
+  )
+  (modify ?g (mode EXPANDED))
+)
+
 
 
 (defrule goal-expander-FILL-CAP

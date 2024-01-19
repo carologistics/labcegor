@@ -35,6 +35,7 @@
 
 
 (defrule goal-reasoner-create
+        (not (tmp_haltor)) ; for debug
         (wm-fact (id "/refbox/phase") (value PRODUCTION))
 	(domain-loaded)
 	(not (goal))
@@ -55,18 +56,32 @@
 
 
 ; #  Goal Selection
+(defrule goal-reasoner-select
+  ?g <- (goal (id ?goal-id) (mode FORMULATED) (class bs-run-firstrun) (params robot ?robot 
+									      bs ?bs
+									      bs-side ?bs-side
+									      rs ?rs
+									      rs-side ?rs-side
+									      wp ?wp
+    									      ring ?ring))
+  =>
+  (modify ?g (mode SELECTED))
+)
+
+
+
 ; We can choose one or more goals for expansion, e.g., calling
 ; a planner to determine the required steps.
-(defrule goal-reasoner-select
-	?g <- (goal (id ?goal-id) (mode FORMULATED) (params target-pos ?target robot ?robot))
-	(not (goal (id DEMO-GOAL) (mode ~FORMULATED)))
-	; (not (goal (id DEMO-GOAL-SIMPLE) (mode ~FORMULATED)))
-	=>
-	(modify ?g (mode SELECTED))
-	(assert (goal-meta (goal-id ?goal-id)))
-    (assert (wm-fact (key robot assign) (value ?robot)))
-    ;(assert (wm-fact (key domain fact robot-at-loc args? r ?robot loc ?target)))
-)
+;(defrule goal-reasoner-select
+;	?g <- (goal (id ?goal-id) (mode FORMULATED) (params target-pos ?target robot ?robot))
+;	(not (goal (id DEMO-GOAL) (mode ~FORMULATED)))
+;	; (not (goal (id DEMO-GOAL-SIMPLE) (mode ~FORMULATED)))
+;	=>
+;	(modify ?g (mode SELECTED))
+;	(assert (goal-meta (goal-id ?goal-id)))
+;    (assert (wm-fact (key robot assign) (value ?robot)))
+;    ;(assert (wm-fact (key domain fact robot-at-loc args? r ?robot loc ?target)))
+;)
 
 ; #  Commit to goal (we "intend" it)
 ; A goal might actually be expanded into multiple plans, e.g., by
@@ -96,8 +111,8 @@
 ; orders. It is then up to action selection and execution to determine
 ; what to do when.
 (defrule goal-reasoner-dispatch
-	?g <- (goal (mode COMMITTED) (params target-pos ?zone robot ?robot))
-
+	; ?g <- (goal (mode COMMITTED) (params target-pos ?zone robot ?robot))
+	?g <- (goal (mode COMMITTED) (class bs-run-firstrun))
         ;?rb <- (wm-fact (key robot-is-busy) (value ?robot))
 	=>
 	(modify ?g (mode DISPATCHED))
@@ -116,7 +131,8 @@
 
 ; #  Goal Monitoring
 (defrule goal-reasoner-completed
-	?g <- (goal (id ?goal-id) (mode FINISHED) (outcome COMPLETED) (params target-pos ?target robot ?robot))
+	?g <- (goal (id ?goal-id) (mode FINISHED) (outcome COMPLETED) (class bs-run-firstrun))
+	; ?g <- (goal (id ?goal-id) (mode FINISHED) (outcome COMPLETED) (params target-pos ?target robot ?robot))
 	?gm <- (goal-meta (goal-id ?goal-id))
         ?ra <- (wm-fact (key robot assign) (value ?robot))
         =>

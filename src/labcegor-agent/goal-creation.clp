@@ -1,6 +1,3 @@
-(deffunction is-machine-free()
-)
-
 (defrule goal-creation-prepare-cap
     "cap carrier from shelf -> input"
     ?g <- (goal (id ?goal-id) (class PREPARE-CAPS)(mode FORMULATED))
@@ -47,7 +44,6 @@
 
   (assert (goal (id (sym-cat CLEAR-MPS- (gensym*)))
                 (class CLEAR-MPS) (sub-type SIMPLE)
-                (priority ?prio)
                 (parent ?goal-id)
                 (params robot ?robot
                         mps ?mps
@@ -85,51 +81,70 @@
   ))
 )
 
-(defrule goal-creation-get-base-to-rs
-  "Fill the ring station with a base from the base station."
+; move to BS, take a base from BS, move to RS, put wp to RS.
+; move to RS output and take wp from RS output.
+(defrule goal-creation-get-base-to-rs-first-run
 
-  (or (goal (id ?goal-id) (class PREPARE-RINGS) (mode FORMULATED))
-      (goal (id ?goal-id) (class GET-TO-FILL-RS) (mode FORMULATED))
+  ?trigger_goal <- (goal (id ?goal-id) (class tribs-rs-firstrun) (mode FORMULATED) (params order-id ?order-id ring-color ?ring-color))
+  (wm-fact (id "/refbox/team-color") (value ?team-color&:(neq ?team-color nil))) 
+  
+  ; robot assign, optional: random assignment
+  (wm-fact (key domain fact at args? r ?robot x ?loc)) 
+  
+  (order (id ?order-id) (base-color ?wp))
+
+  ;RS ;rs machine is determined by ring-color in order, and color in ring-assignment 
+  ; ring-assignment (machine ?rs) (colors XXX XXX)
+  ; ring-assignment (machine ?rs) (colors XXX XXX)
+
+  (or (ring-assignment (machine ?rs) (colors ?ring-color ?tmp))
+      (ring-assignment (machine ?rs) (colors ?tmp ?ring-color)) 
   )
-  (wm-fact (key refbox team-color) (value ?team-color))
-  
-  (wm-fact (key domain fact self args? r ?robot))
-  (wm-fact (key domain fact wp-for args? wp ?wp r ?robot))
-  (not (wm-fact (key domain fact holding args? r ?robot wp ?wp-h)))
 
-  ;RS 
-  (wm-fact (key domain fact mps-type args? m ?mps t RS))
-  (wm-fact (key domain fact mps-team args? m ?mps color ?team-color))
-  (wm-fact (key domain fact rs-filled-with args? m ?mps n ?rs-before&ZERO|ONE|TWO))
-
-  ;BS
-  (wm-fact (key domain fact mps-type args? m ?bs t BS))
-  (wm-fact (key domain fact mps-team args? m ?bs color ?team-color))
-  (domain-object (name ?bs-side&:(or (eq ?bs-side INPUT) (eq ?bs-side OUTPUT))) (type mps-side))
-
-  (wm-fact (key domain fact order-base-color args? ord ?order color ?base-color))
-  
-  ; check fr existing goal
-  (not (goal (class GET-BASE-TO-RS) (parent ?goal-id)
-                                         (params robot ?robot
-                                          bs ?bs
-                                          bs-side ?bs-side
-                                          base-color ?
-                                          wp ?wp)))
   =>
-  (printout t "Goal " GET-BASE-TO-RS " formulated" crlf)
-  (assert (goal (id (sym-cat GET-BASE-TO-RS- (gensym*)))
-                (class GET-BASE-TO-RS)
+  (bind ?bs C-BS) ; must be this name because only one BS
+  (bind ?bs-side INPUT) ; hard code now
+  (bind ?rs-side INPUT) ; hard code now
+
+  (printout t "Goal " bs-rs-firstrun " formulated" crlf)
+  (assert (goal (id (sym-cat bs-rs-firstrun- (gensym*)))
+                (class bs-run-firstrun)
                 (parent ?goal-id) (sub-type SIMPLE)
                              (params robot ?robot
                                      bs ?bs
                                      bs-side ?bs-side
-                                     base-color ?base-color
+                                     rs ?rs
+                                     rs-side ?rs-side
                                      wp ?wp
+				     ring ?ring-color
                                      )
                             (required-resources ?wp)
   ))
+  (retract ?trigger_goal)
 )
+
+
+(defrule goal-creation-get-base-to-rs-run
+  ?trigger_goal <- (goal (id ?goal-id) (class trirs-loop-run) (params order-id ?order-id ring-color ?ring-color))
+  ?premise_goal <- (goal (id ?premise_goal_id) (class bs-run-firstrun) (outcome COMPLETED) (params robot ?robot bs ?bs bs-side ?bs-side rs ?pre_rs rs-side ?pre_rs-side wp ?wp))
+  
+  (or (ring-assignment (machine ?rs) (colors ?ring-color ?tmp))
+      (ring-assignment (machine ?rs) (colors ?tmp ?ring-color))
+  )
+
+  =>
+  (bind ?rs-side INPUT)
+  (assert (goal (id (sym-cat rs-loop-run- (gensym*)))
+                (class rs-loop-run)
+                (parent ?goal-id) (sub-type SIMPLE)
+                              (params robot ?robot
+    				      rs ?rs
+                                      rs-side ?rs-side
+                                      wp ?wp)))
+  (retract ?trigger_goal)
+)
+
+
 
 
 (defrule goal-creation-prefill-ring-station

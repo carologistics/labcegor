@@ -10,6 +10,8 @@
     base-color - object
     ring-color - object
     cap-color - object
+    complexity - object
+    workpiece - object
   )
 
   (:constants
@@ -31,7 +33,7 @@
     (mps-location ?loc - location)
     (robot-at-loc ?r - robot ?loc - location)
     (robot-grip-free ?r - robot)
-    (robot-grip-busy ?r - robot)
+    (robot-grip-busy ?r - robot ?wp - workpiece)
   )
 
   (:action move
@@ -41,15 +43,15 @@
   )
 
   (:action pick
-    :parameters (?r - robot)
+    :parameters (?r - robot ?wp - workpiece)
     :precondition (and (robot-grip-free ?r))
-    :effect (and (not (robot-grip-free ?r)) (robot-grip-busy ?r))
+    :effect (and (not (robot-grip-free ?r)) (robot-grip-busy ?r ?wp))
   )
 
   (:action place
-    :parameters (?r - robot)
-    :precondition (and (robot-grip-busy ?r))
-    :effect (and (not (robot-grip-busy ?r)) (robot-grip-free ?r))
+    :parameters (?r - robot ?wp - workpiece ?loc - location)
+    :precondition (and (robot-grip-busy ?r ?wp) (at ?r ?loc))
+    :effect (and (robot-grip-free ?r))
   )
 
 )
