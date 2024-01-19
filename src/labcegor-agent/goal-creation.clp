@@ -106,7 +106,6 @@
   (bind ?bs-side INPUT) ; hard code now
   (bind ?rs-side INPUT) ; hard code now
 
-
   (printout t "Goal " bs-rs-firstrun " formulated" crlf)
   (assert (goal (id (sym-cat bs-rs-firstrun- (gensym*)))
                 (class bs-run-firstrun)
@@ -144,6 +143,7 @@
                                       wp ?wp)))
   (retract ?trigger_goal)
 )
+
 
 
 
