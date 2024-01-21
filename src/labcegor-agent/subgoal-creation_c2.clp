@@ -126,7 +126,10 @@
 			cap ?cap
 			ds ?ds
 			ds-side INPUT
+			order-id ?order-id
                 )))
+
+    (retract ?trigger_goal ?premise_goal)
     (modify ?cs-mps (state PROCESSING))
     (modify ?ds-mps (state PROCESSING))
 )

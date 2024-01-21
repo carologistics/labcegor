@@ -97,7 +97,8 @@
 								        wp ?wp
 								        cap ?cap
 								        ds ?ds
-							 	        ds-side ?ds-side))
+							 	        ds-side ?ds-side
+									order-id ?order-id))
   ?used_cs <- (machine (name ?cs) (type CS)) ; 
   ?used_ds <- (machine (name ?ds) (type DS))
   =>
@@ -107,7 +108,7 @@
   (bind ?wp-added (sym-cat ?wp x?cap))
   (bind ?loc-ds-side (sym-cat ?ds ?ds-side))
   
-  (plan-assert-sequential (sym-cat PLAN-rs-cs-run- (gensym*)) ?goal-id ?robot
+  (plan-assert-sequential (sym-cat PLAN-rs-csds-run- (gensym*)) ?goal-id ?robot
   	    	  (plan-assert-action move ?curr-loc ?loc-cs-side ?robot)
 		  ; (plan-assert-action place ?robot ?wp ?loc-cs-side) ; problem with domain action
 		  (plan-assert-action move ?loc-cs-side (sym-cat ?cs OUTPUT) ?robot)

@@ -124,7 +124,27 @@
 	(retract ?g ?gm)
 )
 
+(defrule goal_reasoner_completed_c2
+  ?g <- (goal (id ?goal-id) (mode FINISHED) (outcome COMPLETED) (class rs-csds-c2run)
+			(params robot ?robot
+                        rs ?rs
+                        rs-side OUTPUT
+                        cs ?cs
+                        cs-side ?cs-side
+                        wp ?wp
+                        cap ?cap
+                        ds ?ds
+                        ds-side INPUT
+                        order-id ?order-id)
+ 		)
+  ?gm <- (goal-meta (goal-id ?goal-id))
 
+  ?order <- (order (id ?order-id) (complexity C2) (quantity-requested ?cnt))
+  =>
+  (bind ?new-cnt (- ?cnt 1))
+  (modify ?order (quantity-requested ?new-cnt))
+  (retract ?g ?gm)
+)
 
 
 (defrule goal-reasoner-failed
