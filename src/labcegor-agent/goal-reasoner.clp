@@ -55,49 +55,25 @@
 )
 
 
-; #  Goal Selection
-(defrule goal-reasoner-select
-  ?g <- (goal (id ?goal-id) (mode FORMULATED) (class bs-run-firstrun) (params robot ?robot 
-									      bs ?bs
-									      bs-side ?bs-side
-									      rs ?rs
-									      rs-side ?rs-side
-									      wp ?wp
-    									      ring ?ring))
+(defrule goal-reasoner-select-bs-rs-firstrun
+  ?g <- (goal (id ?goal-id) (mode FORMULATED) (class bs-run-c2firstrun)) 
+  =>
+  (modify ?g (mode SELECTED))
+)
+
+(defrule goal-reasoner-select-rs-loop-run
+  ?g <- (goal (id ?goal-id) (mode FORMULATED) (class rs-loop-c2run))
   =>
   (modify ?g (mode SELECTED))
 )
 
 
+(defrule goal-reasoner-select-rs-cs-run
+  ?g <- (goal (id ?goal-id) (mode FORMULATED) (class rs-csds-c2run))
+  =>
+  (modify ?g (mode SELECTED))
+)
 
-; We can choose one or more goals for expansion, e.g., calling
-; a planner to determine the required steps.
-;(defrule goal-reasoner-select
-;	?g <- (goal (id ?goal-id) (mode FORMULATED) (params target-pos ?target robot ?robot))
-;	(not (goal (id DEMO-GOAL) (mode ~FORMULATED)))
-;	; (not (goal (id DEMO-GOAL-SIMPLE) (mode ~FORMULATED)))
-;	=>
-;	(modify ?g (mode SELECTED))
-;	(assert (goal-meta (goal-id ?goal-id)))
-;    (assert (wm-fact (key robot assign) (value ?robot)))
-;    ;(assert (wm-fact (key domain fact robot-at-loc args? r ?robot loc ?target)))
-;)
-
-; #  Commit to goal (we "intend" it)
-; A goal might actually be expanded into multiple plans, e.g., by
-; different planners. This step would allow to commit one out of these
-; plans.
-;(defrule goal-reasoner-expand
-;	?g <- (goal (mode SELECTED))
-;	=>
-;	(modify ?g (mode EXPANDED))
-;)
-
-; (defrule goal-reasoner-expand
-; 	?g <- (goal (id VISITALL1) (mode SELECTED))
-;         =>
-;         (pddl-request-plan VISITALL1 "visited LOC1")
-; )
 
 (defrule goal-reasoner-commit
 	?g <- (goal (mode EXPANDED))
@@ -105,36 +81,22 @@
 	(modify ?g (mode COMMITTED))
 )
 
-; #  Dispatch goal (action selection and execution now kick in)
-; Trigger execution of a plan. We may commit to multiple plans
-; (for different goals), e.g., one per robot, or for multiple
-; orders. It is then up to action selection and execution to determine
-; what to do when.
 (defrule goal-reasoner-dispatch
-	; ?g <- (goal (mode COMMITTED) (params target-pos ?zone robot ?robot))
-	?g <- (goal (mode COMMITTED) (class bs-run-firstrun))
-        ;?rb <- (wm-fact (key robot-is-busy) (value ?robot))
+	?g <- (goal (mode COMMITTED))
 	=>
 	(modify ?g (mode DISPATCHED))
-        ;(retract ?rb)
-        ; (retract (robot-is-busy (value ?robot)))
 )
 
 
-;(defrule goal-reasoner-execution
-;	?g <- (goal (mode DISPATCHED) (params target-pos pos-3-3 robots [robot1 robot2 robot3]))
-;	=>
-;	; execution, how ?
-;	(modify ?g (mode FINISHED) (outcome COMPLETED))
-;)
-	
 
-; #  Goal Monitoring
+	
 (defrule goal-reasoner-completed
-	?g <- (goal (id ?goal-id) (mode FINISHED) (outcome COMPLETED) (class bs-run-firstrun))
+	?g <- (goal (id ?goal-id) (mode FINISHED) (outcome COMPLETED) (class bs-c2run-firstrun))
 	; ?g <- (goal (id ?goal-id) (mode FINISHED) (outcome COMPLETED) (params target-pos ?target robot ?robot))
 	?gm <- (goal-meta (goal-id ?goal-id))
+
         ?ra <- (wm-fact (key robot assign) (value ?robot))
+        (goal (id ?goal-id-2) (mode FORMULATED) (class rs-loop-c2run))
         =>
 	(printout t "Goal '" ?goal-id "' has been completed, cleaning up" crlf)
 	(delayed-do-for-all-facts ((?p plan)) (eq ?p:goal-id ?goal-id)
@@ -146,6 +108,24 @@
 	(retract ?g ?gm ?ra)
     (assert (wm-fact (key all robot) (values robot1 robot2 robot3)))
 )
+
+(defrule goal-reasoner-completed_2
+	?g <- (goal (id ?goal-id) (mode FINISHED) (outcome COMPLETED) (class rs-loop-c2run))
+	?gm <- (goal-meta (goal-id ?goal-id))
+        (goal (id ?goal-id-2) (mode FORMULATED) (class rs-csds-c2run))
+        =>
+	(printout t "Goal '" ?goal-id "' has been completed, cleaning up" crlf)
+	(delayed-do-for-all-facts ((?p plan)) (eq ?p:goal-id ?goal-id)
+		(delayed-do-for-all-facts ((?a plan-action)) (eq ?a:plan-id ?p:id)
+			(retract ?a)
+		)
+		(retract ?p)
+	)
+	(retract ?g ?gm)
+)
+
+
+
 
 (defrule goal-reasoner-failed
 	?g <- (goal (id ?goal-id) (mode FINISHED) (outcome FAILED))
