@@ -41,7 +41,7 @@
 	(not (goal))
 	(domain-facts-loaded)
 	(wm-fact (key domain fact mps-location args? loc ?next-machine-location))
-	;(wm-fact (key domain fact at args? r ?robot x ?loc))
+	; (wm-fact (key domain fact at args? r ?robot x ?loc))
 	?tmp <- (wm-fact (key robot) (values ?robot))
 	(not (wm-fact (key domain fact visited args? loc ?next-machine-location)))
 	(not (wm-fact (key robot assign) (value ?robot)))

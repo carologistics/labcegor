@@ -34,7 +34,7 @@
 ; move to RS output and take wp from RS output.
 (defrule goal-creation-get-base-to-rs-first-run
   ?trigger_goal <- (goal (id ?goal-id) (class tribs-rs-c2firstrun) (mode FORMULATED) (params order-id ?order-id ring-color ?ring-color))
-  (wm-fact (key domain fact at args? r ?robot x ?loc)) 
+  (wm-fact (key domain fact at args? r ?robot x START)) 
   
   (order (id ?order-id) (base-color ?wp))
 

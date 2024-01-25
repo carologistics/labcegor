@@ -74,7 +74,7 @@ clips_executive:
         executor: dummy_skiller
       place:
         mapped_to: say{text='hello world!'}
-        execuator: dummy_skiller
+        executor: dummy_skiller
 
     parameters:
       simtest:

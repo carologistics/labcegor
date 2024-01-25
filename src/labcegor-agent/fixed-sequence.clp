@@ -54,7 +54,7 @@
 		(plan-assert-action move ?curr-loc ?zone-bs-side ?robot)
                 (plan-assert-action pick ?robot ?wp)
                 (plan-assert-action move ?zone-bs-side ?zone-rs-side ?robot)
-                ; (plan-assert-action place ?robot ?wp ?zone-rs-side) ; problem in domain action place
+                (plan-assert-action place ?robot ?wp ?zone-rs-side) ; problem in domain action place
                 (plan-assert-action move ?zone-rs-side ?zone-rs-side2 ?robot)
   		(plan-assert-action pick ?robot ?wp-added)
   )
@@ -79,7 +79,7 @@
   (bind ?wp-added (sym-cat ?wp_now (sym-cat - ?ring)))
   (plan-assert-sequential (sym-cat PLAN-rs-loop-run- (gensym*)) ?goal-id ?robot
     				(plan-assert-action move ?old-rs-pos ?new-rs-pos ?robot)
-				; (plan-assert-action place ?robot ?wp-now) ; problem in domain action place
+				(plan-assert-action place ?robot ?wp_now) ; problem in domain action place
 				(plan-assert-action move ?new-rs-pos (sym-cat ?rs OUTPUT) ?robot)
 				(plan-assert-action pick ?robot ?wp-added)
   )
@@ -105,12 +105,12 @@
   ; move from rs to cs input, place, and move to cs output, pick, move to ds and place
   (bind ?curr-loc (sym-cat ?rs ?rs-side))
   (bind ?loc-cs-side  (sym-cat ?cs ?cs-side))
-  (bind ?wp-added (sym-cat ?wp x?cap))
+  (bind ?wp-added (sym-cat ?wp ?cap))
   (bind ?loc-ds-side (sym-cat ?ds ?ds-side))
   
   (plan-assert-sequential (sym-cat PLAN-rs-csds-run- (gensym*)) ?goal-id ?robot
   	    	  (plan-assert-action move ?curr-loc ?loc-cs-side ?robot)
-		  ; (plan-assert-action place ?robot ?wp ?loc-cs-side) ; problem with domain action
+		  (plan-assert-action place ?robot ?wp ?loc-cs-side) ; problem with domain action
 		  (plan-assert-action move ?loc-cs-side (sym-cat ?cs OUTPUT) ?robot)
 		  (plan-assert-action pick ?robot ?wp-added)
 		  (plan-assert-action move (sym-cat ?cs OUTPUT) (sym-cat ?ds ?ds-side) ?robot)
