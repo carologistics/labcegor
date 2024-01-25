@@ -14,7 +14,7 @@
   (domain-loaded)
   =>
   (printout info "Initializing worldmodel" crlf)
-  (foreach ?robot (create$ robot1 robot2 robot3)
+  (foreach ?robot (create$ robot1 )
     (assert
       (domain-object (name ?robot) (type robot))
       (domain-fact (name at) (param-values ?robot START))

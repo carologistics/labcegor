@@ -66,7 +66,18 @@
 (defrule goal-reasoner-expand
 	?g <- (goal (id VISITALL1) (mode SELECTED))
         =>
-        (pddl-request-plan VISITALL1 "(and (visited LOC1))")
+        (pddl-request-plan VISITALL1 "(and (visited LOC1) (visited LOC2))")
+	(delayed-do-for-all-facts ((?a plan-action)) (eq ?a:goal-id VISITALL1)
+		(modify ?a (robot robot1))
+                (printout info "---------modified plan action----- '" ?a  crlf)
+	)
+)
+
+(defrule assign-robot-to-plan
+	(pddl-plan-feedback (plan-id ?pid) (status PLANNED))
+	?pa <- (plan-action (plan-id ?pid) (state FORMULATED) (robot ""))
+	=>
+	(modify ?pa (robot "robot1"))
 )
 
 (defrule goal-reasoner-commit
