@@ -87,33 +87,11 @@
 	(modify ?g (mode DISPATCHED))
 )
 
-
-
-	
+; #  Goal Monitoring
 (defrule goal-reasoner-completed
-	?g <- (goal (id ?goal-id) (mode FINISHED) (outcome COMPLETED) (class bs-c2run-firstrun))
-	; ?g <- (goal (id ?goal-id) (mode FINISHED) (outcome COMPLETED) (params target-pos ?target robot ?robot))
+	?g <- (goal (id ?goal-id) (mode FINISHED) (outcome COMPLETED))
 	?gm <- (goal-meta (goal-id ?goal-id))
-
-        ?ra <- (wm-fact (key robot assign) (value ?robot))
-        (goal (id ?goal-id-2) (mode FORMULATED) (class rs-loop-c2run))
-        =>
-	(printout t "Goal '" ?goal-id "' has been completed, cleaning up" crlf)
-	(delayed-do-for-all-facts ((?p plan)) (eq ?p:goal-id ?goal-id)
-		(delayed-do-for-all-facts ((?a plan-action)) (eq ?a:plan-id ?p:id)
-			(retract ?a)
-		)
-		(retract ?p)
-	)
-	(retract ?g ?gm ?ra)
-    (assert (wm-fact (key all robot) (values robot1 robot2 robot3)))
-)
-
-(defrule goal-reasoner-completed_2
-	?g <- (goal (id ?goal-id) (mode FINISHED) (outcome COMPLETED) (class rs-loop-c2run))
-	?gm <- (goal-meta (goal-id ?goal-id))
-        (goal (id ?goal-id-2) (mode FORMULATED) (class rs-csds-c2run))
-        =>
+	=>
 	(printout t "Goal '" ?goal-id "' has been completed, cleaning up" crlf)
 	(delayed-do-for-all-facts ((?p plan)) (eq ?p:goal-id ?goal-id)
 		(delayed-do-for-all-facts ((?a plan-action)) (eq ?a:plan-id ?p:id)
@@ -123,29 +101,6 @@
 	)
 	(retract ?g ?gm)
 )
-
-(defrule goal_reasoner_completed_c2
-  ?g <- (goal (id ?goal-id) (mode FINISHED) (outcome COMPLETED) (class rs-csds-c2run)
-			(params robot ?robot
-                        rs ?rs
-                        rs-side OUTPUT
-                        cs ?cs
-                        cs-side ?cs-side
-                        wp ?wp
-                        cap ?cap
-                        ds ?ds
-                        ds-side INPUT
-                        order-id ?order-id)
- 		)
-  ?gm <- (goal-meta (goal-id ?goal-id))
-
-  ?order <- (order (id ?order-id) (complexity C2) (quantity-requested ?cnt))
-  =>
-  (bind ?new-cnt (- ?cnt 1))
-  (modify ?order (quantity-requested ?new-cnt))
-  (retract ?g ?gm)
-)
-
 
 (defrule goal-reasoner-failed
 	?g <- (goal (id ?goal-id) (mode FINISHED) (outcome FAILED))
