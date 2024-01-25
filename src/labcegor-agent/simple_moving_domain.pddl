@@ -48,6 +48,9 @@
     :effect (and (not (robot-grip-free ?r)) (robot-grip-busy ?r ?wp))
   )
 
+  
+
+
   (:action place
     :parameters (?r - robot ?wp - workpiece ?loc - location)
     :precondition (and (robot-grip-busy ?r ?wp) (at ?r ?loc))

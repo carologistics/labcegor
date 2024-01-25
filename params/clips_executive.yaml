@@ -50,8 +50,8 @@ clips_executive:
         file: labcegor-agent/refbox-send-messages.clp
       - name: order-expansion
         file: labcegor-agent/order-expansion.clp
-      - name: goal-creation
-        file: labcegor-agent/goal-creation.clp
+      - name: subgoal-creation-c2
+        file: labcegor-agent/subgoal-creation_c2.clp
       - name: goal-reasoner
         file: labcegor-agent/goal-reasoner.clp
       - name: fixed-sequence
@@ -74,7 +74,7 @@ clips_executive:
         executor: dummy_skiller
       place:
         mapped_to: say{text='hello world!'}
-        execuator: dummy_skiller
+        executor: dummy_skiller
 
     parameters:
       simtest:
