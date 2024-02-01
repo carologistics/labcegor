@@ -52,6 +52,8 @@ clips_executive:
         file: labcegor-agent/order-expansion.clp
       - name: subgoal-creation-c2
         file: labcegor-agent/subgoal-creation_c2.clp
+      - name: subgoal-creation-c1
+        file: labcegor-agent/subgoal-creation_c1.clp
       - name: goal-reasoner
         file: labcegor-agent/goal-reasoner.clp
       - name: fixed-sequence

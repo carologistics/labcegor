@@ -1,47 +1,21 @@
+(deftemplate ring_payment
+  (slot ring (type SYMBOL))
+  (slot ring_collect (type INTEGER))
+)
 
-
-(defrule goal-creation-rmv-capless-carriers
-    " Remove a capless capcarrier from the output of a CS"
-
-  (goal (id ?goal-id) (class CAP-CLEAR) (mode FORMULATED))
-  (wm-fact (key refbox team-color) (value ?team-color))
-  
-  (wm-fact (key domain fact self args? r ?robot))
-  (not (wm-fact (key domain fact holding args? r ?robot wp ?wp-h)))
- 
-  (wm-fact (key domain fact mps-type args? m ?mps t CS))
-  (wm-fact (key domain fact mps-team args? m ?mps col ?team-color))
-
-  (wm-fact (key domain fact wp-at args? wp ?wp m ?mps side OUTPUT))
-  (wm-fact (key domain fact wp-cap-color args? wp ?wp col CAP_NONE))
-  =>
-  (printout t "Goal " CLEAR-MPS " ("?mps") formulated" crlf)
-
-  (assert (goal (id (sym-cat CLEAR-MPS- (gensym*)))
-                (class CLEAR-MPS) (sub-type SIMPLE)
-                (parent ?goal-id)
-                (params robot ?robot
-                        mps ?mps
-                        wp ?wp
-                        side OUTPUT
-                )
-                (required-resources (sym-cat ?mps -OUTPUT) ?wp)
-    ))
+(deftemplate finish_payment
+  (slot ring (type SYMBOL))
 )
 
 
-; move to BS, take a base from BS, move to RS, put wp to RS.
-; move to RS output and take wp from RS output.
-(defrule goal-creation-get-base-to-rs-first-run
-  ?trigger_goal <- (goal (id ?goal-id) (class tribs-rs-c2firstrun) (mode FORMULATED) (params order-id ?order-id ring-color ?ring-color))
-  (wm-fact (key domain fact at args? r ?robot x START)) 
-  
+; move to BS, take a base from BS and move to RS wait side.
+(defrule subgoal-creation-bs-first-run
+  ?trigger_goal <- (goal (id ?goal-id) 
+			 (class tri-bs-c2firstrun) 
+			 (mode FORMULATED) 
+			 (params order-id ?order-id ring-color ?ring-color))
+  ?robot-at-start <- (wm-fact (key domain fact at args? r ?robot x START)) 
   (order (id ?order-id) (base-color ?wp))
-
-  ;RS ;rs machine is determined by ring-color in order, and color in ring-assignment 
-  ; ring-assignment (machine ?rs) (colors XXX XXX)
-  ; ring-assignment (machine ?rs) (colors XXX XXX)
-
   (or (ring-assignment (machine ?rs) (colors ?ring-color ?tmp))
       (ring-assignment (machine ?rs) (colors ?tmp ?ring-color)) 
   )
@@ -50,34 +24,126 @@
   =>
   (bind ?bs-side INPUT)
   (bind ?rs-side INPUT)
-  (assert (goal (id (sym-cat bs-rs-c2firstrun- (gensym*)))
+  (assert (goal (id (sym-cat bs-run-c2firstrun- (gensym*)))
                 (class bs-run-c2firstrun)
                 (parent ?goal-id) (sub-type SIMPLE)
                              (params robot ?robot
+				     current-loc START
                                      bs ?bs
                                      bs-side ?bs-side
                                      rs ?rs
-                                     rs-side ?rs-side
                                      wp ?wp
 				     ring ?ring-color
-                                     )
+                             )
                             (required-resources ?wp)
   ))
-  (retract ?trigger_goal)
+  (retract ?trigger_goal ?robot-at-start)
   (modify ?mps-bs (state PROCESSING))
   (modify ?mps-rs (state PROCESSING))
+)
+
+(defrule subgoal-creation-trigger-payment-first
+  ?trigger-goal <- (goal (id ?goal-id) (class tri-payment) (mode FORMULATED) (params ring ?ring))
+  ?ring-spec <- (ring-spec (color ?ring) (cost ?cost))
+  ?robot-at-start <- (wm-fact (key domain fact at args? r ?robot x START))
+  
+  (or (ring-assignment (machine ?rs) (colors ?ring ?tmp))
+      (ring-assignment (machine ?rs) (colors ?tmp ?ring))
+  )
+  
+  ?payment-mps <- (machine (name ?mps) (type CS) (state IDLE))
+  =>
+  ; (bind ?robot robot1)
+  (if (> ?cost 0)
+    then 
+      (assert (goal (id (sym-cat payment-first- (gensym*)))
+         		(class payment-first)
+	        	(params robot ?robot
+				current-loc START
+	  	        	payment-mps ?mps
+			        payment-side INPUT
+			        rs ?rs
+				ring ?ring)))
+      
+      (modify ?payment-mps (state PROCESSING))
+      (bind ?payment-now 1)
+      ; (modify ?ring-spec (cost ?new-cost))
+      (assert (ring_payment (ring ?ring) (ring_collect ?payment-now)))
+      (retract ?trigger-goal)
+      (retract ?robot-at-start)
+    else
+      ; (assert (finish_payment (ring ?ring)))
+      (assert (ring_payment (ring ?ring) (ring_collect 0)))
+      (assert (finish_payment (ring ?ring)))
+      (retract ?trigger-goal)
+  )
+)
+
+
+(defrule subgoal-creation-trigger-loop-payment
+  ?premise_goal <- (goal (class payment-first) (params robot ?robot 
+						current-loc ?curr-loc
+					      	payment-mps ?prev-payment-mps
+				      		payment-side ?prev-payment-side 
+				      		rs ?rs 
+				      		ring ?ring) (outcome COMPLETED))
+  ?ring-spec <- (ring-spec (color ?ring) (cost ?cost))
+  ?rp <- (ring_payment (ring ?ring) (ring_collect ?now_payment))
+  ?payment-mps <- (machine (name ?mps) (type CS) (state IDLE))
+  =>
+  (bind ?current-loc (sym-cat ?rs INPUT))
+  (if (> ?cost ?now_payment)
+    then
+      (assert (goal (id (sym-cat payment-loop- (gensym*)))
+		    (class payment)
+		    (params robot ?robot
+			    current-loc ?current-loc
+		            payment-mps ?mps
+			    payment-side INPUT
+			    rs ?rs
+			    ring ?ring)))
+      (modify ?payment-mps (state PROCESSING))
+      ; (bind ?new-collect 1)
+      (modify ?rp (ring_collect (+ ?now_payment 1)))
+      (retract ?premise_goal)
+    else
+      (assert (finish_payment (ring ?ring)))
+  )
+)
+
+
+(defrule subgoal-creation-rs-first-run  ; rs wait to rs input, place, rs input to rs output, pick 
+  ; (goal (class payment) (params robot ?robot current-loc ?current-loc payment-mps ?mps payment-side ?mps-side rs ?rs ring ?ring) (outcome COMPLETED))
+  ?premise_goal <- (goal (class bs-run-c2firstrun) (params robot ?robot
+                                                                   	      current-loc ?curr-loc
+                                                                              bs ?bs
+                                                                              bs-side ?bs-side
+                                                                              rs ?rs
+                                                                              wp ?wp
+                                                                              ring ?ring) (outcome COMPLETED))
+  (finish_payment (ring ?ring))
+  (not (goal (class rs-run-c2firstrun)))
+  =>
+  (assert (goal (id (sym-cat rs-run-c2firstrun- (gensym*)))
+		(class rs-run-c2firstrun)
+		(params robot ?robot rs ?rs wp ?wp ring ?ring)))
+
 )
 
 
 (defrule goal-creation-rs-loop-run
   ?trigger_goal <- (goal (id ?goal-id) (class trirs-loop-c2run) (mode FORMULATED) (params order-id ?order-id ring-color ?ring-color))
-  ?premise_goal <- (goal (id ?premise_goal_id) (class bs-run-c2firstrun) (outcome COMPLETED) (params robot ?robot bs ?bs bs-side ?bs-side rs ?pre_rs rs-side ?pre_rs-side wp ?wp ring ?pre_ring))
+  ?premise_goal <- (goal (id ?premise_goal_id) (class bs-run-c2firstrun) (outcome COMPLETED) (params robot ?robot current-loc ?prev_current_loc bs ?bs bs-side ?bs-side rs ?pre_rs wp ?wp ring ?pre_ring))
+
+  ; (ring-spec (color ?ring-color) (cost 0))
+  (finish_payment (ring ?ring-color))
   
   (or (ring-assignment (machine ?rs) (colors ?ring-color ?tmp))
       (ring-assignment (machine ?rs) (colors ?tmp ?ring-color))
   )
   
   ?used_rs <- (machine (name ?rs) (type RS) (state IDLE))
+  (not (goal (class rs-loop-c2run)))
   =>
   (bind ?wp_now (sym-cat ?wp (sym-cat - ?pre_ring)))
   (assert (goal (id (sym-cat rs-loop-c2run- (gensym*)))

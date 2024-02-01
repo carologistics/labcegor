@@ -55,11 +55,30 @@
 )
 
 
+;(defrule goal-reasoner-select
+;  ?g <- (goal (id ?goal-id) (mode FORMULATED))
+;  =>
+;  (modify ?g (mode SELECTED))
+;)
+
 (defrule goal-reasoner-select-bs-rs-firstrun
   ?g <- (goal (id ?goal-id) (mode FORMULATED) (class bs-run-c2firstrun)) 
   =>
   (modify ?g (mode SELECTED))
 )
+
+(defrule goal-reasoner-select-rs-run-c2firstrun
+  ?g <- (goal (id ?goal-id) (mode FORMULATED) (class rs-run-c2firstrun))
+  =>
+  (modify ?g (mode SELECTED))
+)
+
+(defrule goal-reasoner-select-payment-first
+  ?g <- (goal (id ?goal-id) (mode FORMULATED) (class payment-first))
+  =>
+  (modify ?g (mode SELECTED))
+)
+
 
 (defrule goal-reasoner-select-rs-loop-run
   ?g <- (goal (id ?goal-id) (mode FORMULATED) (class rs-loop-c2run))
