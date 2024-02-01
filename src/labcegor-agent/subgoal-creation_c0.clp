@@ -24,7 +24,7 @@
 	                            current-loc START
                                     bs ?bs
                                     bs-side ?bs-side		
-                     	      	    cs ?cs
+                       	      	    cs ?cs
                                     wp ?wp
                                     cap ?cap)
                             )
@@ -47,11 +47,11 @@
   (goal (class bs-run-c2firstrun-c0) (outcome COMPLETED)
                             (params robot ?robot
 	                            current-loc START
-                   	            bs ?bs
-                                    bs-side ?bs-side
-				    cs ?cs
-                            	    wp ?wp
-                            	    cap ?cap)
+                   	          bs ?bs
+                              bs-side ?bs-side
+                        			cs ?cs
+                              wp ?wp
+                              cap ?cap)
                             )
 
 
@@ -68,7 +68,7 @@
                 (class C0-cs-ds-run)
                 (parent ?goal-id) (sub-type SIMPLE)
                             (params robot ?robot
-				    cs ?cs
+                        				    cs ?cs
                                     ds ?ds
                                     wp ?wp-base-cap)
                             )

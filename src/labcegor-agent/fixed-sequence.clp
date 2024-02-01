@@ -148,7 +148,7 @@
   (bind ?loc-ds-side (sym-cat ?ds ?ds-side))
   
   (plan-assert-sequential (sym-cat PLAN-rs-csds-run- (gensym*)) ?goal-id ?robot
-  	    	  (plan-assert-action move ?curr-loc ?loc-cs-side ?robot)
+  	    	(plan-assert-action move ?curr-loc ?loc-cs-side ?robot)
 		  (plan-assert-action place ?robot ?wp ?loc-cs-side) ; problem with domain action
 		  (plan-assert-action move ?loc-cs-side (sym-cat ?cs OUTPUT) ?robot)
 		  (plan-assert-action pick ?robot ?wp-added)
@@ -195,6 +195,7 @@
 				                    cs ?cs
             	        	        	    ds ?ds
                 	        	    	    wp ?wp))
+
   
   (wp_on_output (mps ?cs) (wp ?wp-base-cap))
 
