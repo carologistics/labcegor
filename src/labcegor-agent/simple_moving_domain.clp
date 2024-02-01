@@ -19,7 +19,7 @@
     =>
     (printout t "in the production phase, start initializing domain facts ..." crlf)
 
-    (foreach ?robot (create$ robot1 robot2 robot3)
+    (foreach ?robot (create$ robot1 robot2)
         (assert (domain-object (name ?robot) (type robot)))
         (assert (domain-fact (name at) (param-values ?robot START)))
         (assert (wm-fact (key central agent robot args? r ?robot)))
