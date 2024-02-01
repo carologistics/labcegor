@@ -50,3 +50,29 @@
          ; (modify ?order_c2 (quantity-requested ?new-quantity-requested))
    )
 )
+
+
+
+
+
+
+
+
+(defrule goal-create-c0
+  ?order_c0 <- (order (id ?id) (complexity C0) (base-color ?base-color) 
+			(quantity-requested ?quantity-requested) )
+  =>
+   (if (eq ?quantity-requested 0)
+       then ; finish delivery
+         (printout t "all delivered" crlf)
+         (retract ?order_c0)
+       else 
+         ; expand this order
+         (assert (goal (id (sym-cat tri-bs-c0firstrun- (gensym*))) (class tri-bs-c0firstrun) (params order-id ?id))) ; 
+         
+
+         ; go to cs-ds
+         (assert (goal (id (sym-cat bs-cs-c0run- (gensym*))) (class trirs-cs-c0run) (params order-id ?id)))          
+         
+   )
+)
