@@ -72,7 +72,7 @@
          
 
          ; go to cs-ds
-         (assert (goal (id (sym-cat bs-cs-c0run- (gensym*))) (class trirs-cs-c0run) (params order-id ?id)))          
+         (assert (goal (id (sym-cat bs-cs-c0run- (gensym*))) (class tri-cs-c0run) (params order-id ?id)))          
          
    )
 )

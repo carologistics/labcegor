@@ -169,6 +169,9 @@
 							cs ?cs
                             wp ?wp
 							cap ?cap))
+
+
+              
   ?used_bs <- (machine (name ?bs) (type BS))
   ?used_cs <- (machine (name ?cs) (type CS))
   =>
@@ -177,8 +180,8 @@
   (bind ?wp-add (sym-cat ?wp ?cap)) 
   (plan-assert-sequential (sym-cat PLAN-first-bs-rs-run- (gensym*)) ?goal-id ?robot
 		(plan-assert-action move ?curr-loc ?zone-bs-side ?robot)
-        (plan-assert-action pick ?robot ?wp)
-		(plan-assert-action move ?zone-bs-side ?zone-cs-side ?robot)
+    (plan-assert-action pick ?robot ?wp)
+		(plan-assert-action move ?zone-bs-side ?loc-cs-side ?robot)
 		(plan-assert-action place ?robot ?wp-add ?loc-cs-side)
   )
   (modify ?g (mode EXPANDED))
@@ -186,24 +189,26 @@
   )
 
 
+
+
 (defrule C0-cs-ds-run
  ?g <- (goal (id ?goal-id) (mode SELECTED) (class C0-cs-ds-run) 
 					    (params robot ?robot
 				                    cs ?cs
-                                    ds ?ds
-                                    wp ?wp))
+                            ds ?ds
+                            wp ?wp))
+  
+  (wp_on_output (mps ?cs) (wp ?wp-base-cap))
 
   =>
   (bind ?curr-loc (sym-cat ?cs INPUT))
   (bind ?cs-output (sym-cat ?cs OUTPUT))
   (bind ?ds-side (sym-cat ?ds INPUT))
-
-  (bind ?wp-base-cap (sym-cat ?wp ?cap))
-
+  
   (plan-assert-sequential (sym-cat PLAN-first-bs-rs-run- (gensym*)) ?goal-id ?robot
 		(plan-assert-action move ?curr-loc ?cs-output ?robot)
-        (plan-assert-action pick ?robot ?wp-base-cap)
-		(plan-assert-action move ?cs-side ?ds-side ?robot)
+    (plan-assert-action pick ?robot ?wp-base-cap)
+		(plan-assert-action move ?cs-output ?ds-side ?robot)
 		(plan-assert-action place ?robot ?wp-base-cap ?ds-side)
   )
   (modify ?g (mode EXPANDED))
