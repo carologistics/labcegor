@@ -160,17 +160,15 @@
   (modify ?used_ds (state IDLE))
 )
 
-(defrule C0-bs-cs-run
- ?g <- (goal (id ?goal-id) (mode SELECTED) (class bs-run-c0firstrun) 
+(defrule goal-expander-bs-cs-run-c0
+ ?g <- (goal (id ?goal-id) (mode SELECTED) (class bs-run-c2firstrun-c0) 
 					    (params robot ?robot
-							current-loc ?curr-loc
-                            bs ?bs
-                            bs-side ?bs-side
-							cs ?cs
-                            wp ?wp
-							cap ?cap))
-
-
+						    current-loc ?curr-loc
+                            			    bs ?bs
+                            			    bs-side ?bs-side
+						    cs ?cs
+                            			    wp ?wp
+						    cap ?cap))
               
   ?used_bs <- (machine (name ?bs) (type BS))
   ?used_cs <- (machine (name ?cs) (type CS))
@@ -180,23 +178,24 @@
   (bind ?wp-add (sym-cat ?wp ?cap)) 
   (plan-assert-sequential (sym-cat PLAN-first-bs-rs-run- (gensym*)) ?goal-id ?robot
 		(plan-assert-action move ?curr-loc ?zone-bs-side ?robot)
-    (plan-assert-action pick ?robot ?wp)
+    		(plan-assert-action pick ?robot ?wp)
 		(plan-assert-action move ?zone-bs-side ?loc-cs-side ?robot)
 		(plan-assert-action place ?robot ?wp-add ?loc-cs-side)
   )
   (modify ?g (mode EXPANDED))
   (modify ?used_bs (state IDLE))
-  )
+)
 
 
 
 
-(defrule C0-cs-ds-run
+(defrule goal-expander-cs-ds-run-c0
  ?g <- (goal (id ?goal-id) (mode SELECTED) (class C0-cs-ds-run) 
 					    (params robot ?robot
 				                    cs ?cs
-                            ds ?ds
-                            wp ?wp))
+            	        	        	    ds ?ds
+                	        	    	    wp ?wp))
+
   
   (wp_on_output (mps ?cs) (wp ?wp-base-cap))
 
@@ -207,9 +206,9 @@
   
   (plan-assert-sequential (sym-cat PLAN-first-bs-rs-run- (gensym*)) ?goal-id ?robot
 		(plan-assert-action move ?curr-loc ?cs-output ?robot)
-    (plan-assert-action pick ?robot ?wp-base-cap)
+	        (plan-assert-action pick ?robot ?wp-base-cap)
 		(plan-assert-action move ?cs-output ?ds-side ?robot)
 		(plan-assert-action place ?robot ?wp-base-cap ?ds-side)
   )
   (modify ?g (mode EXPANDED))
-  )
+)

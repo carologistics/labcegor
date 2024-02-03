@@ -4,27 +4,27 @@
 )
 
 
-
 (defrule subgoal-creation-bs-first-runc0
   ?trigger_goal <- (goal (id ?goal-id) 
-		                  	 (class tri-bs-c0firstrun) 
-	                   		 (mode FORMULATED) 
-			                   (params order-id ?order-id))
+		         (class tri-bs-c0firstrun) 
+	                 ; (mode FORMULATED) 
+			 (params order-id ?order-id))
   ?robot-at-start <- (wm-fact (key domain fact at args? r ?robot x START)) 
   (order (id ?order-id) (base-color ?wp) (cap-color ?cap))
   ?mps-bs <- (machine (name ?bs) (type BS) (state IDLE))
   ?mps-cs <- (machine (name ?cs) (type CS) (state IDLE))
   
   =>
+  
   (bind ?bs-side INPUT)
   (assert (goal (id (sym-cat C0-bs-cs-run- (gensym*)))
-                (class bs-run-c2firstrun)
+                (class bs-run-c2firstrun-c0)
                 (parent ?goal-id) (sub-type SIMPLE)
                             (params robot ?robot
-				                            current-loc START
+	                            current-loc START
                                     bs ?bs
-                                    bs-side ?bs-side
-					                 	      	cs ?cs
+                                    bs-side ?bs-side		
+                       	      	    cs ?cs
                                     wp ?wp
                                     cap ?cap)
                             )
@@ -44,14 +44,14 @@
 			 (mode FORMULATED) 
 			 (params order-id ?order-id))
 
-  (goal (class bs-run-c2firstrun) (outcome COMPLETED)
+  (goal (class bs-run-c2firstrun-c0) (outcome COMPLETED)
                             (params robot ?robot
-				                        current-loc START
-                            bs ?bs
-                            bs-side ?bs-side
-						              	cs ?cs
-                            wp ?wp
-                            cap ?cap)
+	                        current-loc START
+                   	        bs ?bs
+				bs-side ?bs-side
+                        	cs ?cs
+                              	wp ?wp
+                              	cap ?cap)
                             )
 
 
@@ -68,9 +68,9 @@
                 (class C0-cs-ds-run)
                 (parent ?goal-id) (sub-type SIMPLE)
                             (params robot ?robot
-				                    cs ?cs
-                                    ds ?ds
-                                    wp ?wp-base-cap)
+				cs ?cs
+                                ds ?ds
+                                wp ?wp-base-cap)
                             )
   )
 
