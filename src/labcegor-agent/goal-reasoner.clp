@@ -62,36 +62,37 @@
 ;)
 
 (defrule goal-reasoner-select-bs-rs-firstrun
-  ?g <- (goal (id ?goal-id) (mode FORMULATED) (class bs-run-c2firstrun)) 
+  ?g <- (goal (id ?goal-id) (mode FORMULATED) 
+		(class bs-run-c2firstrun|rs-run-c2firstrun|payment-first|rs-loop-c2run|rs-csds-c2run|bs-run-c2firstrun-c0|C0-cs-ds-run)) 
   =>
   (modify ?g (mode SELECTED))
 )
 
-(defrule goal-reasoner-select-rs-run-c2firstrun
-  ?g <- (goal (id ?goal-id) (mode FORMULATED) (class rs-run-c2firstrun))
-  =>
-  (modify ?g (mode SELECTED))
-)
+;(defrule goal-reasoner-select-rs-run-c2firstrun
+;  ?g <- (goal (id ?goal-id) (mode FORMULATED) (class rs-run-c2firstrun))
+;  =>
+;  (modify ?g (mode SELECTED))
+;)
 
-(defrule goal-reasoner-select-payment-first
-  ?g <- (goal (id ?goal-id) (mode FORMULATED) (class payment-first))
-  =>
-  (modify ?g (mode SELECTED))
-)
-
-
-(defrule goal-reasoner-select-rs-loop-run
-  ?g <- (goal (id ?goal-id) (mode FORMULATED) (class rs-loop-c2run))
-  =>
-  (modify ?g (mode SELECTED))
-)
+;(defrule goal-reasoner-select-payment-first
+;  ?g <- (goal (id ?goal-id) (mode FORMULATED) (class payment-first))
+;  =>
+;  (modify ?g (mode SELECTED))
+;)
 
 
-(defrule goal-reasoner-select-rs-cs-run
-  ?g <- (goal (id ?goal-id) (mode FORMULATED) (class rs-csds-c2run))
-  =>
-  (modify ?g (mode SELECTED))
-)
+;(defrule goal-reasoner-select-rs-loop-run
+;  ?g <- (goal (id ?goal-id) (mode FORMULATED) (class rs-loop-c2run))
+;  =>
+;  (modify ?g (mode SELECTED))
+;)
+
+
+;(defrule goal-reasoner-select-rs-cs-run
+;  ?g <- (goal (id ?goal-id) (mode FORMULATED) (class rs-csds-c2run))
+;  =>
+;  (modify ?g (mode SELECTED))
+;)
 
 
 (defrule goal-reasoner-commit
