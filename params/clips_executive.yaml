@@ -50,12 +50,12 @@ clips_executive:
         file: labcegor-agent/refbox-send-messages.clp
       - name: order-expansion
         file: labcegor-agent/order-expansion.clp
-      - name: subgoal-creation-c2
-        file: labcegor-agent/subgoal-creation_c2.clp
-      - name: subgoal-creation-c1
-        file: labcegor-agent/subgoal-creation_c1.clp
-      - name: subgoal-creation-c0
-        file: labcegor-agent/subgoal-creation_c0.clp
+      - name: subgoal-creation
+        files: 
+          - labcegor-agent/subgoal-creation_c3.clp
+          - labcegor-agent/subgoal-creation_c2.clp
+          - labcegor-agent/subgoal-creation_c1.clp
+          - labcegor-agent/subgoal-creation_c0.clp
       - name: goal-reasoner
         file: labcegor-agent/goal-reasoner.clp
       - name: fixed-sequence

@@ -52,7 +52,8 @@
 )
 
 
-(defrule order-expansion-c0
+
+(defrule order_expansion_c0
   ?order_c0 <- (order (id ?id) (complexity C0) (base-color ?base-color) 
 			(quantity-requested ?quantity-requested) )
   =>
@@ -67,5 +68,36 @@
          ; go to cs-ds
          (assert (goal (id (sym-cat bs-cs-c0run- (gensym*))) (class tri-cs-c0run) (params order-id ?id)))          
          
+   )
+)
+
+
+(defrule order_expansion_c3
+  ?order_c3 <- (order (id ?id) (complexity C3) (base-color ?base-color) 
+			(quantity-requested ?quantity-requested) (ring-colors ?ring-color1 ?ring-color2 ?ring-color3))
+  ; order info c3 and ring cost
+  (ring-spec (color ?ring-color1) (cost ?cost-1))
+  (ring-spec (color ?ring-color2) (cost ?cost-2))
+  (ring-spec (color ?ring-color2) (cost ?cost-3))
+  =>
+   (if (eq ?quantity-requested 0)
+       then ; finish delivery
+         (printout t "all delivered" crlf)
+         (retract ?order_c3)
+    else 
+      ; expand this order
+       (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params ring ?ring-color1)))
+       (assert (goal (id (sym-cat tri-bs-c3firstrun- (gensym*))) (class tri-bs-c3firstrun) (params order-id ?id ring-color ?ring-color1)))
+         
+      ; 2nd run rs-loop
+       (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params ring ?ring-color2)))
+       (assert (goal (id (sym-cat rs-loop-c3run- (gensym*))) (class trirs-loop-c3run) (params order-id ?id ring-color ?ring-color2)))
+
+      ; 3rd run rs-loop
+       (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params ring ?ring-color3)))
+       (assert (goal (id (sym-cat rs-loop-c3run- (gensym*))) (class trirs-loop-c3run) (params order-id ?id ring-color ?ring-color3)))
+
+      ; go to rs-cs-ds
+       (assert (goal (id (sym-cat rs-cs-c3run- (gensym*))) (class trirs-cs-c3run) (params order-id ?id)))                  
    )
 )
