@@ -169,7 +169,6 @@
 							cs ?cs
                             wp ?wp
 							cap ?cap))
-     <<<<<<< adas/labcegor
 
   ?used_bs <- (machine (name ?bs) (type BS))
   ?used_cs <- (machine (name ?cs) (type CS))

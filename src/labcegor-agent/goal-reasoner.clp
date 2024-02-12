@@ -63,7 +63,7 @@
 
 (defrule goal-reasoner-select-bs-rs-firstrun
   ?g <- (goal (id ?goal-id) (mode FORMULATED) 
-		(class bs-run-c2firstrun|rs-run-c2firstrun|payment-first|rs-loop-c2run|rs-csds-c2run|bs-run-c2firstrun-c0|C0-cs-ds-run)) 
+		(class bs-run-c3firstrun|rs-run-c3firstrun|bs-run-c2firstrun|rs-run-c2firstrun|payment-first|rs-loop-c3run|rs-csds-c3run|rs-loop-c2run|rs-csds-c2run|bs-run-c2firstrun-c0|C0-cs-ds-run)) 
   =>
   (modify ?g (mode SELECTED))
 )
