@@ -32,7 +32,6 @@
   (modify ?mps-rs (state PROCESSING))
 )
 
-
 (defrule subgoal-creation-rs-first-run-c3  ; rs wait to rs input, place, rs input to rs output, pick 
   ; (goal (class payment) (params robot ?robot current-loc ?current-loc payment-mps ?mps payment-side ?mps-side rs ?rs ring ?ring) (outcome COMPLETED))
   ?premise_goal <- (goal (class bs-run-c3firstrun) (params robot ?robot
@@ -119,4 +118,5 @@
     (retract ?trigger_goal ?premise_goal)
     (modify ?cs-mps (state PROCESSING))
     (modify ?ds-mps (state PROCESSING))
+
 )

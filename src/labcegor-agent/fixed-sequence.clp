@@ -35,14 +35,15 @@
 
 
 (defrule goal-expander-first-bs-run ; move to BS, take a base from BS and move to RS wait side.
-  ?g <- (goal (id ?goal-id) (mode SELECTED) (class bs-run-c2firstrun|bs-run-c1firstrun) 
+  ?g <- (goal (id ?goal-id) (mode SELECTED) (class bs-run-c3firstrun|bs-run-c2firstrun|bs-run-c1firstrun) 
 					    (params robot ?robot
-						    current-loc ?curr-loc
-                        			    bs ?bs
-                        			    bs-side ?bs-side
-                        			    rs ?rs
-                        			    wp ?wp
-						    ring ?ring))
+        					    current-loc ?curr-loc
+                      bs ?bs
+                      bs-side ?bs-side
+                      rs ?rs
+                      wp ?wp
+                  		ring ?ring))
+
   ?used_bs <- (machine (name ?bs) (type BS))
   ?used_rs <- (machine (name ?rs) (type RS))
   =>
@@ -84,7 +85,7 @@
 
 
 (defrule goal-expander-first-rs-run
-  ?g <- (goal (id ?goal-id) (mode SELECTED) (class rs-run-c2firstrun|rs-run-c1firstrun) (params robot ?robot
+  ?g <- (goal (id ?goal-id) (mode SELECTED) (class rs-run-c3firstrun|rs-run-c2firstrun|rs-run-c1firstrun) (params robot ?robot
 									      rs ?rs
 									      wp ?wp
 									      ring ?ring))
@@ -104,7 +105,7 @@
 
 
 (defrule goal-expander-rs-loop-run
-  ?g <- (goal (id ?goal-id) (class rs-loop-c2run) (mode SELECTED) (params robot ?robot
+  ?g <- (goal (id ?goal-id) (class rs-loop-c3run|rs-loop-c2run) (mode SELECTED) (params robot ?robot
 				  					pre_rs ?pre_rs
 									pre_rs_side ?pre_rs_side
 									rs ?rs
@@ -128,7 +129,7 @@
 
 
 (defrule goal-expander-rs-cs-ds-run
-  ?g <- (goal (id ?goal-id) (class rs-csds-c2run|rs-csds-c1run) (mode SELECTED) (params robot ?robot
+  ?g <- (goal (id ?goal-id) (class rs-csds-c3run|rs-csds-c2run|rs-csds-c1run) (mode SELECTED) (params robot ?robot
 					  		  	        rs ?rs
 								        rs-side ?rs-side
 								        cs ?cs
@@ -168,12 +169,12 @@
 (defrule goal-expander-bs-cs-run-c0
  ?g <- (goal (id ?goal-id) (mode SELECTED) (class bs-run-c2firstrun-c0) 
 					    (params robot ?robot
-							current-loc ?curr-loc
-                            				bs ?bs
-                			                bs-side ?bs-side
-							cs ?cs
-			                                wp ?wp
-							cap ?cap))
+			        				current-loc ?curr-loc
+                      bs ?bs
+                      bs-side ?bs-side
+        							cs ?cs
+                      wp ?wp
+        							cap ?cap))
 
   ?used_bs <- (machine (name ?bs) (type BS))
   ?used_cs <- (machine (name ?cs) (type CS))
