@@ -11,6 +11,7 @@
   )
   ?mps-bs <- (machine (name ?bs) (type BS) (state IDLE))
   ?mps-rs <- (machine (name ?rs) (type RS) (state IDLE))
+  (not (goal (class bs-run-c2firstrun)))
   =>
   (bind ?bs-side INPUT)
   (bind ?rs-side INPUT)
@@ -28,19 +29,19 @@
                             (required-resources ?wp)
   ))
   (retract ?trigger_goal ?robot-at-start)
-  (modify ?mps-bs (state PROCESSING))
-  (modify ?mps-rs (state PROCESSING))
+  ; (modify ?mps-bs (state PROCESSING))
+  ; (modify ?mps-rs (state PROCESSING))
 )
 
 (defrule subgoal-creation-rs-first-run-c2  ; rs wait to rs input, place, rs input to rs output, pick 
-  ; (goal (class payment) (params robot ?robot current-loc ?current-loc payment-mps ?mps payment-side ?mps-side rs ?rs ring ?ring) (outcome COMPLETED))
   ?premise_goal <- (goal (class bs-run-c2firstrun) (params robot ?robot
-                                                                   	      current-loc ?curr-loc
-                                                                              bs ?bs
-                                                                              bs-side ?bs-side
-                                                                              rs ?rs
-                                                                              wp ?wp
-                                                                              ring ?ring) (outcome COMPLETED))
+                                                           current-loc ?curr-loc
+                                                           bs ?bs
+                                                           bs-side ?bs-side
+                                                           rs ?rs
+                                                           wp ?wp
+                                                           ring ?ring) (outcome COMPLETED))
+
   (finish_payment (ring ?ring))
   (not (goal (class rs-run-c2firstrun)))
   =>
@@ -53,9 +54,11 @@
 
 (defrule goal-creation-rs-loop-run-c2
   ?trigger_goal <- (goal (id ?goal-id) (class trirs-loop-c2run) (mode FORMULATED) (params order-id ?order-id ring-color ?ring-color))
-  ?premise_goal <- (goal (id ?premise_goal_id) (class bs-run-c2firstrun) (outcome COMPLETED) (params robot ?robot current-loc ?prev_current_loc bs ?bs bs-side ?bs-side rs ?pre_rs wp ?wp ring ?pre_ring))
-
-  ; (ring-spec (color ?ring-color) (cost 0))
+  ?premise_goal <- (goal (id ?premise_goal_id) (class rs-run-c2firstrun)
+						(params robot ?robot
+							rs ?pre_rs
+							wp ?wp
+							ring ?pre_ring) (outcome COMPLETED))
   (finish_payment (ring ?ring-color))
   
   (or (ring-assignment (machine ?rs) (colors ?ring-color ?tmp))
@@ -77,7 +80,7 @@
                                       wp ?wp_now
 				      ring ?ring-color)))
   (retract ?trigger_goal)
-  (modify ?used_rs (state PROCESSING))
+  ; (modify ?used_rs (state PROCESSING))
 )
 
 
@@ -99,6 +102,7 @@
     ?cs-mps <- (machine (name ?cs) (type CS) (state IDLE)) ; randomly choose one CS to go
     ?ds-mps <- (machine (name ?ds) (type DS) (state IDLE))
     =>
+    (bind ?wp_with_2ring (sym-cat ?wp (sym-cat - ?ring-color)))
     (bind ?cs-side INPUT)
     (assert (goal (id (sym-cat rs-csds-c2run- (gensym*)))
                 (class rs-csds-c2run) (sub-type SIMPLE)
@@ -108,7 +112,7 @@
 			rs-side OUTPUT
 			cs ?cs
 			cs-side ?cs-side
-			wp ?wp
+			wp ?wp_with_2ring
 			cap ?cap
 			ds ?ds
 			ds-side INPUT
@@ -116,6 +120,26 @@
                 )))
 
     (retract ?trigger_goal ?premise_goal)
-    (modify ?cs-mps (state PROCESSING))
-    (modify ?ds-mps (state PROCESSING))
+    ; (modify ?cs-mps (state PROCESSING))
+    ; (modify ?ds-mps (state PROCESSING))
+)
+
+
+(defrule update_c2_order
+  ?premise_goal <- (goal (class rs-csds-c2run) 
+			 (params robot ?robot
+				 rs ?rs
+				 rs-side ?rs-side 
+				 cs ?cs
+				 cs-side ?cs-side
+				 wp ?wp 
+				 cap ?cap
+				 ds ?ds
+				 ds-side ?ds-side
+				 order-id ?id) (outcome COMPLETED))
+  ?current-order <- (order (id ?id) (quantity-requested ?req) (quantity-delivered ?done))
+  =>
+  (modify ?current-order (quantity-requested (- ?req 1)) (quantity-delivered (+ ?done 1)))
+  (assert (wm-fact (key domain fact at args? r ?robot x START)))
+  (retract ?premise_goal)
 )

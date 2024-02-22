@@ -33,32 +33,32 @@
 ;
 ;)
 
-
-(defrule goal-reasoner-create
-        (not (tmp_haltor)) ; for debug
-        (wm-fact (id "/refbox/phase") (value PRODUCTION))
-	(domain-loaded)
-	(not (goal))
-        (debug)
-	(domain-facts-loaded)
-	(wm-fact (key domain fact mps-location args? loc ?next-machine-location))
+; goal creation for simple move task
+;(defrule goal-reasoner-create
+;        (not (tmp_haltor)) ; for debug
+;        (wm-fact (id "/refbox/phase") (value PRODUCTION))
+;	 (domain-loaded)
+; 	 (not (goal))
+;        (debug)
+;	 (domain-facts-loaded)
+;	 (wm-fact (key domain fact mps-location args? loc ?next-machine-location))
 	; (wm-fact (key domain fact at args? r ?robot x ?loc))
-	?tmp <- (wm-fact (key robot) (values ?robot))
-	(not (wm-fact (key domain fact visited args? loc ?next-machine-location)))
-	(not (wm-fact (key robot assign) (value ?robot)))
-	(not (key domain fact at args? r ?other-robot ?loc ?next-machine-location)) ; if target position is free
+;	?tmp <- (wm-fact (key robot) (values ?robot))
+;	(not (wm-fact (key domain fact visited args? loc ?next-machine-location)))
+;	(not (wm-fact (key robot assign) (value ?robot)))
+;	(not (key domain fact at args? r ?other-robot ?loc ?next-machine-location)) ; if target position is free
 	; (not (wm-fact (key domain fact robot-at-loc args? r ?other-robot loc ?next-machine-location))) ; if no other robot in this position
 	; ?rl <- (wm-fact (key robot-at-loc args? r ?robot loc ?loc))
-	=>
-	(assert (goal (id DEMO-GOAL-SIMPLE) (class DEMO-GOAL-SIMPLE) (params target-pos ?next-machine-location robot ?robot)))
-	(assert (wm-fact (key domain fact visited args? loc ?next-machine-location)))
-	(retract ?tmp)	
-)
+;	=>
+;	(assert (goal (id DEMO-GOAL-SIMPLE) (class DEMO-GOAL-SIMPLE) (params target-pos ?next-machine-location robot ?robot)))
+;	(assert (wm-fact (key domain fact visited args? loc ?next-machine-location)))
+;	(retract ?tmp)	
+;)
 
-(defrule goal-reasoner-select-bs-rs-firstrun
+(defrule goal-reasoner-select-manually
   ?g <- (goal (id ?goal-id) 
 	      (mode FORMULATED) 
-	      (class bs-run-c2firstrun|rs-run-c2firstrun|payment-first|payment|rs-loop-c2run|rs-csds-c2run|bs-run-c2firstrun-c0|C0-cs-ds-run|bs-run-c1firstrun|rs-run-c1firstrun|rs-csds-c1run)
+	      (class bs-run-c2firstrun|rs-run-c2firstrun|payment-first|payment|rs-loop-c2run|rs-csds-c2run|bs-run-c2firstrun-c0|C0-cs-ds-run|bs-run-c1firstrun|rs-run-c1firstrun|rs-csds-c1run|bs-run-c3firstrun|rs-run-c3firstrun|rs-loop-c3run-second|rs-loop-c3run-final|rs-csds-c3run)
 	) 
   =>
   (modify ?g (mode SELECTED))

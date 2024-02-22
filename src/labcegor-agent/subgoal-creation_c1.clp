@@ -104,6 +104,7 @@
   ?current-order <- (order (id ?order-id) (quantity-requested ?req) (quantity-delivered ?done))
   =>
   (modify ?current-order (quantity-requested (- ?req 1)) (quantity-delivered (+ ?done 1)))
+  (assert (wm-fact (key domain fact at args? r ?robot x START)))
   (retract ?premise_goal)
 )
 
