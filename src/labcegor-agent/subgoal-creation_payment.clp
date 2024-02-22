@@ -8,9 +8,20 @@
 )
 
 
+(defrule subgoal_payment_0
+  ?trigger_goal <- (goal (id ?goal-id) (class tri-payment) (mode FORMULATED) (params ring ?ring))
+  ?ring-spec <- (ring-spec (color ?ring) (cost 0))
+  (not (finish_payment (ring ?ring)))
+  =>
+  (assert (finish_payment (ring ?ring)))
+  (assert (ring_payment (ring ?ring) (ring_collect 0)))
+  (retract ?trigger_goal)
+)
+
+
 (defrule subgoal-creation-trigger-payment-first
   ?trigger-goal <- (goal (id ?goal-id) (class tri-payment) (mode FORMULATED) (params ring ?ring))
-  ?ring-spec <- (ring-spec (color ?ring) (cost ?cost))
+  ?ring-spec <- (ring-spec (color ?ring) (cost ?cost&:(> ?cost 0)))
   ?robot-at-start <- (wm-fact (key domain fact at args? r ?robot x START))
 
   (or (ring-assignment (machine ?rs) (colors ?ring ?tmp))
@@ -18,25 +29,19 @@
   )
 
   ?payment-mps <- (machine (name ?mps) (type CS) (state IDLE))
+  (not (goal (class payment-first)))
   =>
-  (if (> ?cost 0)
-    then
-      (assert (goal (id (sym-cat payment-first- (gensym*)))
-                        (class payment-first)
-                        (params robot ?robot
-                                current-loc START
-                                payment-mps ?mps
-                                payment-side OUTPUT
-                                rs ?rs
-                                ring ?ring)))
+  (assert (goal (id (sym-cat payment-first- (gensym*)))
+                    (class payment-first)
+                    (params robot ?robot
+                            current-loc START
+                            payment-mps ?mps
+                            payment-side OUTPUT
+                            rs ?rs
+                            ring ?ring)))
 
-      (assert (ring_payment (ring ?ring) (ring_collect 0)))
-      (retract ?trigger-goal ?robot-at-start)
-    else
-      (assert (ring_payment (ring ?ring) (ring_collect 0)))
-      (assert (finish_payment (ring ?ring)))
-      (retract ?trigger-goal)
-  )
+   (assert (ring_payment (ring ?ring) (ring_collect 0)))
+   (retract ?trigger-goal ?robot-at-start)
 )
 
 
@@ -52,12 +57,11 @@
   ?payment-mps <- (machine (name ?mps) (type CS) (state IDLE))
   =>
   (bind ?current-loc (sym-cat ?rs OUTPUT))
-
+  
   ; update payment +1,
   (bind ?new-payment-collect (+ ?now_payment 1))
   (modify ?rp (ring_collect ?new-payment-collect))
   
-
   (if (> ?cost ?new-payment-collect)
     then
       (assert (goal (id (sym-cat payment-loop- (gensym*)))
@@ -68,9 +72,9 @@
                             payment-side OUTPUT
                             rs ?rs
                             ring ?ring)))
-      (retract ?premise_goal)
     else
       (assert (finish_payment (ring ?ring)))
+      (assert (wm-fact (key domain fact at args? r ?robot x START)))
   )
+  (retract ?premise_goal)
 )
-

@@ -38,11 +38,11 @@
   ?g <- (goal (id ?goal-id) (mode SELECTED) (class bs-run-c3firstrun|bs-run-c2firstrun|bs-run-c1firstrun) 
 					    (params robot ?robot
         					    current-loc ?curr-loc
-                      bs ?bs
-                      bs-side ?bs-side
-                      rs ?rs
-                      wp ?wp
-                  		ring ?ring))
+                      				    bs ?bs
+                      				    bs-side ?bs-side
+                      				    rs ?rs
+                      				    wp ?wp
+                  				    ring ?ring))
 
   ?used_bs <- (machine (name ?bs) (type BS))
   ?used_rs <- (machine (name ?rs) (type RS))
@@ -105,7 +105,7 @@
 
 
 (defrule goal-expander-rs-loop-run
-  ?g <- (goal (id ?goal-id) (class rs-loop-c3run|rs-loop-c2run) (mode SELECTED) (params robot ?robot
+  ?g <- (goal (id ?goal-id) (class rs-loop-c3run-second|rs-loop-c3run-final|rs-loop-c2run) (mode SELECTED) (params robot ?robot
 				  					pre_rs ?pre_rs
 									pre_rs_side ?pre_rs_side
 									rs ?rs
@@ -124,7 +124,7 @@
 				(plan-assert-action pick ?robot ?wp-added)
   )
   (modify ?g (mode EXPANDED))
-  (modify ?used_rs (state IDLE))
+  ; (modify ?used_rs (state IDLE))
 )
 
 
@@ -147,7 +147,7 @@
   ; move from rs to cs input, place, and move to cs output, pick, move to ds and place
   (bind ?curr-loc (sym-cat ?rs ?rs-side))
   (bind ?loc-cs-side  (sym-cat ?cs ?cs-side))
-  (bind ?wp-added (sym-cat ?wp ?cap))
+  (bind ?wp-added (sym-cat ?wp (sym-cat - ?cap)))
   (bind ?loc-ds-side (sym-cat ?ds ?ds-side))
   
   (plan-assert-sequential (sym-cat PLAN-rs-csds-run- (gensym*)) ?goal-id ?robot
@@ -162,19 +162,19 @@
   (assert (wm-fact (key domain fact at args? r ?robot x START)))
   
   (modify ?g (mode EXPANDED))
-  (modify ?used_cs (state IDLE))
-  (modify ?used_ds (state IDLE))
+  ; (modify ?used_cs (state IDLE))
+  ; (modify ?used_ds (state IDLE))
 )
 
 (defrule goal-expander-bs-cs-run-c0
  ?g <- (goal (id ?goal-id) (mode SELECTED) (class bs-run-c2firstrun-c0) 
 					    (params robot ?robot
-			        				current-loc ?curr-loc
-                      bs ?bs
-                      bs-side ?bs-side
-        							cs ?cs
-                      wp ?wp
-        							cap ?cap))
+			        		    current-loc ?curr-loc
+                      				    bs ?bs
+                      				    bs-side ?bs-side
+        					    cs ?cs
+                      				    wp ?wp
+        				 	    cap ?cap))
 
   ?used_bs <- (machine (name ?bs) (type BS))
   ?used_cs <- (machine (name ?cs) (type CS))
@@ -221,6 +221,6 @@
 		(plan-assert-action move ?ds-side START ?robot)
   )
   ; (modify ?mps-ds (state IDLE))
-  (assert (wm-fact (key domain fact at args? r ?robot x START)))
+  ; (assert (wm-fact (key domain fact at args? r ?robot x START)))
   (modify ?g (mode EXPANDED))
 )
