@@ -64,6 +64,13 @@
     :effect (and (robot-grip-free ?r))
   )
 
+  (:action place-at-slide
+    :parameters (?r - robot ?wp - workpiece ?m - mps)
+    :precondition (and (robot-grip-busy ?r ?wp) (at ?r ?m INPUT))
+    :effect (and (robot-grip-free ?r))
+  )
+
+
   (:action prepare-bs
     :parameters (?m - mps ?side - mps-side ?bc - base-color)
     :precondition (and (mps-type ?m BS) (mps-state ?m IDLE))
