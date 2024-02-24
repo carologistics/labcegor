@@ -52,6 +52,7 @@ clips_executive:
         file: labcegor-agent/order-expansion.clp
       - name: subgoal-creation
         files: 
+          - labcegor-agent/subgoal-creation_payment.clp
           - labcegor-agent/subgoal-creation_c3.clp
           - labcegor-agent/subgoal-creation_c2.clp
           - labcegor-agent/subgoal-creation_c1.clp

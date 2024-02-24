@@ -37,12 +37,13 @@
 (defrule goal-expander-first-bs-run ; move to BS, take a base from BS and move to RS wait side.
   ?g <- (goal (id ?goal-id) (mode SELECTED) (class bs-run-c3firstrun|bs-run-c2firstrun|bs-run-c1firstrun) 
 					    (params robot ?robot
-									      current-loc ?curr-loc
-                        bs ?bs
-                        bs-side ?bs-side
-                        rs ?rs
-                        wp ?wp
-									      ring ?ring))
+        					    current-loc ?curr-loc
+                      				    bs ?bs
+                      				    bs-side ?bs-side
+                      				    rs ?rs
+                      				    wp ?wp
+                  				    ring ?ring))
+
   ?used_bs <- (machine (name ?bs) (type BS))
   ?used_rs <- (machine (name ?rs) (type RS))
   =>
@@ -54,13 +55,13 @@
 		(plan-assert-action move ?zone-bs-side ?zone-rs-side ?robot)
   )
   (modify ?g (mode EXPANDED))
-  (modify ?used_bs (state IDLE))
-  (modify ?used_rs (state PROCESSING))
+  ; (modify ?used_bs (state IDLE))
+  ; (modify ?used_rs (state PROCESSING))
 )
 
 
 (defrule goal-expander-payment ; from current location to payment mps with side, pick additional base and to rs input
-  ?g <- (goal (id ?goal-id) (mode SELECTED) (class payment-first) (params robot ?robot
+  ?g <- (goal (id ?goal-id) (mode SELECTED) (class payment-first|payment) (params robot ?robot
 							                  current-loc ?curr-loc
 								    	  payment-mps ?mps
 								    	  payment-side ?mps-side
@@ -104,7 +105,7 @@
 
 
 (defrule goal-expander-rs-loop-run
-  ?g <- (goal (id ?goal-id) (class rs-loop-c3run|rs-loop-c2run) (mode SELECTED) (params robot ?robot
+  ?g <- (goal (id ?goal-id) (class rs-loop-c3run-second|rs-loop-c3run-final|rs-loop-c2run) (mode SELECTED) (params robot ?robot
 				  					pre_rs ?pre_rs
 									pre_rs_side ?pre_rs_side
 									rs ?rs
@@ -123,7 +124,7 @@
 				(plan-assert-action pick ?robot ?wp-added)
   )
   (modify ?g (mode EXPANDED))
-  (modify ?used_rs (state IDLE))
+  ; (modify ?used_rs (state IDLE))
 )
 
 
@@ -138,13 +139,15 @@
 								        ds ?ds
 							 	        ds-side ?ds-side
 									order-id ?order-id))
+
+  
   ?used_cs <- (machine (name ?cs) (type CS)) ; 
   ?used_ds <- (machine (name ?ds) (type DS))
   =>
   ; move from rs to cs input, place, and move to cs output, pick, move to ds and place
   (bind ?curr-loc (sym-cat ?rs ?rs-side))
   (bind ?loc-cs-side  (sym-cat ?cs ?cs-side))
-  (bind ?wp-added (sym-cat ?wp ?cap))
+  (bind ?wp-added (sym-cat ?wp (sym-cat - ?cap)))
   (bind ?loc-ds-side (sym-cat ?ds ?ds-side))
   
   (plan-assert-sequential (sym-cat PLAN-rs-csds-run- (gensym*)) ?goal-id ?robot
@@ -153,22 +156,25 @@
 		  (plan-assert-action move ?loc-cs-side (sym-cat ?cs OUTPUT) ?robot)
 		  (plan-assert-action pick ?robot ?wp-added)
 		  (plan-assert-action move (sym-cat ?cs OUTPUT) (sym-cat ?ds ?ds-side) ?robot)
-		  (plan-assert-action place ?robot ?wp-added ?loc-ds-side)  ; problem with domain action
+		  (plan-assert-action place ?robot ?wp-added ?loc-ds-side)
+		  (plan-assert-action move (sym-cat ?ds ?ds-side) START ?robot)
   )
+  (assert (wm-fact (key domain fact at args? r ?robot x START)))
+  
   (modify ?g (mode EXPANDED))
-  (modify ?used_cs (state IDLE))
-  (modify ?used_ds (state IDLE))
+  ; (modify ?used_cs (state IDLE))
+  ; (modify ?used_ds (state IDLE))
 )
 
 (defrule goal-expander-bs-cs-run-c0
  ?g <- (goal (id ?goal-id) (mode SELECTED) (class bs-run-c2firstrun-c0) 
 					    (params robot ?robot
-							current-loc ?curr-loc
-                            bs ?bs
-                            bs-side ?bs-side
-							cs ?cs
-                            wp ?wp
-							cap ?cap))
+			        		    current-loc ?curr-loc
+                      				    bs ?bs
+                      				    bs-side ?bs-side
+        					    cs ?cs
+                      				    wp ?wp
+        				 	    cap ?cap))
 
   ?used_bs <- (machine (name ?bs) (type BS))
   ?used_cs <- (machine (name ?cs) (type CS))
@@ -183,7 +189,7 @@
 		(plan-assert-action place ?robot ?wp-add ?loc-cs-side)
   )
   (modify ?g (mode EXPANDED))
-  (modify ?used_bs (state IDLE))
+  ;(modify ?used_bs (state IDLE))
 )
 
 
@@ -194,12 +200,15 @@
 					    (params robot ?robot
 				                    cs ?cs
             	        	        	    ds ?ds
-                	        	    	    wp ?wp))
+                	        	    	    wp ?wp
+						    order-id ?order-id))
 
   
   (wp_on_output (mps ?cs) (wp ?wp-base-cap))
-
+  ; ?mps-ds <- (machine (name ?ds) (type DS) (state ~IDLE))
+  
   =>
+   
   (bind ?curr-loc (sym-cat ?cs INPUT))
   (bind ?cs-output (sym-cat ?cs OUTPUT))
   (bind ?ds-side (sym-cat ?ds INPUT))
@@ -209,6 +218,9 @@
 	        (plan-assert-action pick ?robot ?wp-base-cap)
 		(plan-assert-action move ?cs-output ?ds-side ?robot)
 		(plan-assert-action place ?robot ?wp-base-cap ?ds-side)
+		(plan-assert-action move ?ds-side START ?robot)
   )
+  ; (modify ?mps-ds (state IDLE))
+  ; (assert (wm-fact (key domain fact at args? r ?robot x START)))
   (modify ?g (mode EXPANDED))
 )
