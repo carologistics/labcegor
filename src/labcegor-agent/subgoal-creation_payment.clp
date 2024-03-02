@@ -35,8 +35,9 @@
                     (class payment-first)
                     (params robot ?robot
                             current-loc START
+                            current-side None  ; none/slide-side
                             payment-mps ?mps
-                            payment-side OUTPUT
+                            payment-side slide-side
                             rs ?rs
                             ring ?ring)))
 
@@ -48,6 +49,7 @@
 (defrule subgoal-creation-trigger-loop-payment ; fire if payment >= 1
   ?premise_goal <- (goal (class payment-first|payment) (params robot ?robot
                                                 current-loc ?curr-loc
+						current-side ?curr-side
                                                 payment-mps ?prev-payment-mps
                                                 payment-side ?prev-payment-side
                                                 rs ?rs
@@ -56,8 +58,8 @@
   ?rp <- (ring_payment (ring ?ring) (ring_collect ?now_payment))
   ?payment-mps <- (machine (name ?mps) (type CS) (state IDLE))
   =>
-  (bind ?current-loc (sym-cat ?rs OUTPUT))
-  
+  (bind ?current-side slide-side)
+   
   ; update payment +1,
   (bind ?new-payment-collect (+ ?now_payment 1))
   (modify ?rp (ring_collect ?new-payment-collect))
@@ -67,9 +69,10 @@
       (assert (goal (id (sym-cat payment-loop- (gensym*)))
                     (class payment)
                     (params robot ?robot
-                            current-loc ?current-loc
+                            current-loc ?rs
+			    current-side ?current-side
                             payment-mps ?mps
-                            payment-side OUTPUT
+                            payment-side slide-side
                             rs ?rs
                             ring ?ring)))
     else
