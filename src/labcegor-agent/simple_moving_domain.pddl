@@ -1,4 +1,4 @@
-(define (domain robot-movement)
+(define (domain robot-movement-simple)
   (:requirements :strips :typing)
   (:types
     location - object

@@ -64,6 +64,13 @@
         (assert (domain-fact (name mps-location) (param-values ?mps-side)))
       )
     )
+    (assert (domain-fact (name mps-type) (param-values ?bs BS))
+	    (domain-fact (name mps-type) (param-values ?cs1 CS))	
+	    (domain-fact (name mps-type) (param-values ?cs2 CS))	
+	    (domain-fact (name mps-type) (param-values ?rs1 RS))	
+	    (domain-fact (name mps-type) (param-values ?rs2 RS))	
+	    (domain-fact (name mps-type) (param-values ?ds DS))	
+    )
 
     (printout t "initialization complete." crlf)
 )

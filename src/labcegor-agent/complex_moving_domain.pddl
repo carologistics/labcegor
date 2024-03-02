@@ -55,7 +55,7 @@
     :effect (and (not (robot-grip-free ?r)) (robot-grip-busy ?r ?wp))
   )
   
-  (:action pick-at-output
+  (:action pick_at_output
     :parameters (?r - robot ?mpswithside - location ?m - mps ?wp - workpiece)
     :precondition (and (robot-grip-free ?r) 
 		       (at ?r ?mpswithside) 
@@ -80,7 +80,7 @@
   )
 
 
-  (:action prepare-bs
+  (:action prepare_bs
     :parameters (?m - mps ?side - mps-side ?bc - base-color)
     :precondition (and (mps-type ?m BS) (mps-state ?m IDLE))
     :effect (and (not (mps-state ?m IDLE))

@@ -42,7 +42,6 @@ clips_executive:
       - name: domain
         # file: labcegor-agent/domain.clp
         file: labcegor-agent/simple_moving_domain.clp
-        # file: labcegor-agent/complex_moving_domain.pddl
       - name: refbox-comm
         file: labcegor-agent/refbox-comm-init.clp
       - name: refbox-recv
@@ -61,8 +60,8 @@ clips_executive:
       - name: goal-reasoner
         file: labcegor-agent/goal-reasoner.clp
       - name: fixed-sequence  # FIXME: only used one
-        # file: labcegor-agent/fixed-sequence_on_new_domain.clp
-        file: labcegor-agent/fixed-sequence.clp
+        file: labcegor-agent/fixed-sequence_on_new_domain.clp
+        # file: labcegor-agent/fixed-sequence.clp
       - name: action-selection
         file: labcegor-agent/action-selection.clp
       - name: action-execution
@@ -82,7 +81,7 @@ clips_executive:
       pick-at-slide:
         mapped_to: say{text='hello world!'}
         executor: dummy_skiller
-      pick-at-output:
+      pick_at_output:
         mapped_to: say{text='hello world!'}
         executor: dummy_skiller
       place:
@@ -91,7 +90,7 @@ clips_executive:
       place-at-slide:
         mapped_to: say{text='hello world!'}
         executor: dummy_skiller
-      prepare-bs:
+      prepare_bs:
         mapped_to: say{text='hello world!'}
         executor: dummy_skiller
       prepare-cs:

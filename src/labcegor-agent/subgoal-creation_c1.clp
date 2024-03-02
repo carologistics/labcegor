@@ -3,7 +3,7 @@
                          (class tri-bs-c1firstrun)
                          (params order-id ?order-id ring-color ?ring-color))
   
-  ?robot-at-start <- (wm-fact (key domain fact at args? r ?robot x START))
+  ?robot-at-start <- (wm-fact (key domain fact at args? r ?robot mps-with-side START))
   (order (id ?order-id) (base-color ?wp))
   (or (ring-assignment (machine ?rs) (colors ?ring-color ?tmp))
       (ring-assignment (machine ?rs) (colors ?tmp ?ring-color))
