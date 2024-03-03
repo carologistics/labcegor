@@ -49,7 +49,7 @@
 		 (not (mps-side-free ?to ?to-side)))
   )
   
-  (:action pick-at-slide
+  (:action pick_at_slide
     :parameters (?r - robot ?mpswithside - location ?wp - workpiece)
     :precondition (and (robot-grip-free ?r) (at ?r ?mpswithside))
     :effect (and (not (robot-grip-free ?r)) (robot-grip-busy ?r ?wp))
@@ -73,7 +73,7 @@
     :effect (and (robot-grip-free ?r))
   )
 
-  (:action place-at-slide
+  (:action place_at_slide
     :parameters (?r - robot ?wp - workpiece ?mpswithside - location)
     :precondition (and (robot-grip-busy ?r ?wp) (at ?r ?mpswithside))
     :effect (and (robot-grip-free ?r))
@@ -90,7 +90,7 @@
 	    )
   )
 
-  (:action prepare-ds
+  (:action prepare_ds
     :parameters (?m - mps ?ord - order)
     :precondition (and (mps-type ?m DS) (mps-state ?m IDLE))
     :effect (and (not (mps-state ?m IDLE)) 
@@ -99,7 +99,7 @@
 	    )
   )
   
-  (:action prepare-cs
+  (:action prepare_cs
     :parameters (?m - mps)
     :precondition (and (mps-type ?m CS)
                        (mps-state ?m IDLE))
@@ -108,7 +108,7 @@
 	    )
   )
 
-  (:action prepare-rs
+  (:action prepare_rs
     :parameters (?m - mps ?rc - ring-color)
     :precondition (and (mps-type ?m RS)
                    (mps-state ?m IDLE))

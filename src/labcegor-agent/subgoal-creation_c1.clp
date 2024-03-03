@@ -1,4 +1,4 @@
-(defrule subgoal-creation-bs-first-run-c1
+(defrule subgoal-creation-bs-first-run-c1 ; move from start to bsoutput, prepare bs and pick base from output side, go to rs wait side.
   ?trigger_goal <- (goal (id ?goal-id)
                          (class tri-bs-c1firstrun)
                          (params order-id ?order-id ring-color ?ring-color))
@@ -11,8 +11,11 @@
   (not (goal (class bs-run-c1firstrun)))
   ?mps-bs <- (machine (name ?bs) (type BS) (state IDLE))
   ?mps-rs <- (machine (name ?rs) (type RS) (state IDLE))
+
+  (not (mps-occupied (mps ?bs)))
+  (not (mps-occupied (mps ?rs)))
   =>
-  (bind ?bs-side INPUT)
+  (bind ?bs-side OUTPUT)
   (bind ?rs-side INPUT)
   (assert (goal (id (sym-cat bs-run-c1firstrun- (gensym*)))
                 (class bs-run-c1firstrun)
@@ -30,6 +33,17 @@
   (retract ?trigger_goal ?robot-at-start)
   ;(modify ?mps-bs (state PROCESSING))
   ;(modify ?mps-rs (state PROCESSING))
+  (assert (mps-occupied (mps ?bs))
+	  (mps-occupied (mps ?rs))
+  )
+
+)
+
+(defrule subgoal-lifecycle-bs-first-run-c1
+  (goal (class bs-run-c1firstrun) (params robot ?robot current-loc ?curr-loc bs ?bs bs-side ?bs-side rs ?rs wp ?wp ring ?ring) (outcome COMPLETED))
+  ?mps-occ <- (mps-occupied (mps ?bs))
+  =>
+  (retract ?mps-occ)
 )
 
 
@@ -43,11 +57,19 @@
                                                            ring        ?ring) (outcome COMPLETED))
   (finish_payment (ring ?ring))
   (not (goal (class rs-run-c1firstrun)))
+  (mps-occupied (mps ?rs))
   =>
   (assert (goal (id (sym-cat rs-run-c1firstrun- (gensym*)))
                 (class rs-run-c1firstrun)
                 (params robot ?robot rs ?rs wp ?wp ring ?ring)))
   (retract ?premise_goal)
+)
+
+(defrule subgoal-lifecycle-rs-first-run-c1
+  (goal (class rs-run-c1firstrun) (params robot ?robot rs ?rs wp ?wp ring ?ring) (outcome COMPLETED))
+  ?mps-occ <- (mps-occupied (mps ?rs))
+  =>
+  (retract ?mps-occ)
 )
 
 
@@ -61,9 +83,13 @@
                                    wp ?wp
                                    ring ?ring-color)
                                 (outcome COMPLETED))
-
+    
     ?cs-mps <- (machine (name ?cs) (type CS) (state IDLE)) ; randomly choose one CS to go
     ?ds-mps <- (machine (name ?ds) (type DS) (state IDLE))
+
+    (not (mps-occupied (mps ?cs)))
+    (not (mps-occupied (mps ?ds)))
+    
     =>
     (bind ?cs-side INPUT)
     (bind ?wp-new (sym-cat ?wp (sym-cat - ?ring-color)))
@@ -85,6 +111,11 @@
     (retract ?trigger_goal ?premise_goal)
     ; (modify ?cs-mps (state PROCESSING))
     ; (modify ?ds-mps (state PROCESSING))
+
+    (assert (mps-occupied (mps ?cs))
+	    (mps-occupied (mps ?ds))
+    )
+
 )
 
 
@@ -102,9 +133,11 @@
                         	order-id ?order-id)
 			(outcome COMPLETED))
   ?current-order <- (order (id ?order-id) (quantity-requested ?req) (quantity-delivered ?done))
+  ?mps-occ-cs <- (mps-occupied (mps ?cs))
+  ?mps-occ-ds <- (mps-occupied (mps ?ds))
   =>
   (modify ?current-order (quantity-requested (- ?req 1)) (quantity-delivered (+ ?done 1)))
   ; (assert (wm-fact (key domain fact at args? r ?robot x START)))
-  (retract ?premise_goal)
+  (retract ?premise_goal ?mps-occ-cs ?mps-occ-ds)
 )
 

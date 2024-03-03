@@ -4,7 +4,7 @@
 			 (class tri-bs-c3firstrun) 
 			 (mode FORMULATED) 
 			 (params order-id ?order-id ring-color ?ring-color))
-  ?robot-at-start <- (wm-fact (key domain fact at args? r ?robot x START)) 
+  ?robot-at-start <- (wm-fact (key domain fact at args? r ?robot mps-with-side START)) 
   (order (id ?order-id) (base-color ?wp))
   (or (ring-assignment (machine ?rs) (colors ?ring-color ?tmp))
       (ring-assignment (machine ?rs) (colors ?tmp ?ring-color)) 
@@ -12,7 +12,7 @@
   ?mps-bs <- (machine (name ?bs) (type BS) (state IDLE))
   ?mps-rs <- (machine (name ?rs) (type RS) (state IDLE))
   =>
-  (bind ?bs-side INPUT)
+  (bind ?bs-side OUTPUT)
   (bind ?rs-side INPUT)
   (assert (goal (id (sym-cat bs-run-c3firstrun- (gensym*)))
                 (class bs-run-c3firstrun)

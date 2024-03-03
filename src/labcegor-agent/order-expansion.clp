@@ -1,9 +1,9 @@
-; made by Yuan,Chengzhi @20240302
+; made by Yuan,Chengzhi, last modified @20240303
 
 (defrule order_expansion_c0
   ?order_c0 <- (order (id ?id) (complexity C0) (base-color ?base-color) 
 			(quantity-requested ?quantity-requested&:(> ?quantity-requested 0)) )
-  (debug)
+  ; (debug)
   =>
    (if (eq ?quantity-requested 0)
        then ; finish delivery

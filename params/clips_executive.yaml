@@ -51,7 +51,8 @@ clips_executive:
       - name: order-expansion
         file: labcegor-agent/order-expansion.clp
       - name: subgoal-creation
-        files: 
+        files:
+          - labcegor-agent/subgoal-creation_misc.clp 
           - labcegor-agent/subgoal-creation_payment.clp
           - labcegor-agent/subgoal-creation_c3.clp
           - labcegor-agent/subgoal-creation_c2.clp
@@ -78,7 +79,7 @@ clips_executive:
       pick:
         mapped_to: say{text='hello world!'}
         executor: dummy_skiller
-      pick-at-slide:
+      pick_at_slide:
         mapped_to: say{text='hello world!'}
         executor: dummy_skiller
       pick_at_output:
@@ -87,20 +88,18 @@ clips_executive:
       place:
         mapped_to: say{text='hello world!'}
         executor: dummy_skiller
-      place-at-slide:
+      place_at_slide:
         mapped_to: say{text='hello world!'}
         executor: dummy_skiller
       prepare_bs:
         mapped_to: say{text='hello world!'}
         executor: dummy_skiller
-      prepare-cs:
+      prepare_cs:
         mapped_to: say{text='hello world!'}
         executor: dummy_skiller
-      prepare-rs:
+      prepare_rs:
         mapped_to: say{text='hello world!'}
         executor: dummy_skiller
-
-
 
     parameters:
       simtest:
