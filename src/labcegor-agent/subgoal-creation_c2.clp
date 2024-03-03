@@ -148,7 +148,7 @@
     
     (not (mps-occupied (mps ?cs)))
     (not (mps-occupied (mps ?ds)))
-    
+    (not (goal (class rs-csds-c2run))) 
     =>
     (bind ?wp_with_2ring (sym-cat ?wp (sym-cat - ?ring-color)))
     (bind ?cs-side INPUT)

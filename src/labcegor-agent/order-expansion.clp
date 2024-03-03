@@ -3,7 +3,7 @@
 (defrule order_expansion_c0
   ?order_c0 <- (order (id ?id) (complexity C0) (base-color ?base-color) 
 			(quantity-requested ?quantity-requested&:(> ?quantity-requested 0)) )
-  (debug)
+  ; (debug)
   =>
    (if (eq ?quantity-requested 0)
        then ; finish delivery
@@ -23,7 +23,7 @@
   ?order_c1 <- (order (id ?id) (complexity C1) (base-color ?base-color) (quantity-requested ?quantity-requested&:(> ?quantity-requested 0)) (ring-colors ?ring-color1))
   (ring-spec (color ?ring-color1) (cost ?cost))
   (machine (name C-BS) (state IDLE))
-  (debug)
+  ; (debug)
   =>
   (if (eq ?quantity-requested 0)
     then
@@ -75,7 +75,7 @@
   (ring-spec (color ?ring-color1) (cost ?cost-1))
   (ring-spec (color ?ring-color2) (cost ?cost-2))
   (ring-spec (color ?ring-color2) (cost ?cost-3))
-  (debug)
+  ; (debug)
   =>
    (if (eq ?quantity-requested 0)
        then ; finish delivery

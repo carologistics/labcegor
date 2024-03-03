@@ -11,6 +11,11 @@
   )
   ?mps-bs <- (machine (name ?bs) (type BS) (state IDLE))
   ?mps-rs <- (machine (name ?rs) (type RS) (state IDLE))
+  (not (goal (class bs-run-c3firstrun)))
+  
+  (not (mps-occupied (mps ?bs)))
+  (not (mps-occupied (mps ?rs)))
+
   =>
   (bind ?bs-side OUTPUT)
   (bind ?rs-side INPUT)
@@ -30,9 +35,27 @@
   (retract ?trigger_goal ?robot-at-start)
   ; (modify ?mps-bs (state PROCESSING))
   ; (modify ?mps-rs (state PROCESSING))
+  (assert (mps-occupied (mps ?bs))
+          (mps-occupied (mps ?rs))
+  )
 )
 
-(defrule subgoal-creation-rs-first-run-c3  ; rs wait to rs input, place, rs input to rs output, pick 
+
+(defrule subgoal-lifecycle-bs-first-run-c3
+  (goal (class bs-run-c3firstrun) (params robot ?robot
+                                     current-loc ?current-location
+                                     bs ?bs
+                                     bs-side ?bs-side
+                                     rs ?rs
+                                     wp ?wp
+                                     ring ?ring-color) (outcome COMPLETED))
+  ?mps-occ <- (mps-occupied (mps ?bs))
+  =>
+  (retract ?mps-occ)
+)
+
+
+(defrule subgoal-creation-rs-first-run-c3  ; rs wait to rs input, place, prepare rs, move from rs input to rs output, pick 
   ?premise_goal <- (goal (class bs-run-c3firstrun) (params robot ?robot
                                                            current-loc ?curr-loc
                                                            bs ?bs
@@ -42,11 +65,20 @@
                                                            ring ?ring) (outcome COMPLETED))
   (finish_payment (ring ?ring))
   (not (goal (class rs-run-c3firstrun)))
+  (mps-occupied (mps ?rs))
   =>
   (assert (goal (id (sym-cat rs-run-c3firstrun- (gensym*)))
 		(class rs-run-c3firstrun)
 		(params robot ?robot rs ?rs wp ?wp ring ?ring)))
-  (retract ?premise_goal)
+  ; (retract ?premise_goal)
+)
+
+
+(defrule subgoal-lifecycle-rs-first-run-c3
+  (goal (class rs-run-c3firstrun) (params robot ?robot rs ?rs wp ?wp ring ?ring) (outcome COMPLETED))
+  ?mps-occ <- (mps-occupied (mps ?rs))
+  =>
+  (retract ?mps-occ)
 )
 
 
@@ -66,6 +98,7 @@
   
   ?used_rs <- (machine (name ?rs) (type RS) (state IDLE))
   (not (goal (class rs-loop-c3run-second)))
+  (not (mps-occupied (mps ?rs)))
   =>
   (bind ?wp_now (sym-cat ?prev_wp (sym-cat - ?prev_ring)))
   (assert (goal (id (sym-cat rs-loop-c3run- (gensym*)))
@@ -78,8 +111,17 @@
                                       rs-side INPUT
                                       wp ?wp_now
 				      ring ?ring-color)))
-  (retract ?trigger_goal ?premise_goal)
+  (retract ?trigger_goal)
+  ; (retract ?trigger_goal ?premise_goal)
   ; (modify ?used_rs (state PROCESSING))
+  (assert (mps-occupied (mps ?rs)))
+)
+
+(defrule subgoal-lifecycle-rs-loop-run1-c3
+  (goal (class rs-loop-c3run-second) (params robot ?robot pre_rs ?pre_rs pre_rs_side ?pre_rs_side rs ?rs rs-side ?rs-side wp ?wp ring ?ring) (outcome COMPLETED))
+  ?mps-occ <- (mps-occupied (mps ?rs))
+  =>
+  (retract ?mps-occ)
 )
 
 
@@ -102,6 +144,10 @@
 
   ?used_rs <- (machine (name ?rs) (type RS) (state IDLE))
   (not (goal (class rs-loop-c3run-final)))
+  
+  (not (mps-occupied (mps ?rs)))
+  
+  
   =>
   (bind ?wp_now (sym-cat ?wp (sym-cat - ?prev_ring)))
   (assert (goal (id (sym-cat rs-loop-c3run- (gensym*)))
@@ -114,8 +160,17 @@
                                       rs-side INPUT
                                       wp ?wp_now
                                       ring ?ring-color)))
-  (retract ?trigger_goal ?premise_goal)
+  (retract ?trigger_goal)
+  ; (retract ?trigger_goal ?premise_goal)
   ; (modify ?used_rs (state PROCESSING))
+  (assert (mps-occupied (mps ?rs)))
+)
+
+(defrule subgoal-lifecycle-rs-loop-run2-c3
+  (goal (class rs-loop-c3run-final) (params robot ?robot pre_rs ?pre_rs pre_rs_side ?pre_rs_side rs ?rs rs-side ?rs-side wp ?wp ring ?ring) (outcome COMPLETED))
+  ?mps-occ <- (mps-occupied (mps ?rs))
+  =>
+  (retract ?mps-occ)
 )
 
 
@@ -129,14 +184,20 @@
             			   pre_rs_side ?pre-rs-side
                      		   rs ?rs
                 		   rs-side ?rs-side
-                     		   wp ?wp
+                     		   wp ?wp-old
                    		   ring ?ring-color) 
 	  			(outcome COMPLETED))
 
     ?cs-mps <- (machine (name ?cs) (type CS) (state IDLE)) ; randomly choose one CS to go
     ?ds-mps <- (machine (name ?ds) (type DS) (state IDLE))
+
+    (not (mps-occupied (mps ?cs)))
+    (not (mps-occupied (mps ?ds)))
+    (not (goal (class rs-csds-c3run)))
+
     =>
     (bind ?cs-side INPUT)
+    (bind ?wp (sym-cat ?wp-old (sym-cat - ?ring-color)))
     (assert (goal (id (sym-cat rs-csds-c3run- (gensym*)))
                 (class rs-csds-c3run) (sub-type SIMPLE)
                 (parent ?goal-id)
@@ -152,9 +213,12 @@
 			order-id ?order-id
                 )))
 
-    (retract ?trigger_goal ?premise_goal)
+    (retract ?trigger_goal)
+    ; (retract ?trigger_goal ?premise_goal)
     ; (modify ?cs-mps (state PROCESSING))
     ; (modify ?ds-mps (state PROCESSING))
+    (assert (mps-occupied (mps ?cs))
+            (mps-occupied (mps ?ds)))
 )
 
 
@@ -171,8 +235,11 @@
 				 ds-side ?ds-side
 				 order-id ?id) (outcome COMPLETED))
   ?current-order <- (order (id ?id) (quantity-requested ?req) (quantity-delivered ?done))
+  ?mps-occ-cs <- (mps-occupied (mps ?cs))
+  ?mps-occ-ds <- (mps-occupied (mps ?ds))
   =>
   (modify ?current-order (quantity-requested (- ?req 1)) (quantity-delivered (+ ?done 1)))
   ; (assert (wm-fact (key domain fact at args? r ?robot x START)))
-  (retract ?premise_goal)
+  ; (retract ?premise_goal)
+  (retract ?mps-occ-cs ?mps-occ-ds)
 )

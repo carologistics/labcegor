@@ -224,7 +224,7 @@
 	        (plan-assert-action pick_at_output ?robot (sym-cat ?cs (sym-cat - OUTPUT)) ?cs ?wp-base-cap)
 		(plan-assert-action move ?cs OUTPUT ?ds INPUT ?robot)
 		(plan-assert-action place ?robot ?wp-base-cap ?ds)
-		(plan-assert-action move ?ds-side START ?robot)
+		(plan-assert-action move ?ds ?ds-side START None ?robot)
   )
   ; (modify ?mps-ds (state IDLE))
   ; (assert (wm-fact (key domain fact at args? r ?robot x START)))
