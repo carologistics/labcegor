@@ -89,7 +89,7 @@
 
 
 
-(defrule goal-expander-first-rs-run
+(defrule goal-expander-first-rs-run   ; move from rs wait side to input side, place wp on input side, prepare rs, move to output, pick wp at output side.
   ?g <- (goal (id ?goal-id) (mode SELECTED) (class rs-run-c3firstrun|rs-run-c2firstrun|rs-run-c1firstrun) (params robot ?robot
 									      rs ?rs
 									      wp ?wp
