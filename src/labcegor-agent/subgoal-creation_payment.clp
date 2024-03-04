@@ -11,7 +11,7 @@
 (defrule subgoal_payment_0
   ?trigger_goal <- (goal (id ?goal-id) (class tri-payment) (mode FORMULATED) (params ring ?ring))
   ?ring-spec <- (ring-spec (color ?ring) (cost 0))
-  ; (not (finish_payment (ring ?ring)))
+  (not (finish_payment (ring ?ring)))
   =>
   (assert (finish_payment (ring ?ring)))
   (assert (ring_payment (ring ?ring) (ring_collect 0)))
@@ -32,7 +32,7 @@
   (not (goal (class payment-first)))
   
   (not (mps-occupied (mps ?mps)))
-  ; (not (finish_payment (ring ?ring))) 
+  (not (finish_payment (ring ?ring))) 
   =>
   (assert (goal (id (sym-cat payment-first- (gensym*)))
                     (class payment-first)

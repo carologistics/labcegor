@@ -70,7 +70,7 @@
   (assert (goal (id (sym-cat rs-run-c3firstrun- (gensym*)))
 		(class rs-run-c3firstrun)
 		(params robot ?robot rs ?rs wp ?wp ring ?ring)))
-  ; (retract ?premise_goal)
+  (retract ?premise_goal)
 )
 
 
@@ -111,8 +111,8 @@
                                       rs-side INPUT
                                       wp ?wp_now
 				      ring ?ring-color)))
-  (retract ?trigger_goal)
-  ; (retract ?trigger_goal ?premise_goal)
+  ; (retract ?trigger_goal)
+  (retract ?trigger_goal ?premise_goal)
   ; (modify ?used_rs (state PROCESSING))
   (assert (mps-occupied (mps ?rs)))
 )
@@ -160,8 +160,8 @@
                                       rs-side INPUT
                                       wp ?wp_now
                                       ring ?ring-color)))
-  (retract ?trigger_goal)
-  ; (retract ?trigger_goal ?premise_goal)
+  ; (retract ?trigger_goal)
+  (retract ?trigger_goal ?premise_goal)
   ; (modify ?used_rs (state PROCESSING))
   (assert (mps-occupied (mps ?rs)))
 )
@@ -213,8 +213,8 @@
 			order-id ?order-id
                 )))
 
-    (retract ?trigger_goal)
-    ; (retract ?trigger_goal ?premise_goal)
+    ; (retract ?trigger_goal)
+    (retract ?trigger_goal ?premise_goal)
     ; (modify ?cs-mps (state PROCESSING))
     ; (modify ?ds-mps (state PROCESSING))
     (assert (mps-occupied (mps ?cs))
@@ -240,6 +240,6 @@
   =>
   (modify ?current-order (quantity-requested (- ?req 1)) (quantity-delivered (+ ?done 1)))
   ; (assert (wm-fact (key domain fact at args? r ?robot x START)))
-  ; (retract ?premise_goal)
+  (retract ?premise_goal)
   (retract ?mps-occ-cs ?mps-occ-ds)
 )

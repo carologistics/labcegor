@@ -1,4 +1,4 @@
-; made by Yuan,Chengzhi, last modified @20240303
+; made by Yuan,Chengzhi, last modified @20240304
 
 (defrule order_expansion_c0
   ?order_c0 <- (order (id ?id) (complexity C0) (base-color ?base-color) 

@@ -65,13 +65,14 @@
                                                            wp ?wp
                                                            ring ?ring) (outcome COMPLETED))
 
-  (finish_payment (ring ?ring))
+  ?finish_payment <- (finish_payment (ring ?ring))
   (not (goal (class rs-run-c2firstrun)))
   (mps-occupied (mps ?rs))
   =>
   (assert (goal (id (sym-cat rs-run-c2firstrun- (gensym*)))
 		(class rs-run-c2firstrun)
 		(params robot ?robot rs ?rs wp ?wp ring ?ring)))
+  (retract ?premise_goal ?finish_payment)
 )
 
 
@@ -91,7 +92,7 @@
 							rs ?pre_rs
 							wp ?wp
 							ring ?pre_ring) (outcome COMPLETED))
-  (finish_payment (ring ?ring-color))
+  ?finish_payment <- (finish_payment (ring ?ring-color))
   
   (or (ring-assignment (machine ?rs) (colors ?ring-color ?tmp))
       (ring-assignment (machine ?rs) (colors ?tmp ?ring-color))
@@ -114,7 +115,7 @@
                                       rs-side INPUT
                                       wp ?wp_now
 				      ring ?ring-color)))
-  (retract ?trigger_goal)
+  (retract ?trigger_goal ?premise_goal ?finish_payment)
   ; (modify ?used_rs (state PROCESSING))
   (assert (mps-occupied (mps ?rs)))
 )
@@ -167,7 +168,7 @@
 			order-id ?order-id
                 )))
 
-    (retract ?trigger_goal)
+    (retract ?trigger_goal ?premise_goal)
     ; (modify ?cs-mps (state PROCESSING))
     ; (modify ?ds-mps (state PROCESSING))
     (assert (mps-occupied (mps ?cs))
@@ -194,5 +195,5 @@
   =>
   (modify ?current-order (quantity-requested (- ?req 1)) (quantity-delivered (+ ?done 1)))
   ; (assert (wm-fact (key domain fact at args? r ?robot x START)))
-  (retract ?mps-occ-cs ?mps-occ-ds)
+  (retract ?mps-occ-cs ?mps-occ-ds ?premise_goal)
 )
