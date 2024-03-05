@@ -81,7 +81,7 @@
 
   (bind ?cs-side OUTPUT)
   (bind ?ds-side INPUT)
-  (bind ?wp-base-cap (sym-cat ?wp ?cap))
+  (bind ?wp-base-cap (sym-cat ?wp (sym-cat - ?cap)))
 
   (assert (goal (id (sym-cat C0-cd-ds-run- (gensym*)))
                 (class C0-cs-ds-run)
