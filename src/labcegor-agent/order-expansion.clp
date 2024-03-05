@@ -1,8 +1,13 @@
 ; made by Yuan,Chengzhi, last modified @20240305
 
+(deftemplate finish-order                                                       
+  (slot order-id (type INTEGER))                                                
+) 
+
 (defrule order_expansion_c0
   ?order_c0 <- (order (id ?id) (complexity C0) (base-color ?base-color) 
-			(quantity-requested ?quantity-requested&:(> ?quantity-requested 0)) )
+			(quantity-requested ?quantity-requested&:(> ?quantity-requested 0)))
+  (not (finish-order (order-id ?id)))
   ; (debug)
   =>
   ; expand this order
@@ -18,6 +23,7 @@
   (ring-spec (color ?ring-color1) (cost ?cost))
   (machine (name C-BS) (state IDLE))
   ; (debug)
+  (not (finish-order (order-id ?id)))
   =>
   (assert 
      (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params ring ?ring-color1))
@@ -34,6 +40,7 @@
   (ring-spec (color ?ring-color1) (cost ?cost-1))
   (ring-spec (color ?ring-color2) (cost ?cost-2))
   ; (debug)
+  (not (finish-order (order-id ?id)))
   =>
   ; expand this order
   (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params ring ?ring-color1)))
@@ -59,6 +66,7 @@
   (ring-spec (color ?ring-color2) (cost ?cost-2))
   (ring-spec (color ?ring-color2) (cost ?cost-3))
   ; (debug)
+  (not (finish-order (order-id ?id)))
   =>
    (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params ring ?ring-color1)))
    (assert (goal (id (sym-cat tri-bs-c3firstrun- (gensym*))) (class tri-bs-c3firstrun) (params order-id ?id ring-color ?ring-color1)))
@@ -77,9 +85,10 @@
 
 
 (defrule complete_order_expansion
-  ?finished-order <- (order (id ?id) (quantity-requested 0))
+  ?finished-order  <- (order (id ?id) (quantity-requested 0))
+  ?finished-status <- (finish-order (order-id ?id))
   =>
   (printout t "finish expansion for order id " ?id crlf)
-  (retract ?finished-order)
+;  (retract ?finished-order)
 )
 

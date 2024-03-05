@@ -240,6 +240,15 @@
   =>
   (modify ?current-order (quantity-requested (- ?req 1)) (quantity-delivered (+ ?done 1)))
   ; (assert (wm-fact (key domain fact at args? r ?robot x START)))
+  
+  (bind ?delivered-wp (+ ?done 1))
+  (if (eq ?req ?delivered-wp)
+      then
+        (assert (finish-order (order-id ?id)))
+      else
+	(printout t "" crlf)
+  )
+
   (retract ?premise_goal)
   (retract ?mps-occ-cs ?mps-occ-ds)
 )
