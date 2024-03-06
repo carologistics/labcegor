@@ -1,26 +1,28 @@
-(deftemplate ring_payment
-  (slot ring (type SYMBOL))
-  (slot ring_collect (type INTEGER))
-)
+; (deftemplate ring_payment
+;   (slot order-id (type INTEGER))
+;   (slot ring (type SYMBOL))
+;   (slot ring_collect (type INTEGER))
+; )
 
-(deftemplate finish_payment
-  (slot ring (type SYMBOL))
-)
+; (deftemplate finish_payment
+;   (slot order-id (type INTEGER))
+;   (slot ring (type SYMBOL))
+; )
 
 
 (defrule subgoal_payment_0
-  ?trigger_goal <- (goal (id ?goal-id) (class tri-payment) (mode FORMULATED) (params ring ?ring))
+  ?trigger_goal <- (goal (id ?goal-id) (class tri-payment) (mode FORMULATED) (params order-id ?order-id ring ?ring))
   ?ring-spec <- (ring-spec (color ?ring) (cost 0))
-  (not (finish_payment (ring ?ring)))
+  (not (finish_payment (order-id ?order-id) (ring ?ring)))
   =>
-  (assert (finish_payment (ring ?ring)))
-  (assert (ring_payment (ring ?ring) (ring_collect 0)))
+  (assert (finish_payment (order-id ?order-id) (ring ?ring)))
+  (assert (ring_payment (order-id ?order-id) (ring ?ring) (ring_collect 0)))
   (retract ?trigger_goal)
 )
 
 
 (defrule subgoal-creation-trigger-payment-first
-  ?trigger-goal <- (goal (id ?goal-id) (class tri-payment) (mode FORMULATED) (params ring ?ring))
+  ?trigger-goal <- (goal (id ?goal-id) (class tri-payment) (mode FORMULATED) (params order-id ?order-id ring ?ring))
   ?ring-spec <- (ring-spec (color ?ring) (cost ?cost&:(> ?cost 0)))
   ?robot-at-start <- (wm-fact (key domain fact at args? r ?robot mps-with-side START))
 
@@ -32,7 +34,7 @@
   (not (goal (class payment-first)))
   
   (not (mps-occupied (mps ?mps)))
-  (not (finish_payment (ring ?ring))) 
+  (not (finish_payment (order-id ?order-id) (ring ?ring))) 
   =>
   (assert (goal (id (sym-cat payment-first- (gensym*)))
                     (class payment-first)
@@ -42,9 +44,10 @@
                             payment-mps ?mps
                             payment-side slide-side
                             rs ?rs
-                            ring ?ring)))
-
-   (assert (ring_payment (ring ?ring) (ring_collect 0)))
+                            ring ?ring
+			    order-id ?order-id)))
+   
+   (assert (ring_payment (order-id ?order-id) (ring ?ring) (ring_collect 0)))
    (retract ?trigger-goal ?robot-at-start)
    (assert (mps-occupied (mps ?mps)))
 )
@@ -71,12 +74,12 @@
                                                 payment-mps ?prev-payment-mps
                                                 payment-side ?prev-payment-side
                                                 rs ?rs
-                                                ring ?ring) (outcome COMPLETED))
+                                                ring ?ring
+						order-id ?order-id) (outcome COMPLETED))
   ?ring-spec <- (ring-spec (color ?ring) (cost ?cost))
-  ?rp <- (ring_payment (ring ?ring) (ring_collect ?now_payment))
+  ?rp <- (ring_payment (order-id ?order-id) (ring ?ring) (ring_collect ?now_payment))
   ?payment-mps <- (machine (name ?mps) (type CS) (state IDLE))
   (not (mps-occupied (mps ?mps)))
-  ; (not (finish_payment (ring ?ring)))
   =>
   (bind ?current-side slide-side)
    
@@ -94,11 +97,12 @@
                             payment-mps ?mps
                             payment-side slide-side
                             rs ?rs
-                            ring ?ring))
+                            ring ?ring
+			    order-id ?order-id))
 		(mps-occupied (mps ?mps))
 	)
     else
-      (assert (finish_payment (ring ?ring)))
+      (assert (finish_payment (order-id ?order-id) (ring ?ring)))
       (assert (wm-fact (key domain fact at args? r ?robot mps-with-side START)))
   )
   (retract ?premise_goal)

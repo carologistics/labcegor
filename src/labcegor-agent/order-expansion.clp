@@ -1,4 +1,14 @@
-; made by Yuan,Chengzhi, last modified @20240305
+; made by Yuan,Chengzhi, last modified @20240306
+(deftemplate ring_payment
+  (slot order-id (type INTEGER))
+  (slot ring (type SYMBOL))
+  (slot ring_collect (type INTEGER))
+)
+
+(deftemplate finish_payment
+  (slot order-id (type INTEGER))
+  (slot ring (type SYMBOL))
+)
 
 (deftemplate finish-order                                                       
   (slot order-id (type INTEGER))                                                
@@ -8,7 +18,7 @@
   ?order_c0 <- (order (id ?id) (complexity C0) (base-color ?base-color) 
 			(quantity-requested ?quantity-requested&:(> ?quantity-requested 0)))
   (not (finish-order (order-id ?id)))
-  ; (debug)
+  (debug)
   =>
   ; expand this order
   (assert (goal (id (sym-cat tri-bs-c0firstrun- (gensym*))) (class tri-bs-c0firstrun) (params order-id ?id))) ; 
@@ -22,11 +32,11 @@
   ?order_c1 <- (order (id ?id) (complexity C1) (base-color ?base-color) (quantity-requested ?quantity-requested&:(> ?quantity-requested 0)) (ring-colors ?ring-color1))
   (ring-spec (color ?ring-color1) (cost ?cost))
   (machine (name C-BS) (state IDLE))
-  ; (debug)
+  (debug)
   (not (finish-order (order-id ?id)))
   =>
   (assert 
-     (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params ring ?ring-color1))
+     (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params order-id ?id ring ?ring-color1))
      (goal (id (sym-cat tri-bs-c1firstrun- (gensym*))) (class tri-bs-c1firstrun) (params order-id ?id ring-color ?ring-color1)) ; bs-rs
      (goal (id (sym-cat rs-cs-c1run- (gensym*))) (class trirs-cs-c1run) (params order-id ?id)) ; rs - cs
   )
@@ -43,11 +53,11 @@
   (not (finish-order (order-id ?id)))
   =>
   ; expand this order
-  (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params ring ?ring-color1)))
+  (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params order-id ?id ring ?ring-color1)))
   (assert (goal (id (sym-cat tri-bs-c2firstrun- (gensym*))) (class tri-bs-c2firstrun) (params order-id ?id ring-color ?ring-color1)))
          
   ; 2nd run rs-loop
-  (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params ring ?ring-color2)))
+  (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params order-id ?id ring ?ring-color2)))
   (assert (goal (id (sym-cat rs-loop-c2run- (gensym*))) (class trirs-loop-c2run) (params order-id ?id ring-color ?ring-color2)))
 
   ; go to rs-cs-ds
@@ -65,30 +75,27 @@
   (ring-spec (color ?ring-color1) (cost ?cost-1))
   (ring-spec (color ?ring-color2) (cost ?cost-2))
   (ring-spec (color ?ring-color2) (cost ?cost-3))
-  ; (debug)
+  (debug)
   (not (finish-order (order-id ?id)))
   =>
-   (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params ring ?ring-color1)))
+   (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params order-id ?id ring ?ring-color1)))
    (assert (goal (id (sym-cat tri-bs-c3firstrun- (gensym*))) (class tri-bs-c3firstrun) (params order-id ?id ring-color ?ring-color1)))
          
    ; 2nd run, rs-loop-1
-   (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params ring ?ring-color2)))
+   (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params order-id ?id ring ?ring-color2)))
    (assert (goal (id (sym-cat rs-loop1-c3run- (gensym*))) (class trirs-loop1-c3run) (params order-id ?id ring-color ?ring-color2)))
 
    ; 3rd run, rs-loop-2
-   (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params ring ?ring-color3)))
+   (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params order-id ?id ring ?ring-color3)))
    (assert (goal (id (sym-cat rs-loop2-c3run- (gensym*))) (class trirs-loop2-c3run) (params order-id ?id ring-color ?ring-color3)))
 
    ; go to rs-cs-ds
    (assert (goal (id (sym-cat rs-cs-c3run- (gensym*))) (class trirs-cs-c3run) (params order-id ?id)))                  
 )
 
-
-(defrule complete_order_expansion
-  ?finished-order  <- (order (id ?id) (quantity-requested 0))
+(defrule complete_oneorder_expansion
+  ?finished-order <- (order (id ?id) (complexity ?com) (quantity-requested 0))
   ?finished-status <- (finish-order (order-id ?id))
   =>
-  (printout t "finish expansion for order id " ?id crlf)
-;  (retract ?finished-order)
+  (printout t "finish " ?com " expansion for order id " ?id crlf)
 )
-

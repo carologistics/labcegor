@@ -32,7 +32,8 @@
                                     bs-side ?bs-side		
                        	      	    cs ?cs
                                     wp ?wp
-                                    cap ?cap)
+                                    cap ?cap
+				    order-id ?order-id)
                             )
                             (required-resources ?wp)
   )
@@ -50,17 +51,14 @@
                 bs-side ?bs-side
                 cs ?cs
                 wp ?wp
-                cap ?cap) (outcome COMPLETED))
+                cap ?cap
+		order-id ?order-id) (outcome COMPLETED))
   ?mps-occ <- (mps-occupied (mps ?bs))
   =>
   (retract ?mps-occ)
 )
 
 (defrule subgoal-creation-cs-dsc0
-  ?trigger_goal <- (goal (id ?goal-id) 
-			 (class tri-cs-c0run)
-			 (params order-id ?order-id))
-
   ?premise_goal <- (goal (class bs-run-c2firstrun-c0)
                             (params robot ?robot
 	                        current-loc START
@@ -68,9 +66,14 @@
 				bs-side ?bs-side
                         	cs ?cs
                               	wp ?wp
-                              	cap ?cap)
+                              	cap ?cap
+				order-id ?order-id)
 			    (outcome COMPLETED)
                    )
+  ?trigger_goal <- (goal (id ?goal-id) 
+			 (class tri-cs-c0run)
+			 (params order-id ?order-id))
+
   ;?mps-cs <- (machine (name ?cs) (type CS) (state ~IDLE))
   ;?mps-ds <- (machine (name ?ds) (type DS) (state IDLE))
   (machine (name ?ds) (type DS) (state IDLE))

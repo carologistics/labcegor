@@ -43,7 +43,8 @@
                       				    bs-side ?bs-side
                       				    rs ?rs
                       				    wp ?wp
-                  				    ring ?ring))
+                  				    ring ?ring
+						    order-id ?order-id))
 
   ?used_bs <- (machine (name ?bs) (type BS))
   ?used_rs <- (machine (name ?rs) (type RS))
@@ -68,7 +69,8 @@
 								    	  	  payment-mps ?mps
 								    	  	  payment-side ?mps-side
 								    	  	  rs ?rs
-								    	  	  ring ?ring) (outcome ~COMPLETED))
+								    	  	  ring ?ring
+									          order-id ?order-id) (outcome ~COMPLETED))
   ?payment-mps <- (machine (name ?mps) (type CS))
   =>
   (bind ?wp-payment additional_base)
@@ -93,7 +95,8 @@
   ?g <- (goal (id ?goal-id) (mode SELECTED) (class rs-run-c3firstrun|rs-run-c2firstrun|rs-run-c1firstrun) (params robot ?robot
 									      rs ?rs
 									      wp ?wp
-									      ring ?ring))
+									      ring ?ring
+									      order-id ?order-id))
   =>
   (bind ?rs-wait-side WAIT)
   (bind ?rs-input-side INPUT)
@@ -118,7 +121,8 @@
 									rs ?rs
 									rs-side ?rs-side
 									wp ?wp_now
-									ring ?ring))
+									ring ?ring
+									order-id ?order-id))
   ?used_rs <- (machine (name ?rs) (type RS))
   =>
   (bind ?rs-output-side OUTPUT)
@@ -180,7 +184,8 @@
                       				    bs-side ?bs-side
         					    cs ?cs
                       				    wp ?wp
-        				 	    cap ?cap))
+        				 	    cap ?cap
+						    order-id ?order-id))
   
   ?used_bs <- (machine (name ?bs) (type BS))
   ?used_cs <- (machine (name ?cs) (type CS))
