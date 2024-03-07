@@ -60,7 +60,8 @@
                                                 payment-mps ?prev-payment-mps
                                                 payment-side ?prev-payment-side
                                                 rs ?rs
-                                                ring ?ring) (outcome COMPLETED))
+                                                ring ?ring
+						order-id ?order-id) (outcome COMPLETED))
   ?mps-occ <- (mps-occupied (mps ?prev-payment-mps))
   =>
   (retract ?mps-occ)

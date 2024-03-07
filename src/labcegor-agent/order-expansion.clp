@@ -1,4 +1,5 @@
-; made by Yuan,Chengzhi, last modified @20240306
+; made by Yuan,Chengzhi, last modified @20240307
+
 (deftemplate ring_payment
   (slot order-id (type INTEGER))
   (slot ring (type SYMBOL))
@@ -18,7 +19,7 @@
   ?order_c0 <- (order (id ?id) (complexity C0) (base-color ?base-color) 
 			(quantity-requested ?quantity-requested&:(> ?quantity-requested 0)))
   (not (finish-order (order-id ?id)))
-  (debug)
+  ; (debug)
   =>
   ; expand this order
   (assert (goal (id (sym-cat tri-bs-c0firstrun- (gensym*))) (class tri-bs-c0firstrun) (params order-id ?id))) ; 
@@ -32,7 +33,7 @@
   ?order_c1 <- (order (id ?id) (complexity C1) (base-color ?base-color) (quantity-requested ?quantity-requested&:(> ?quantity-requested 0)) (ring-colors ?ring-color1))
   (ring-spec (color ?ring-color1) (cost ?cost))
   (machine (name C-BS) (state IDLE))
-  (debug)
+  ; (debug)
   (not (finish-order (order-id ?id)))
   =>
   (assert 
@@ -75,7 +76,7 @@
   (ring-spec (color ?ring-color1) (cost ?cost-1))
   (ring-spec (color ?ring-color2) (cost ?cost-2))
   (ring-spec (color ?ring-color2) (cost ?cost-3))
-  (debug)
+  ; (debug)
   (not (finish-order (order-id ?id)))
   =>
    (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params order-id ?id ring ?ring-color1)))
