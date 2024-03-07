@@ -91,15 +91,15 @@ clips_executive:
       place_at_slide:
         mapped_to: say{text='hello world!'}
         executor: dummy_skiller
-      prepare_bs:
-        mapped_to: say{text='hello world!'}
-        executor: dummy_skiller
-      prepare_cs:
-        mapped_to: say{text='hello world!'}
-        executor: dummy_skiller
-      prepare_rs:
-        mapped_to: say{text='hello world!'}
-        executor: dummy_skiller
+      # prepare_bs:
+      #   mapped_to: say{text='hello world!'}
+      #   executor: dummy_skiller
+      # prepare_cs:
+      #   mapped_to: say{text='hello world!'}
+      #   executor: dummy_skiller
+      # prepare_rs:
+      #   mapped_to: say{text='hello world!'}
+      #   executor: dummy_skiller
 
     parameters:
       simtest:

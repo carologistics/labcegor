@@ -75,10 +75,9 @@
   =>
   (bind ?wp-payment additional_base)
   (bind ?rs-side slide-side)
-
+  
   (plan-assert-sequential (sym-cat PLAN-payment- (gensym*)) ?goal-id ?robot
 			(plan-assert-action move ?curr-loc ?curr-side ?mps ?mps-side ?robot)
-			(plan-assert-action prepare_cs ?mps)
 			(plan-assert-action pick_at_slide ?robot (sym-cat ?mps (sym-cat - ?mps-side)) ?wp-payment)
 			(plan-assert-action move ?mps ?mps-side ?rs ?rs-side ?robot)
 			(plan-assert-action place_at_slide ?robot ?wp-payment ?rs)
@@ -106,7 +105,7 @@
   (plan-assert-sequential (sym-cat PLAN-first-rs-run- (gensym*)) ?goal-id ?robot
 			(plan-assert-action move ?rs ?rs-wait-side ?rs ?rs-input-side ?robot)
 			(plan-assert-action place ?robot ?wp ?rs)
-			(plan-assert-action prepare_rs ?rs ?ring)
+			(plan-assert-action prepare_rs ?rs ?ring)  ; send instruction to refbox, and check mps-state
 			(plan-assert-action move ?rs ?rs-input-side ?rs ?rs-output-side ?robot)
 			(plan-assert-action pick_at_output ?robot (sym-cat ?rs (sym-cat - ?rs-output-side)) ?rs ?wp-added)
   )
@@ -162,7 +161,7 @@
   (plan-assert-sequential (sym-cat PLAN-rs-csds-run- (gensym*)) ?goal-id ?robot
   	    	  (plan-assert-action move ?rs ?rs-side ?cs ?cs-side ?robot)
 		  (plan-assert-action place ?robot ?wp ?cs)
-		  (plan-assert-action prepare_cs ?cs)
+		  (plan-assert-action prepare_cs ?cs MOUNT_CAP) ; check whether mps-state is ready_at_output
 		  (plan-assert-action move ?cs ?cs-side ?cs ?cs-output-side ?robot)
 		  (plan-assert-action pick_at_output ?robot (sym-cat ?cs (sym-cat - ?cs-output-side)) ?cs ?wp-added)
 		  (plan-assert-action move ?cs ?cs-output-side ?ds ?ds-side ?robot)
@@ -225,7 +224,7 @@
   
   (plan-assert-sequential (sym-cat PLAN-first-bs-rs-run- (gensym*)) ?goal-id ?robot
 		(plan-assert-action move ?cs INPUT ?cs OUTPUT ?robot)
-		(plan-assert-action prepare_cs ?cs)
+		(plan-assert-action prepare_cs ?cs MOUNT_CAP)
 	        (plan-assert-action pick_at_output ?robot (sym-cat ?cs (sym-cat - OUTPUT)) ?cs ?wp-base-cap)
 		(plan-assert-action move ?cs OUTPUT ?ds INPUT ?robot)
 		(plan-assert-action place ?robot ?wp-base-cap ?ds)

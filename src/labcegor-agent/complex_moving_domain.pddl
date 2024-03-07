@@ -14,6 +14,7 @@
     complexity - object
     workpiece - object
     order - object
+    cs-operation - object
   )
   
   (:constants
@@ -22,6 +23,7 @@
     BS CS DS RS SS - mps-typename
     C0 C1 C2 C3 - complexity
     IDLE BROKEN PREPARED PROCESSING PROCESSED WAIT-IDLE READY-AT-OUTPUT DOWN - mps-statename
+    RETRIEVE_CAP MOUNT_CAP - cs-operation
   )
   
   (:predicates
@@ -37,6 +39,7 @@
     (bs-prepared-side ?m - mps ?side - mps-side)
     (ds-prepared-order ?m - mps ?ord - order)
     (rs-prepared-color ?m - mps ?col - ring-color)
+    (cs-can-perform ?m - mps ?op - cs-operation)
   )
   
   (:action move
@@ -100,11 +103,13 @@
   )
   
   (:action prepare_cs
-    :parameters (?m - mps)
+    :parameters (?m - mps ?op - cs-operation)
     :precondition (and (mps-type ?m CS)
-                       (mps-state ?m IDLE))
+                       (mps-state ?m IDLE)
+		       (cs-can-perform ?m ?op))
     :effect (and (not (mps-state ?m IDLE))
 	         (mps-state ?m READY-AT-OUTPUT)
+		 (not (cs-can-perform ?m ?op))
 	    )
   )
 
