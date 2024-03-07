@@ -39,64 +39,61 @@
 )
 
 
-;(defrule action-send-robotinfo
-;  (time $?now)
-;  (wm-fact (key central agent robot) (values $?robot_list))
-;  ?r_peer <- (refbox-peer (name refbox-public) (peer-id ?peer-id))
-;  =>
-;  (retract ?r_peer)
-;  (bind ?robotinfo (pb-create "llsf_msgs.RobotInfo"))
-  ; (pb-set-field ?robotinfo "robots" $?robot_list)
-  ; (pb-add-list ?robotinfo "robots" $?robot_list)
-  
-;  (bind ?index 1)
-;  (while (<= ?index (length$ $?robot_list)) do
-;    (bind ?current_robot_name (nth$ ?index $?robot_list))
-;    (pb-add-list ?robotinfo "robots" ?current_robot_name)
-;    (bind ?index (+ ?index 1))
-;  )
-  
-;  (pb-broadcast ?peer-id ?robotinfo)
-;  (pb-destroy ?robotinfo)
-;)
-
-;(defrule test-send-beaconsignal
-;  (time $?now)
-;  =>
-;  (bind ?tmp (nth$ 2 ?now))
-;  (printout t "tmp time: " ?now crlf)
-;)
-
-
 (defrule action-send-beacon-signal
-  (time ?now)
+   (time ?now)
+   ?bs <- (wm-fact (key refbox beacon seq) (value ?seq))
+   (wm-fact (key central agent robot args? r ?robot))
+   (wm-fact (key refbox robot task seq args? r ?robot) (value ?task-seq))
+   (wm-fact (key config agent team)  (value ?team-name))
+   ?r-peer <- (refbox-peer (name refbox-public) (peer-id ?peer-id))
+   (wm-fact (key refbox phase) (value SETUP|PRODUCTION))
+   ?tf <- (timer (name refbox-beacon) (time ?t&:(> (- ?now ?t) 1)) (seq ?seq))
+   =>
+   (bind ?bs (modify ?bs (value (+ ?seq 1))))
+   (bind ?beacon (pb-create "llsf_msgs.BeaconSignal"))
+   (bind ?beacon-time (pb-field-value ?beacon "time"))
+   (pb-set-field ?beacon-time "sec" (integer ?now))
+   (pb-set-field ?beacon-time "nsec" (integer (mod (* ?now 1000000) 1000000)))
+   (pb-set-field ?beacon "time" ?beacon-time) ; destroys ?beacon-time!
+   (pb-set-field ?beacon "peer_name" ?robot)
+   (bind ?name-length (str-length (str-cat ?robot)))
+   (bind ?robot-number (string-to-field (sub-string ?name-length ?name-length (str-cat ?robot))))
+   (pb-set-field ?beacon "number" ?robot-number)
+   (pb-set-field ?beacon "team_name" ?team-name)
+   (pb-set-field ?beacon "team_color" CYAN)
+ 
+   (pb-set-field ?beacon "seq" ?seq)
+   (pb-broadcast ?peer-id ?beacon)
+   (pb-destroy ?beacon)
+   (modify ?tf (time ?now) (seq (+ ?seq 1)))
+)
 
-  ?bs <- (wm-fact (key refbox beacon seq) (value ?seq))
-  (wm-fact (key central agent robot args? r ?robot))
-  (wm-fact (key refbox robot task seq args? r ?robot) (value ?task-seq))
-  (wm-fact (key config agent team)  (value ?team-name))
-  ?r-peer <- (refbox-peer (name refbox-public) (peer-id ?peer-id))
-  (wm-fact (key refbox phase) (value SETUP|PRODUCTION))
-  ?tf <- (timer (name refbox-beacon) (time ?t&:(> (- ?now ?t) 1)) (seq ?seq))
-  (wm-fact (id "/refbox/team-color") (value ?team-color&:(neq ?team-color nil)))
+
+(defrule refbox-action-prepare-mps-start
+  (time $?now)
+  ?pa <- (plan-action (plan-id ?plan-id) (goal-id ?goal-id) (id ?id)
+                      (state PENDING)
+                      (action-name ?action&prepare-bs|
+                                           prepare-cs|
+                                           prepare-ds|
+                                           prepare-rs|
+                                           prepare-ss)
+                      (executable TRUE)
+                      (param-names $?param-names)
+                      (param-values $?param-values))
+  (wm-fact (key refbox team-color) (value ?team-color&:(neq ?team-color nil)))
+  (wm-fact (key refbox comm peer-id private) (value ?peer-id))
   =>
-  (bind ?bs (modify ?bs (value (+ ?seq 1))))
-
-  (bind ?beacon (pb-create "llsf_msgs.BeaconSignal"))
-  (bind ?beacon-time (pb-field-value ?beacon "time"))
-  (pb-set-field ?beacon-time "sec" (integer ?now))
-  (pb-set-field ?beacon-time "nsec" (integer (mod (* ?now 1000000) 1000000)))
-  (pb-set-field ?beacon "time" ?beacon-time) ; destroys ?beacon-time!
-  (pb-set-field ?beacon "peer_name" ?robot)
-  (bind ?name-length (str-length (str-cat ?robot)))
-  (bind ?robot-number (string-to-field (sub-string ?name-length ?name-length (str-cat ?robot))))
-  (pb-set-field ?beacon "number" ?robot-number)
-  (pb-set-field ?beacon "team_name" ?team-name)
-  
-  (pb-set-field ?beacon "team_color" ?team-color)
-  
-  (pb-set-field ?beacon "seq" ?seq)
-  (pb-broadcast ?peer-id ?beacon)
-  (pb-destroy ?beacon)
+  (bind ?mps (nth$ 1 ?param-values))
+  (bind ?instruction_info (rest$ ?param-values))
+  (printout t "Executing " ?action ?param-values crlf)
+  (assert (metadata-prepare-mps ?mps ?team-color ?peer-id ?instruction_info))
+  (assert (timer (name (sym-cat prepare- ?goal-id - ?plan-id
+                                - ?id -send-timer))
+          (time ?now) (seq 1)))
+  (assert (timer (name (sym-cat prepare- ?goal-id - ?plan-id
+                                - ?id -abort-timer))
+          (time ?now) (seq 1)))
+  (modify ?pa (state RUNNING))
 )
 
