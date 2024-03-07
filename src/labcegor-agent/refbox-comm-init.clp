@@ -24,6 +24,12 @@
   (slot peer-id (type INTEGER))
 )
 
+
+(deftemplate my_timer
+  (slot name (type SYMBOL))
+  (slot time (type INTEGER))
+)
+
 (defrule refbox-comm-enable-public
   "Enable peer connection to the unencrypted refbox channel"
   ; (declare (salience ?*PRIORITY-LOW*))
@@ -128,10 +134,11 @@
   ; (not (timer (name ?timer-name&:(eq ?timer-name (sym-cat refbox-beacon-timer- ?robot)))))
   (not (wm-fact (key refbox robot task seq args? r ?robot)))
   =>
-  (assert ;(timer (name (sym-cat refbox-beacon-timer- ?robot))
-          ;       (time 00)
-          ;)
+  (assert (timer (name refbox-beacon)
+                 (time 0.0)
+          )
           (wm-fact (key config agent team) (value "Carologistics"))
           (wm-fact (key refbox robot task seq args? r robot1) (type UINT) (value 1))
+	  (wm-fact (key refbox robot task seq args? r robot2) (type UINT) (value 1))
   )
 )
