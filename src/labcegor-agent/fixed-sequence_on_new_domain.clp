@@ -64,6 +64,7 @@
 		(plan-assert-action move ?bs ?bs-side ?rs ?rs-wait-side ?robot)
   )
   (modify ?g (mode EXPANDED))
+  (assert (cs-prepared (cs ?cs) (order-id ?order-id)))
 )
 
 
@@ -98,7 +99,7 @@
 									      rs ?rs
 									      wp ?wp
 									      ring ?ring
-									      order-id ?order-id))
+									      order-id ?order-id cs ?cs))
   =>
   (bind ?rs-wait-side WAIT)
   (bind ?rs-input-side INPUT)
@@ -170,6 +171,7 @@
 		  (plan-assert-action pick_at_output ?robot (sym-cat ?cs (sym-cat - ?cs-output-side)) ?cs ?wp-added)
 		  (plan-assert-action move ?cs ?cs-output-side ?ds ?ds-side ?robot)
 		  (plan-assert-action place ?robot ?wp-added ?ds)
+		  (plan-assert-action prepare_ds ?ds ?order-id)
 		  (plan-assert-action move ?ds ?ds-side START None ?robot)
   )
   ; (assert (wm-fact (key domain fact at args? r ?robot x START)))

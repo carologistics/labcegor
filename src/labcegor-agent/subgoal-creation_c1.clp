@@ -19,6 +19,8 @@
   (not (mps-occupied (mps ?cs)))
   (not (mps-occupied (mps ?bs)))
   (not (mps-occupied (mps ?rs)))
+
+  (not (cs-prepared (cs ?cs)))
   =>
   (bind ?bs-side OUTPUT)
   (bind ?rs-side INPUT)
@@ -50,9 +52,10 @@
 
 (defrule subgoal-lifecycle-bs-first-run-c1
   (goal (class bs-run-c1firstrun) (params robot ?robot current-loc ?curr-loc bs ?bs bs-side ?bs-side rs ?rs cs ?cs cc ?cc wp ?wp ring ?ring order-id ?order-id) (outcome COMPLETED))
-  ?mps-occ <- (mps-occupied (mps ?bs))
+  ?mps-occ-bs <- (mps-occupied (mps ?bs))
+  ?mps-occ-cs <- (mps-occupied (mps ?cs))
   =>
-  (retract ?mps-occ)
+  (retract ?mps-occ-bs ?mps-occ-cs)
 )
 
 
@@ -74,12 +77,12 @@
   =>
   (assert (goal (id (sym-cat rs-run-c1firstrun- (gensym*)))
                 (class rs-run-c1firstrun)
-                (params robot ?robot rs ?rs wp ?wp ring ?ring order-id ?order-id)))
+                (params robot ?robot rs ?rs wp ?wp ring ?ring order-id ?order-id cs ?cs)))
   (retract ?premise_goal ?finish_payment ?ring-payment-status)
 )
 
 (defrule subgoal-lifecycle-rs-first-run-c1
-  (goal (class rs-run-c1firstrun) (params robot ?robot rs ?rs wp ?wp ring ?ring order-id ?order-id) (outcome COMPLETED))
+  (goal (class rs-run-c1firstrun) (params robot ?robot rs ?rs wp ?wp ring ?ring order-id ?order-id cs ?cs) (outcome COMPLETED))
   ?mps-occ <- (mps-occupied (mps ?rs))
   =>
   (retract ?mps-occ)
@@ -93,7 +96,8 @@
                                    rs ?rs
                                    wp ?wp
                                    ring ?ring-color
-				   order-id ?order-id)
+				   order-id ?order-id
+				   cs ?cs)
                                 (outcome COMPLETED))
     
     ?trigger_goal <- (goal (id ?goal-id) (class trirs-cs-c1run) (mode FORMULATED) (params order-id ?order-id))
@@ -101,6 +105,8 @@
     
     ?cs-mps <- (machine (name ?cs) (type CS) (state IDLE)) ; randomly choose one CS to go
     ?ds-mps <- (machine (name ?ds) (type DS) (state IDLE))
+
+    (cs-prepared (cs ?cs) (order-id ?order-id))
 
     (not (mps-occupied (mps ?cs)))
     (not (mps-occupied (mps ?ds)))
@@ -150,6 +156,9 @@
   ?current-order <- (order (id ?order-id) (quantity-requested ?req) (quantity-delivered ?done))
   ?mps-occ-cs <- (mps-occupied (mps ?cs))
   ?mps-occ-ds <- (mps-occupied (mps ?ds))
+
+  ?cs-shield <- (cs-prepared (cs ?cs) (order-id ?order-id))
+
   =>
   (modify ?current-order (quantity-requested (- ?req 1)) (quantity-delivered (+ ?done 1)))
   ; (assert (wm-fact (key domain fact at args? r ?robot x START)))
@@ -162,6 +171,6 @@
         (printout t "" crlf)
   )
 
-  (retract ?premise_goal ?mps-occ-cs ?mps-occ-ds)
+  (retract ?premise_goal ?mps-occ-cs ?mps-occ-ds ?cs-shield)
 )
 
