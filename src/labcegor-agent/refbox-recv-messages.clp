@@ -136,7 +136,7 @@
   (delayed-do-for-all-facts ((?ra1 ring-assignment) (?ra2 ring-assignment)) (and (< (fact-index ?ra1) (fact-index ?ra2)) (eq ?ra1:machine ?ra2:machine))
     (retract ?ra1)
   )
-  ; (retract ?pb-msg)
+  (retract ?pb-msg)
 )
 
 
