@@ -32,8 +32,7 @@
 (defrule order_expansion_c1
   ?order_c1 <- (order (id ?id) (complexity C1) (base-color ?base-color) (quantity-requested ?quantity-requested&:(> ?quantity-requested 0)) (ring-colors ?ring-color1))
   (ring-spec (color ?ring-color1) (cost ?cost))
-  (machine (name C-BS) (state IDLE))
-  (debug)
+  ; (debug)
   (not (finish-order (order-id ?id)))
   =>
   (assert 

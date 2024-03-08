@@ -4,14 +4,19 @@
                          (params order-id ?order-id ring-color ?ring-color))
   
   ?robot-at-start <- (wm-fact (key domain fact at args? r ?robot mps-with-side START))
-  (order (id ?order-id) (base-color ?wp))
+  (order (id ?order-id) (base-color ?wp) (cap-color ?cap))
   (or (ring-assignment (machine ?rs) (colors ?ring-color ?tmp))
       (ring-assignment (machine ?rs) (colors ?tmp ?ring-color))
   )
   (not (goal (class bs-run-c1firstrun)))
-  ?mps-bs <- (machine (name ?bs) (type BS) (state IDLE))
-  ?mps-rs <- (machine (name ?rs) (type RS) (state IDLE))
 
+  (wp-cap-color (cc ?cc) (cap-color ?cap))
+  (domain-fact (name wp-on-shelf) (param-values ?cc ?cs))
+  (machine (name ?cs) (type CS) (state IDLE))
+  (machine (name ?bs) (type BS) (state IDLE))
+  (machine (name ?rs) (type RS) (state IDLE))
+
+  (not (mps-occupied (mps ?cs)))
   (not (mps-occupied (mps ?bs)))
   (not (mps-occupied (mps ?rs)))
   =>
@@ -25,6 +30,8 @@
                                      bs ?bs
                                      bs-side ?bs-side
                                      rs ?rs
+				     cs ?cs
+				     cc ?cc
                                      wp ?wp
                                      ring ?ring-color
 				     order-id ?order-id
@@ -36,12 +43,13 @@
   ;(modify ?mps-rs (state PROCESSING))
   (assert (mps-occupied (mps ?bs))
 	  (mps-occupied (mps ?rs))
+	  (mps-occupied (mps ?cs))
   )
 
 )
 
 (defrule subgoal-lifecycle-bs-first-run-c1
-  (goal (class bs-run-c1firstrun) (params robot ?robot current-loc ?curr-loc bs ?bs bs-side ?bs-side rs ?rs wp ?wp ring ?ring order-id ?order-id) (outcome COMPLETED))
+  (goal (class bs-run-c1firstrun) (params robot ?robot current-loc ?curr-loc bs ?bs bs-side ?bs-side rs ?rs cs ?cs cc ?cc wp ?wp ring ?ring order-id ?order-id) (outcome COMPLETED))
   ?mps-occ <- (mps-occupied (mps ?bs))
   =>
   (retract ?mps-occ)
@@ -54,6 +62,8 @@
                                                            bs          ?bs
                                                            bs-side     ?bs-side
                                                            rs          ?rs
+							   cs	       ?cs
+							   cc	       ?cc
                                                            wp          ?wp
                                                            ring        ?ring
 							   order-id    ?order-id) (outcome COMPLETED))

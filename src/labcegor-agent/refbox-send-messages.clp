@@ -45,7 +45,7 @@
    (wm-fact (key central agent robot args? r ?robot))
    (wm-fact (key refbox robot task seq args? r ?robot) (value ?task-seq))
    (wm-fact (key config agent team)  (value ?team-name))
-   ?r-peer <- (refbox-peer (name refbox-public) (peer-id ?peer-id))
+   ?r-peer <- (refbox-peer (name refbox-private) (peer-id ?peer-id))
    (wm-fact (key refbox phase) (value SETUP|PRODUCTION))
    ?tf <- (timer (name refbox-beacon) (time ?t&:(> (- ?now ?t) 1)) (seq ?seq))
    =>
@@ -171,10 +171,6 @@
                                    prepare_rs)
                       (param-names $?param-names)
                       (param-values $?param-values))
-  ; (domain-obj-is-of-type ?mps&:(eq ?mps (plan-action-arg m
-  ;                                                        ?param-names
-  ;                                                        ?param-values))
-  ;                        mps)
   ?st <- (timer (name ?nst&:(eq ?nst
                                (sym-cat prepare- ?goal-id - ?plan-id
                                         - ?id -send-timer))))
@@ -182,20 +178,36 @@
                                (sym-cat prepare- ?goal-id - ?plan-id
                                         - ?id -abort-timer))))
   ?md <- (metadata-prepare-mps ?mps $?date)
-  
-  (machine (name ?mps) (state READY-AT-OUTPUT|WAIT-IDLE|PROCESSED|PREPARED))
-  ; (wm-fact (key domain fact mps-state args? m ?mps statename IDLE))
-  
+  (machine (name ?mps) (state READY-AT-OUTPUT|WAIT-IDLE|PROCESSED))
   ?plan-action-sent <- (plan-action-sent (plan-id ?id))
-
   =>
   (printout t "Action Prepare " ?mps " is final" crlf)
   (retract ?st ?at ?md ?plan-action-sent)
   (modify ?pa (state EXECUTION-SUCCEEDED))
-
 )
 
-
+(defrule refbox-action-prepare-mps-final-ds-special-case
+  "Finalize the prepare action if the desired machine state was reached"
+  (time ?now)
+  ?pa <- (plan-action (plan-id ?plan-id) (goal-id ?goal-id) (id ?id)
+                      (state RUNNING)
+                      (action-name prepare_ds)
+                      (param-names $?param-names)
+                      (param-values $?param-values))
+  ?st <- (timer (name ?nst&:(eq ?nst
+                               (sym-cat prepare- ?goal-id - ?plan-id
+                                        - ?id -send-timer))))
+  ?at <- (timer (name ?nat&:(eq ?nat
+                               (sym-cat prepare- ?goal-id - ?plan-id
+                                        - ?id -abort-timer))))
+  ?md <- (metadata-prepare-mps ?mps $?date)
+  (machine (name ?mps) (state READY-AT-OUTPUT|WAIT-IDLE|PROCESSED|PREPARED))
+  ?plan-action-sent <- (plan-action-sent (plan-id ?id))
+  =>
+  (printout t "Action Prepare " ?mps " is final" crlf)
+  (retract ?st ?at ?md ?plan-action-sent)
+  (modify ?pa (state EXECUTION-SUCCEEDED))
+)
 
 (defrule refbox-action-prepare-mps-abort-on-broken
   "Abort preparing if the mps got broken"

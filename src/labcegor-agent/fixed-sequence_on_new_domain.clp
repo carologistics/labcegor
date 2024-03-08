@@ -42,18 +42,23 @@
                       				    bs ?bs
                       				    bs-side ?bs-side
                       				    rs ?rs
+						    cs ?cs
+						    cc ?cc
                       				    wp ?wp
                   				    ring ?ring
 						    order-id ?order-id))
-
-  ?used_bs <- (machine (name ?bs) (type BS))
-  ?used_rs <- (machine (name ?rs) (type RS))
+  (order (id ?order-id) (cap-color ?cap))
   =>
   (bind ?from_side None)
   (bind ?rs-wait-side WAIT)
    
   (plan-assert-sequential (sym-cat PLAN-first-bs-rs-run- (gensym*)) ?goal-id ?robot
-		(plan-assert-action move ?curr-loc ?from_side ?bs ?bs-side ?robot)
+		(plan-assert-action move ?curr-loc ?from_side ?cs INPUT ?robot)
+		(plan-assert-action pick_at_shelf ?robot ?cc ?cs)
+		(plan-assert-action place ?robot ?cc ?cs)
+		(plan-assert-action prepare_cs ?cs RETRIEVE_CAP)
+		(plan-assert-action cs_retrieve_cap ?cs ?cc ?cap)
+		(plan-assert-action move ?cs INPUT ?bs ?bs-side ?robot)
 		(plan-assert-action prepare_bs ?bs ?bs-side ?wp)
                 (plan-assert-action pick_at_output ?robot (sym-cat ?bs (sym-cat - ?bs-side)) ?bs ?wp)
 		(plan-assert-action move ?bs ?bs-side ?rs ?rs-wait-side ?robot)
@@ -71,7 +76,6 @@
 								    	  	  rs ?rs
 								    	  	  ring ?ring
 									          order-id ?order-id) (outcome ~COMPLETED))
-  ?payment-mps <- (machine (name ?mps) (type CS))
   =>
   (bind ?wp-payment additional_base)
   (bind ?rs-side slide-side)
@@ -83,7 +87,6 @@
 			(plan-assert-action place_at_slide ?robot ?wp-payment ?rs)
   )
   (modify ?g (mode EXPANDED))
-  (modify ?payment-mps (state IDLE))
 )
 
 
@@ -162,6 +165,7 @@
   	    	  (plan-assert-action move ?rs ?rs-side ?cs ?cs-side ?robot)
 		  (plan-assert-action place ?robot ?wp ?cs)
 		  (plan-assert-action prepare_cs ?cs MOUNT_CAP) ; check whether mps-state is ready_at_output
+		  (plan-assert-action cs_mount_cap ?cs ?cap)
 		  (plan-assert-action move ?cs ?cs-side ?cs ?cs-output-side ?robot)
 		  (plan-assert-action pick_at_output ?robot (sym-cat ?cs (sym-cat - ?cs-output-side)) ?cs ?wp-added)
 		  (plan-assert-action move ?cs ?cs-output-side ?ds ?ds-side ?robot)
@@ -169,10 +173,7 @@
 		  (plan-assert-action move ?ds ?ds-side START None ?robot)
   )
   ; (assert (wm-fact (key domain fact at args? r ?robot x START)))
-  
   (modify ?g (mode EXPANDED))
-  ; (modify ?used_cs (state IDLE))
-  ; (modify ?used_ds (state IDLE))
 )
 
 (defrule goal-expander-bs-cs-run-c0
@@ -240,7 +241,6 @@
 		(plan-assert-action prepare_ds ?ds ?order-id)
 		(plan-assert-action move ?ds ?ds-side START None ?robot)
   )
-  ; (modify ?mps-ds (state IDLE))
   ; (assert (wm-fact (key domain fact at args? r ?robot x START)))
   (modify ?g (mode EXPANDED))
 )
