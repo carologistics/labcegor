@@ -70,7 +70,7 @@
 
 
 (defrule refbox-action-prepare-mps-start
-  (time $?now)
+  (time ?now)
   ?pa <- (plan-action (plan-id ?plan-id) (goal-id ?goal-id) (id ?id)
                       (state PENDING)
                       (action-name ?action&prepare_bs|
@@ -99,7 +99,7 @@
 
 
 (defrule refbox-action-mps-prepare-send-signal
-  (declare (salience ?*SALIENCE-LOW*))
+  ; (declare (salience ?*SALIENCE-LOW*))
   ?pa <- (plan-action (plan-id ?plan-id) (goal-id ?goal-id) (id ?id)
                       (state RUNNING)
                       (action-name prepare_bs|
@@ -109,10 +109,10 @@
                       (executable TRUE)
                       (param-names $?param-names)
                       (param-values $?param-values))
-  (domain-obj-is-of-type ?mps&:(eq ?mps (plan-action-arg m
-                                                         ?param-names
-                                                         ?param-values))
-                         mps)
+  ; (domain-obj-is-of-type ?mps&:(eq ?mps (plan-action-arg m
+  ;                                                        ?param-names
+  ;                                                        ?param-values))
+  ;                         mps)
   (metadata-prepare-mps ?mps ?team-color ?peer-id $?instruction_info)
   (wm-fact (key domain fact mps-type args? m ?mps t ?mps-type) (value TRUE))
   (protobuf-msg (type "llsf_msgs.MachineInfo"))
@@ -129,6 +129,12 @@
         (pb-set-field ?bs-inst "color" (nth$ 2 ?instruction_info))
         (pb-set-field ?machine-instruction "instruction_bs" ?bs-inst)
     )
+    (case RS
+      then
+        (bind ?rs-inst (pb-create "llsf_msgs.PrepareInstructionRS"))
+        (pb-set-field ?rs-inst "ring_color" (nth$ 1 ?instruction_info) )
+        (pb-set-field ?machine-instruction "instruction_rs" ?rs-inst)
+    )
     (case CS
       then
       	(bind ?cs-inst (pb-create "llsf_msgs.PrepareInstructionCS"))
@@ -139,22 +145,20 @@
       then
         (bind ?ds-inst (pb-create "llsf_msgs.PrepareInstructionDS"))
         (bind ?order (nth$ 1 ?instruction_info))
-        (bind ?order-id (float (string-to-field (sub-string 2 (length$ (str-cat ?order)) (str-cat ?order)))))
+        ; (bind ?order-id (float (string-to-field (sub-string 2 (length$ (str-cat ?order)) (str-cat ?order)))))
+        (bind ?order-id (float ?order))
         (pb-set-field ?ds-inst "order_id" ?order-id)
         (pb-set-field ?machine-instruction "instruction_ds" ?ds-inst)
-     )
+    )
   )
   (pb-broadcast ?peer-id ?machine-instruction)
   (pb-destroy ?machine-instruction)
   (printout t "Sent Prepare Msg for " ?mps " with " ?instruction_info  crlf) 
 )
 
-
-
-
 (defrule refbox-action-prepare-mps-final
   "Finalize the prepare action if the desired machine state was reached"
-  (time $?now)
+  (time ?now)
   ?pa <- (plan-action (plan-id ?plan-id) (goal-id ?goal-id) (id ?id)
                       (state RUNNING)
                       (action-name prepare_bs|
@@ -163,10 +167,10 @@
                                    prepare_rs)
                       (param-names $?param-names)
                       (param-values $?param-values))
-  (domain-obj-is-of-type ?mps&:(eq ?mps (plan-action-arg m
-                                                         ?param-names
-                                                         ?param-values))
-                         mps)
+  ; (domain-obj-is-of-type ?mps&:(eq ?mps (plan-action-arg m
+  ;                                                        ?param-names
+  ;                                                        ?param-values))
+  ;                        mps)
   ?st <- (timer (name ?nst&:(eq ?nst
                                (sym-cat prepare- ?goal-id - ?plan-id
                                         - ?id -send-timer))))
@@ -174,15 +178,23 @@
                                (sym-cat prepare- ?goal-id - ?plan-id
                                         - ?id -abort-timer))))
   ?md <- (metadata-prepare-mps ?mps $?date)
-  (wm-fact (key domain fact mps-state args? m ?mps s READY-AT-OUTPUT|
-                                                     WAIT-IDLE|
-                                                     PROCESSING|
-                                                     PROCESSED|
-                                                     PREPARED))
+
+  ; first modify plan-action to EXECUTION-SUCCEEDED then domain-effects-apply, why check those?
+  ; (wm-fact (key domain fact mps-state args? m ?mps statename READY-AT-OUTPUT|
+  ;                                                    WAIT-IDLE|
+  ;                                                    PROCESSING|
+  ;                                                    PROCESSED|
+  ;                                                    PREPARED))
+  (wm-fact (key domain fact mps-state args? m ?mps statename IDLE))
   =>
   (printout t "Action Prepare " ?mps " is final" crlf)
   (retract ?st ?at ?md)
   (modify ?pa (state EXECUTION-SUCCEEDED))
+
+  ; from  domain-effects-check-for-sensed, is this need to send to refbox?
+  ; (domain-pending-sensed-fact (name mps-state) (goal-id C0-bs-cs-run-gen178) (plan-id PLAN-first-bs-rs-run-gen179gen185) (action-id 2) (type POSITIVE) (param-values C-BS READY-AT-OUTPUT))
+  
+
 )
 
 
@@ -197,10 +209,10 @@
                                    prepare_rs)
                       (param-names $?param-names)
                       (param-values $?param-values))
-  (domain-obj-is-of-type ?mps&:(eq ?mps (plan-action-arg m
-                                                         ?param-names
-                                                         ?param-values))
-                      					 mps)
+  ; (domain-obj-is-of-type ?mps&:(eq ?mps (plan-action-arg m
+  ;                                                        ?param-names
+  ;                                                        ?param-values))
+  ;                     					 mps)
   ?st <- (timer (name ?nst&:(eq ?nst
                                (sym-cat prepare- ?goal-id - ?plan-id
                                         - ?id -send-timer))))

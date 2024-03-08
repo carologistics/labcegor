@@ -228,6 +228,7 @@
 	        (plan-assert-action pick_at_output ?robot (sym-cat ?cs (sym-cat - OUTPUT)) ?cs ?wp-base-cap)
 		(plan-assert-action move ?cs OUTPUT ?ds INPUT ?robot)
 		(plan-assert-action place ?robot ?wp-base-cap ?ds)
+		(plan-assert-action prepare_ds ?ds ?order-id)
 		(plan-assert-action move ?ds ?ds-side START None ?robot)
   )
   ; (modify ?mps-ds (state IDLE))

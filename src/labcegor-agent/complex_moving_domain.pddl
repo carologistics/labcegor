@@ -24,6 +24,7 @@
     C0 C1 C2 C3 - complexity
     IDLE BROKEN PREPARED PROCESSING PROCESSED WAIT-IDLE READY-AT-OUTPUT DOWN - mps-statename
     RETRIEVE_CAP MOUNT_CAP - cs-operation
+    BASE_NONE BASE_CLEAR BASE_RED BASE_BLACK BASE_SILVER - base-color
   )
   
   (:predicates

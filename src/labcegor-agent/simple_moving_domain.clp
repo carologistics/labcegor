@@ -1,13 +1,25 @@
-; (defglobal ?*robot-name-list* = (create$))
-
 (defrule load-domain
     (not (domain-loaded))
     (wm-fact (id "/refbox/phase") (value $?))
     (wm-fact (id "/refbox/state") (value $?))
-  => 
+    => 
     (parse-pddl-domain (path-resolve "labcegor-agent/complex_moving_domain.pddl"))
     (assert (domain-loaded))
     (printout t "successfully load domain" crlf)
+)
+
+(defrule domain-set-sensedpredicates
+  (domain-loaded)
+  ?p <- (domain-predicate (name mps-state) (sensed FALSE))
+  =>
+  (modify ?p (sensed TRUE))
+)
+
+(defrule domain-nowait-actions
+  (domain-loaded)
+  ?o <- (domain-operator (name place|place_at_slide|prepare_bs|prepare_rs|prepare_ds|prepare_cs) (wait-sensed ~FALSE))
+  =>
+  (modify ?o (wait-sensed FALSE))
 )
 
 
