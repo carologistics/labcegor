@@ -96,7 +96,9 @@
   (modify ?pa (state RUNNING))
 )
 
-
+(deftemplate plan-action-sent
+  (slot plan-id (type INTEGER))
+)
 
 (defrule refbox-action-mps-prepare-send-signal
   ; (declare (salience ?*SALIENCE-LOW*))
@@ -113,6 +115,7 @@
   ;                                                        ?param-names
   ;                                                        ?param-values))
   ;                         mps)
+  (not (plan-action-sent (plan-id ?id)))
   (metadata-prepare-mps ?mps ?team-color ?peer-id $?instruction_info)
   (wm-fact (key domain fact mps-type args? m ?mps t ?mps-type) (value TRUE))
   (protobuf-msg (type "llsf_msgs.MachineInfo"))
@@ -154,6 +157,7 @@
   (pb-broadcast ?peer-id ?machine-instruction)
   (pb-destroy ?machine-instruction)
   (printout t "Sent Prepare Msg for " ?mps " with " ?instruction_info  crlf) 
+  (assert (plan-action-sent (plan-id ?id)))
 )
 
 (defrule refbox-action-prepare-mps-final
@@ -178,22 +182,16 @@
                                (sym-cat prepare- ?goal-id - ?plan-id
                                         - ?id -abort-timer))))
   ?md <- (metadata-prepare-mps ?mps $?date)
+  
+  (machine (name ?mps) (state READY-AT-OUTPUT|WAIT-IDLE|PROCESSED|PREPARED))
+  ; (wm-fact (key domain fact mps-state args? m ?mps statename IDLE))
+  
+  ?plan-action-sent <- (plan-action-sent (plan-id ?id))
 
-  ; first modify plan-action to EXECUTION-SUCCEEDED then domain-effects-apply, why check those?
-  ; (wm-fact (key domain fact mps-state args? m ?mps statename READY-AT-OUTPUT|
-  ;                                                    WAIT-IDLE|
-  ;                                                    PROCESSING|
-  ;                                                    PROCESSED|
-  ;                                                    PREPARED))
-  (wm-fact (key domain fact mps-state args? m ?mps statename IDLE))
   =>
   (printout t "Action Prepare " ?mps " is final" crlf)
-  (retract ?st ?at ?md)
+  (retract ?st ?at ?md ?plan-action-sent)
   (modify ?pa (state EXECUTION-SUCCEEDED))
-
-  ; from  domain-effects-check-for-sensed, is this need to send to refbox?
-  ; (domain-pending-sensed-fact (name mps-state) (goal-id C0-bs-cs-run-gen178) (plan-id PLAN-first-bs-rs-run-gen179gen185) (action-id 2) (type POSITIVE) (param-values C-BS READY-AT-OUTPUT))
-  
 
 )
 
