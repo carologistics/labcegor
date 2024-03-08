@@ -4,18 +4,21 @@
 )
 
 
-(defrule subgoal-creation-bs-first-runc0  ; move to bs output side, prepare bs, pick base from output, move to cs input side, place base to cs.
+(defrule subgoal-creation-bs-first-runc0  ; move to cs shelf side bs output side, prepare bs, pick base from output, move to cs input side, place base to cs.
   ?trigger_goal <- (goal (id ?goal-id) 
 		         (class tri-bs-c0firstrun) 
 			 (params order-id ?order-id))
   ?robot-at-start <- (wm-fact (key domain fact at args? r ?robot mps-with-side START)) 
   (order (id ?order-id) (base-color ?wp) (cap-color ?cap))
   (machine (name ?bs) (type BS) (state IDLE))
+  
+  (wp-cap-color (cc ?cc) (cap-color ?cap))
+  (domain-fact (name wp-on-shelf) (param-values ?cc ?cs))
   (machine (name ?cs) (type CS) (state IDLE))
   ;?mps-bs <- (machine (name ?bs) (type BS) (state IDLE))
   ;?mps-cs <- (machine (name ?cs) (type CS) (state IDLE))
   (not (goal (class bs-run-c2firstrun-c0)))
-
+  
   (not (mps-occupied (mps ?bs)))
   (not (mps-occupied (mps ?cs)))
   =>
@@ -31,6 +34,7 @@
                                     bs ?bs
                                     bs-side ?bs-side		
                        	      	    cs ?cs
+				    cc ?cc
                                     wp ?wp
                                     cap ?cap
 				    order-id ?order-id)
@@ -50,6 +54,7 @@
                 bs ?bs
                 bs-side ?bs-side
                 cs ?cs
+		cc ?cc
                 wp ?wp
                 cap ?cap
 		order-id ?order-id) (outcome COMPLETED))
@@ -65,6 +70,7 @@
                    	        bs ?bs
 				bs-side ?bs-side
                         	cs ?cs
+				cc ?cc
                               	wp ?wp
                               	cap ?cap
 				order-id ?order-id)
@@ -93,7 +99,8 @@
 				cs ?cs
                                 ds ?ds
                                 wp ?wp-base-cap
-				order-id ?order-id)
+				order-id ?order-id
+				cap-color ?cap)
                             )
   )
 
@@ -108,7 +115,7 @@
 
 
 (defrule update_c0_order
-  ?premise_goal <- (goal (class C0-cs-ds-run) (params robot ?robot cs ?cs ds ?ds wp ?wp order-id ?id) (outcome COMPLETED))
+  ?premise_goal <- (goal (class C0-cs-ds-run) (params robot ?robot cs ?cs ds ?ds wp ?wp order-id ?id cap-color ?cap) (outcome COMPLETED))
   ?current-order <- (order (id ?id) (quantity-requested ?req) (quantity-delivered ?done))
 
   ?mps-occ-cs <- (mps-occupied (mps ?cs))

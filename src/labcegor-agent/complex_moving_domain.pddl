@@ -15,6 +15,7 @@
     workpiece - object
     order - object
     cs-operation - object
+    cap-carrier - workpiece
   )
   
   (:constants
@@ -41,6 +42,7 @@
     (ds-prepared-order ?m - mps ?ord - order)
     (rs-prepared-color ?m - mps ?col - ring-color)
     (cs-can-perform ?m - mps ?op - cs-operation)
+    (wp-on-shelf ?wp - workpiece ?m - mps)
   )
   
   (:action move
@@ -123,4 +125,41 @@
              (rs-prepared-color ?m ?rc)
             )
   )
+
+  (:action pick_at_shelf
+    :parameters (?r - robot ?cc - cap-carrier ?m - mps)
+    :precondition (and (at ?r ?m)
+	               (wp-on-shelf ?cc ?m)
+		       (robot-grip-free ?r)
+	          )
+     :effect (and (robot-grip-busy ?r ?cc)
+	          (not (robot-grip-free ?r))
+	     )
+  )
+
+  (:action cs_retrieve_cap
+	:parameters (?m - mps ?cc - cap-carrier ?capcol - cap-color)
+	:precondition (and (mps-type ?m CS)
+	                   (or (mps-state ?m PROCESSING)
+	                       (mps-state ?m READY-AT-OUTPUT)
+	                   )
+	              )
+	:effect (and (cs-can-perform ?m MOUNT_CAP)
+	        )
+  )
+
+  
+  (:action cs_mount_cap
+	:parameters (?m - mps ?capcol - cap-color)
+	:precondition (and (mps-type ?m CS)
+	                   (or (mps-state ?m PROCESSING)
+	                       (mps-state ?m READY-AT-OUTPUT)
+	                   )
+	              )
+	:effect (and (cs-can-perform ?m RETRIEVE_CAP)
+	             (not (cs-can-perform ?m MOUNT_CAP))
+	        )
+  )
+
+
 )

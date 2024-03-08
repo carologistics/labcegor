@@ -81,7 +81,7 @@
                       (param-names $?param-names)
                       (param-values $?param-values))
   (wm-fact (key refbox team-color) (value ?team-color&:(neq ?team-color nil)))
-  ?r-peer <- (refbox-peer (name refbox-public) (peer-id ?peer-id))
+  ?r-peer <- (refbox-peer (name refbox-private) (peer-id ?peer-id))
   =>
   (bind ?mps (nth$ 1 ?param-values))
   (bind ?instruction_info (rest$ ?param-values))

@@ -1,3 +1,9 @@
+(deftemplate wp-cap-color
+  (slot cc (type SYMBOL))
+  (slot cap-color (type SYMBOL))
+)
+
+
 (defrule load-domain
     (not (domain-loaded))
     (wm-fact (id "/refbox/phase") (value $?))
@@ -76,6 +82,19 @@
         (assert (domain-fact (name mps-location) (param-values ?mps-side)))
       )
     )
+    (assert
+	      (domain-fact (name wp-on-shelf) (param-values CCB1 ?cs2))
+     	      ; (domain-fact (name wp-on-shelf) (param-values CCB2 ?cs2))
+      	      ; (domain-fact (name wp-on-shelf) (param-values CCB3 ?cs2))
+      	      (domain-fact (name wp-on-shelf) (param-values CCG1 ?cs1))
+      	      ; (domain-fact (name wp-on-shelf) (param-values CCG2 ?cs1))
+      	      ; (domain-fact (name wp-on-shelf) (param-values CCG3 ?cs1))
+    	      (wp-cap-color (cc CCB1) (cap-color CAP_BLACK))
+	      (wp-cap-color (cc CCG1) (cap-color CAP_GREY))
+    )
+
+
+
     (assert (domain-fact (name mps-type) (param-values ?bs BS))
 	    (domain-fact (name mps-type) (param-values ?cs1 CS))	
 	    (domain-fact (name mps-type) (param-values ?cs2 CS))	
@@ -83,6 +102,11 @@
 	    (domain-fact (name mps-type) (param-values ?rs2 RS))	
 	    (domain-fact (name mps-type) (param-values ?ds DS))	
     )
-
+    
+    (assert
+      (domain-fact (name cs-can-perform) (param-values ?cs1 RETRIEVE_CAP))
+      (domain-fact (name cs-can-perform) (param-values ?cs2 RETRIEVE_CAP))
+    )
+    
     (printout t "initialization complete." crlf)
 )

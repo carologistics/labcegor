@@ -182,6 +182,7 @@
                       				    bs ?bs
                       				    bs-side ?bs-side
         					    cs ?cs
+						    cc ?cc
                       				    wp ?wp
         				 	    cap ?cap
 						    order-id ?order-id))
@@ -189,9 +190,15 @@
   ?used_bs <- (machine (name ?bs) (type BS))
   ?used_cs <- (machine (name ?cs) (type CS))
   =>
-  (bind ?wp-add (sym-cat ?wp ?cap)) 
+  (bind ?wp-add (sym-cat ?wp ?cap))
+  (bind ?cap-carrier-side shelf-side) 
   (plan-assert-sequential (sym-cat PLAN-first-bs-rs-run- (gensym*)) ?goal-id ?robot
-		(plan-assert-action move ?curr-loc None ?bs ?bs-side ?robot)
+		(plan-assert-action move ?curr-loc None ?cs INPUT ?robot)
+		(plan-assert-action pick_at_shelf ?robot ?cc ?cs)
+		(plan-assert-action place ?robot ?cc ?cs)
+		(plan-assert-action prepare_cs ?cs RETRIEVE_CAP)
+		(plan-assert-action cs_retrieve_cap ?cs ?cc ?cap)
+		(plan-assert-action move ?cs INPUT ?bs ?bs-side ?robot)
 		(plan-assert-action prepare_bs ?bs ?bs-side ?wp)
     		(plan-assert-action pick_at_output ?robot (sym-cat ?bs (sym-cat - ?bs-side)) ?bs ?wp)
 		(plan-assert-action move ?bs ?bs-side ?cs INPUT ?robot)
@@ -210,7 +217,8 @@
 				                    cs ?cs
             	        	        	    ds ?ds
                 	        	    	    wp ?wp
-						    order-id ?order-id))
+						    order-id ?order-id
+						    cap-color ?cap))
 
   
   (wp_on_output (mps ?cs) (wp ?wp-base-cap))
@@ -226,7 +234,8 @@
 		(plan-assert-action move ?cs INPUT ?cs OUTPUT ?robot)
 		(plan-assert-action prepare_cs ?cs MOUNT_CAP)
 	        (plan-assert-action pick_at_output ?robot (sym-cat ?cs (sym-cat - OUTPUT)) ?cs ?wp-base-cap)
-		(plan-assert-action move ?cs OUTPUT ?ds INPUT ?robot)
+		(plan-assert-action cs_mount_cap ?cs ?cap)
+  		(plan-assert-action move ?cs OUTPUT ?ds INPUT ?robot)
 		(plan-assert-action place ?robot ?wp-base-cap ?ds)
 		(plan-assert-action prepare_ds ?ds ?order-id)
 		(plan-assert-action move ?ds ?ds-side START None ?robot)
