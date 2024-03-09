@@ -18,8 +18,17 @@
 (defrule order_expansion_c0
   ?order_c0 <- (order (id ?id) (complexity C0) (base-color ?base-color) 
 			(quantity-requested ?quantity-requested&:(> ?quantity-requested 0)))
+  
+  ; sort id index within same complexity, starting from lowest one
+  ; if not exists one order with lower id,
+  ; or there exists and already finished. 
+  (or  (not (order (id ?other-id&:(< ?other-id ?id)) (complexity C0)))
+       (and (order (id ?other-id) (complexity C0))
+       	    (finish-order (order-id ?other-id))
+       )
+  )
   (not (finish-order (order-id ?id)))
-  (debug)
+  ; (debug)
   =>
   ; expand this order
   (assert (goal (id (sym-cat tri-bs-c0firstrun- (gensym*))) (class tri-bs-c0firstrun) (params order-id ?id))) ; 
@@ -32,8 +41,18 @@
 (defrule order_expansion_c1
   ?order_c1 <- (order (id ?id) (complexity C1) (base-color ?base-color) (quantity-requested ?quantity-requested&:(> ?quantity-requested 0)) (ring-colors ?ring-color1))
   (ring-spec (color ?ring-color1) (cost ?cost))
-  (debug)
+  ; (debug)
   (not (finish-order (order-id ?id)))
+
+  ; sort id index within same complexity, starting from lowest one
+  ; if not exists one order with lower id,
+  ; or there exists and already finished.
+  (or  (not (order (id ?other-id&:(< ?other-id ?id)) (complexity C1)))
+       (and (order (id ?other-id) (complexity C1))
+            (finish-order (order-id ?other-id))
+       )
+  )
+
   =>
   (assert 
      (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params order-id ?id ring ?ring-color1))
@@ -51,6 +70,17 @@
   (ring-spec (color ?ring-color2) (cost ?cost-2))
   ; (debug)
   (not (finish-order (order-id ?id)))
+
+
+  ; sort id index within same complexity, starting from lowest one
+  ; if not exists one order with lower id,
+  ; or there exists and already finished.
+  (or  (not (order (id ?other-id&:(< ?other-id ?id)) (complexity C2)))
+       (and (order (id ?other-id) (complexity C2))
+            (finish-order (order-id ?other-id))
+       )
+  )
+
   =>
   ; expand this order
   (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params order-id ?id ring ?ring-color1)))
@@ -75,8 +105,19 @@
   (ring-spec (color ?ring-color1) (cost ?cost-1))
   (ring-spec (color ?ring-color2) (cost ?cost-2))
   (ring-spec (color ?ring-color2) (cost ?cost-3))
-  (debug)
+  ; (debug)
   (not (finish-order (order-id ?id)))
+
+  ; sort id index within same complexity, starting from lowest one
+  ; if not exists one order with lower id,
+  ; or there exists and already finished.
+  (or  (not (order (id ?other-id&:(< ?other-id ?id)) (complexity C3)))
+       (and (order (id ?other-id) (complexity C3))
+            (finish-order (order-id ?other-id))
+       )
+  )
+
+
   =>
    (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params order-id ?id ring ?ring-color1)))
    (assert (goal (id (sym-cat tri-bs-c3firstrun- (gensym*))) (class tri-bs-c3firstrun) (params order-id ?id ring-color ?ring-color1)))
