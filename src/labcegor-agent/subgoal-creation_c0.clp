@@ -15,8 +15,8 @@
   (wp-cap-color (cc ?cc) (cap-color ?cap))
   (domain-fact (name wp-on-shelf) (param-values ?cc ?cs))
   (machine (name ?cs) (type CS) (state IDLE))
-  ;?mps-bs <- (machine (name ?bs) (type BS) (state IDLE))
-  ;?mps-cs <- (machine (name ?cs) (type CS) (state IDLE))
+  ; ?mps-bs <- (machine (name ?bs) (type BS) (state IDLE))
+  ; ?mps-cs <- (machine (name ?cs) (type CS) (state IDLE))
   (not (goal (class bs-run-c2firstrun-c0)))
   
   (not (mps-occupied (mps ?bs)))
@@ -27,8 +27,6 @@
   (not (finish-order (order-id ?order-id)))
   
   =>
-  ;(modify ?mps-bs (state PROCESSING))
-  ;(modify ?mps-cs (state PROCESSING)) 
   (bind ?bs-side OUTPUT)
   
   (assert (goal (id (sym-cat C0-bs-cs-run- (gensym*)))
@@ -47,7 +45,8 @@
                             (required-resources ?wp)
   )
   (assert (mps-occupied (mps ?bs))
-	  (mps-occupied (mps ?cs)))
+	  (mps-occupied (mps ?cs))
+  )
   
   (retract ?trigger_goal ?robot-at-start)
 )
@@ -85,8 +84,8 @@
 			 (class tri-cs-c0run)
 			 (params order-id ?order-id))
 
-  ;?mps-cs <- (machine (name ?cs) (type CS) (state ~IDLE))
-  ;?mps-ds <- (machine (name ?ds) (type DS) (state IDLE))
+  ?mps-cs <- (machine (name ?cs) (type CS) (state IDLE))
+  ?mps-ds <- (machine (name ?ds) (type DS) (state IDLE))
   (machine (name ?ds) (type DS) (state IDLE))
   (not (goal (class C0-cs-ds-run)))
   (mps-occupied (mps ?cs))
@@ -114,8 +113,6 @@
   (assert (mps-occupied (mps ?ds)))
 
   (retract ?trigger_goal ?premise_goal)
-  ;(modify ?mps-ds (state PROCESSING))
-  ;(modify ?mps-cs (state IDLE))
 )
 
 
@@ -128,10 +125,6 @@
   ?cs-shield <- (cs-prepared (cs ?cs) (order-id ?order-id))
   
   =>
-  ; (modify ?current-order (quantity-requested (- ?req 1)) (quantity-delivered (+ ?done 1)))
-  ; (assert (wm-fact (key domain fact at args? r ?robot x START)))
-  
-  ; (bind ?delivered-wp (+ ?done 1))
   (if (eq ?req ?done)
       then
         (assert (finish-order (order-id ?id)))

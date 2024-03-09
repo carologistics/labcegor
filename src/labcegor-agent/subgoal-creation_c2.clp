@@ -20,7 +20,7 @@
   (machine (name ?bs) (type BS) (state IDLE))
   (machine (name ?rs) (type RS) (state IDLE))
   
-  (not (mps-occupied (mps ?cs)))
+  ; (not (mps-occupied (mps ?cs)))
   (not (mps-occupied (mps ?bs)))
   (not (mps-occupied (mps ?rs)))
 
@@ -47,12 +47,10 @@
                             (required-resources ?wp)
   ))
   (retract ?trigger_goal ?robot-at-start)
-  ; (modify ?mps-bs (state PROCESSING))
-  ; (modify ?mps-rs (state PROCESSING))
 
   (assert (mps-occupied (mps ?bs))
           (mps-occupied (mps ?rs))
-	  (mps-occupied (mps ?cs))
+	  ; (mps-occupied (mps ?cs))
   )
 
 )
@@ -70,9 +68,10 @@
 				     order-id ?order-id) (outcome COMPLETED))
 
   ?mps-occ-bs <- (mps-occupied (mps ?bs))
-  ?mps-occ-cs <- (mps-occupied (mps ?cs))
+  ; ?mps-occ-cs <- (mps-occupied (mps ?cs))
   =>
-  (retract ?mps-occ-bs ?mps-occ-cs)
+  (retract ?mps-occ-bs)
+  ; (retract ?mps-occ-bs ?mps-occ-cs)
 )
 
 
@@ -88,8 +87,8 @@
                                                            ring ?ring
 							   order-id ?order-id) (outcome COMPLETED))
 
-  ?finish_payment <- (finish_payment (order-id ?order-id) (ring ?ring))
-  ?ring-payment-status <- (ring_payment (order-id ?order-id) (ring ?ring))
+  ?finish_payment <- (finish_payment (order-id ?order-id) (ring ?ring) (index 1))
+  ?ring-payment-status <- (ring_payment (order-id ?order-id) (ring ?ring) (index 1))
   (not (goal (class rs-run-c2firstrun)))
   (mps-occupied (mps ?rs))
   =>
@@ -116,8 +115,8 @@
 							wp ?wp
 							ring ?pre_ring
 							order-id ?order-id cs ?cs) (outcome COMPLETED))
-  ?finish_payment <- (finish_payment (order-id ?order-id) (ring ?ring-color))
-  ?ring-payment-status <- (ring_payment (order-id ?order-id) (ring ?ring-color))
+  ?finish_payment <- (finish_payment (order-id ?order-id) (ring ?ring-color) (index 2))
+  ?ring-payment-status <- (ring_payment (order-id ?order-id) (ring ?ring-color) (index 2))
   
   ; consider to delete it.
   ?trigger_goal <- (goal (id ?goal-id) (class trirs-loop-c2run) (mode FORMULATED) (params order-id ?order-id ring-color ?ring-color))

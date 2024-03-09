@@ -3,12 +3,14 @@
 (deftemplate ring_payment
   (slot order-id (type INTEGER))
   (slot ring (type SYMBOL))
+  (slot index (type INTEGER))
   (slot ring_collect (type INTEGER))
 )
 
 (deftemplate finish_payment
   (slot order-id (type INTEGER))
   (slot ring (type SYMBOL))
+  (slot index (type INTEGER))
 )
 
 (deftemplate finish-order                                                       
@@ -55,7 +57,7 @@
 
   =>
   (assert 
-     (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params order-id ?id ring ?ring-color1))
+     (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params order-id ?id ring ?ring-color1 index 1))
      (goal (id (sym-cat tri-bs-c1firstrun- (gensym*))) (class tri-bs-c1firstrun) (params order-id ?id ring-color ?ring-color1)) ; bs-rs
      (goal (id (sym-cat rs-cs-c1run- (gensym*))) (class trirs-cs-c1run) (params order-id ?id)) ; rs - cs
   )
@@ -83,11 +85,11 @@
 
   =>
   ; expand this order
-  (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params order-id ?id ring ?ring-color1)))
+  (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params order-id ?id ring ?ring-color1 index 1)))
   (assert (goal (id (sym-cat tri-bs-c2firstrun- (gensym*))) (class tri-bs-c2firstrun) (params order-id ?id ring-color ?ring-color1)))
          
   ; 2nd run rs-loop
-  (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params order-id ?id ring ?ring-color2)))
+  (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params order-id ?id ring ?ring-color2 index 2)))
   (assert (goal (id (sym-cat rs-loop-c2run- (gensym*))) (class trirs-loop-c2run) (params order-id ?id ring-color ?ring-color2)))
 
   ; go to rs-cs-ds
@@ -119,15 +121,15 @@
 
 
   =>
-   (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params order-id ?id ring ?ring-color1)))
+   (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params order-id ?id ring ?ring-color1 index 1)))
    (assert (goal (id (sym-cat tri-bs-c3firstrun- (gensym*))) (class tri-bs-c3firstrun) (params order-id ?id ring-color ?ring-color1)))
          
    ; 2nd run, rs-loop-1
-   (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params order-id ?id ring ?ring-color2)))
+   (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params order-id ?id ring ?ring-color2 index 2)))
    (assert (goal (id (sym-cat rs-loop1-c3run- (gensym*))) (class trirs-loop1-c3run) (params order-id ?id ring-color ?ring-color2)))
 
    ; 3rd run, rs-loop-2
-   (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params order-id ?id ring ?ring-color3)))
+   (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params order-id ?id ring ?ring-color3 index 3)))
    (assert (goal (id (sym-cat rs-loop2-c3run- (gensym*))) (class trirs-loop2-c3run) (params order-id ?id ring-color ?ring-color3)))
 
    ; go to rs-cs-ds

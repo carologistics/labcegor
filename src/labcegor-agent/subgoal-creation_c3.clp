@@ -17,7 +17,7 @@
   ?mps-rs <- (machine (name ?rs) (type RS) (state IDLE))
   (not (goal (class bs-run-c3firstrun)))
   
-  (not (mps-occupied (mps ?cs)))
+  ; (not (mps-occupied (mps ?cs)))
   (not (mps-occupied (mps ?bs)))
   (not (mps-occupied (mps ?rs)))
 
@@ -45,7 +45,7 @@
   (retract ?trigger_goal ?robot-at-start)
   (assert (mps-occupied (mps ?bs))
           (mps-occupied (mps ?rs))
-          (mps-occupied (mps ?cs))
+          ; (mps-occupied (mps ?cs))
   )
 )
 
@@ -62,9 +62,10 @@
                                      ring ?ring-color
 				     order-id ?order-id) (outcome COMPLETED))
   ?mps-occ-bs <- (mps-occupied (mps ?bs))
-  ?mps-occ-cs <- (mps-occupied (mps ?cs))
+  ; ?mps-occ-cs <- (mps-occupied (mps ?cs))
   =>
-  (retract ?mps-occ-bs ?mps-occ-cs)
+  (retract ?mps-occ-bs)
+  ; (retract ?mps-occ-bs ?mps-occ-cs)
 )
 
 
@@ -79,8 +80,8 @@
                                                            wp ?wp
                                                            ring ?ring
 							   order-id ?order-id) (outcome COMPLETED))
-  ?finish_payment <- (finish_payment (order-id ?order-id) (ring ?ring))
-  ?ring-payment-status <- (ring_payment (order-id ?order-id) (ring ?ring))
+  ?finish_payment <- (finish_payment (order-id ?order-id) (ring ?ring) (index 1))
+  ?ring-payment-status <- (ring_payment (order-id ?order-id) (ring ?ring) (index 1))
 
   (not (goal (class rs-run-c3firstrun)))
   (mps-occupied (mps ?rs))
@@ -109,8 +110,8 @@
 				 order-id ?order-id
 				 cs ?cs))
   ?trigger_goal <- (goal (id ?goal-id) (class trirs-loop1-c3run) (mode FORMULATED) (params order-id ?order-id ring-color ?ring-color))
-  ?finish_payment <- (finish_payment (order-id ?order-id) (ring ?ring-color))
-  ?ring-payment-status <- (ring_payment (order-id ?order-id) (ring ?ring-color))
+  ?finish_payment <- (finish_payment (order-id ?order-id) (ring ?ring-color) (index 2))
+  ?ring-payment-status <- (ring_payment (order-id ?order-id) (ring ?ring-color) (index 2))
   
   (or (ring-assignment (machine ?rs) (colors ?ring-color ?tmp))
       (ring-assignment (machine ?rs) (colors ?tmp ?ring-color))
@@ -159,8 +160,8 @@
 
   ?trigger_goal <- (goal (id ?goal-id) (class trirs-loop2-c3run) (mode FORMULATED) (params order-id ?order-id ring-color ?ring-color))
 
-  ?finish_payment <- (finish_payment (order-id ?order-id) (ring ?ring-color))
-  ?ring-payment-status <- (ring_payment (order-id ?order-id) (ring ?ring-color))
+  ?finish_payment <- (finish_payment (order-id ?order-id) (ring ?ring-color) (index 3))
+  ?ring-payment-status <- (ring_payment (order-id ?order-id) (ring ?ring-color) (index 3))
  
   (or (ring-assignment (machine ?rs) (colors ?ring-color ?tmp))
       (ring-assignment (machine ?rs) (colors ?tmp ?ring-color))
