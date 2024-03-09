@@ -21,6 +21,9 @@
   
   (not (mps-occupied (mps ?bs)))
   (not (mps-occupied (mps ?cs)))
+
+  (not (cs-prepared (cs ?cs)))
+  
   =>
   ;(modify ?mps-bs (state PROCESSING))
   ;(modify ?mps-cs (state PROCESSING)) 
@@ -120,18 +123,21 @@
 
   ?mps-occ-cs <- (mps-occupied (mps ?cs))
   ?mps-occ-ds <- (mps-occupied (mps ?ds))
+  
+  ?cs-shield <- (cs-prepared (cs ?cs) (order-id ?order-id))
+  
   =>
-  (modify ?current-order (quantity-requested (- ?req 1)) (quantity-delivered (+ ?done 1)))
+  ; (modify ?current-order (quantity-requested (- ?req 1)) (quantity-delivered (+ ?done 1)))
   ; (assert (wm-fact (key domain fact at args? r ?robot x START)))
   
-  (bind ?delivered-wp (+ ?done 1))
-  (if (eq ?req ?delivered-wp)
+  ; (bind ?delivered-wp (+ ?done 1))
+  (if (eq ?req ?done)
       then
         (assert (finish-order (order-id ?id)))
       else
         (printout t "" crlf)
   )
   
-  (retract ?premise_goal ?mps-occ-cs ?mps-occ-ds)
+  (retract ?premise_goal ?mps-occ-cs ?mps-occ-ds ?cs-shield)
 )
 

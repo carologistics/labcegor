@@ -125,7 +125,7 @@
 									rs-side ?rs-side
 									wp ?wp_now
 									ring ?ring
-									order-id ?order-id))
+									order-id ?order-id cs ?cs))
   ?used_rs <- (machine (name ?rs) (type RS))
   =>
   (bind ?rs-output-side OUTPUT)
@@ -208,7 +208,7 @@
 		(plan-assert-action place ?robot ?wp-add ?cs)
   )
   (modify ?g (mode EXPANDED))
-  ;(modify ?used_bs (state IDLE))
+  (assert (cs-prepared (cs ?cs) (order-id ?order-id)))
 )
 
 

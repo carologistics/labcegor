@@ -5,16 +5,27 @@
 			 (mode FORMULATED) 
 			 (params order-id ?order-id ring-color ?ring-color))
   ?robot-at-start <- (wm-fact (key domain fact at args? r ?robot mps-with-side START)) 
-  (order (id ?order-id) (base-color ?wp))
+  (order (id ?order-id) (base-color ?wp) (cap-color ?cap))
   (or (ring-assignment (machine ?rs) (colors ?ring-color ?tmp))
       (ring-assignment (machine ?rs) (colors ?tmp ?ring-color)) 
   )
   ?mps-bs <- (machine (name ?bs) (type BS) (state IDLE))
   ?mps-rs <- (machine (name ?rs) (type RS) (state IDLE))
   (not (goal (class bs-run-c2firstrun)))
+
+
+  (wp-cap-color (cc ?cc) (cap-color ?cap))
+  (domain-fact (name wp-on-shelf) (param-values ?cc ?cs))
+  (machine (name ?cs) (type CS) (state IDLE))
+  (machine (name ?bs) (type BS) (state IDLE))
+  (machine (name ?rs) (type RS) (state IDLE))
   
+  (not (mps-occupied (mps ?cs)))
   (not (mps-occupied (mps ?bs)))
   (not (mps-occupied (mps ?rs)))
+
+  (not (cs-prepared (cs ?cs)))
+
   =>
   (bind ?bs-side OUTPUT)
   (bind ?rs-side INPUT)
@@ -26,6 +37,8 @@
                                      bs ?bs
                                      bs-side ?bs-side
                                      rs ?rs
+				     cs ?cs
+				     cc ?cc
                                      wp ?wp
 				     ring ?ring-color
 				     order-id ?order-id
@@ -38,6 +51,7 @@
 
   (assert (mps-occupied (mps ?bs))
           (mps-occupied (mps ?rs))
+	  (mps-occupied (mps ?cs))
   )
 
 )
@@ -48,13 +62,16 @@
                                      bs ?bs
                                      bs-side ?bs-side
                                      rs ?rs
+				     cs ?cs
+				     cc ?cc
                                      wp ?wp
                                      ring ?ring-color
 				     order-id ?order-id) (outcome COMPLETED))
 
-  ?mps-occ <- (mps-occupied (mps ?bs))
+  ?mps-occ-bs <- (mps-occupied (mps ?bs))
+  ?mps-occ-cs <- (mps-occupied (mps ?cs))
   =>
-  (retract ?mps-occ)
+  (retract ?mps-occ-bs ?mps-occ-cs)
 )
 
 
@@ -64,6 +81,8 @@
                                                            bs ?bs
                                                            bs-side ?bs-side
                                                            rs ?rs
+							   cs ?cs
+							   cc ?cc
                                                            wp ?wp
                                                            ring ?ring
 							   order-id ?order-id) (outcome COMPLETED))
@@ -75,13 +94,13 @@
   =>
   (assert (goal (id (sym-cat rs-run-c2firstrun- (gensym*)))
 		(class rs-run-c2firstrun)
-		(params robot ?robot rs ?rs wp ?wp ring ?ring order-id ?order-id)))
+		(params robot ?robot rs ?rs wp ?wp ring ?ring order-id ?order-id cs ?cs)))
   (retract ?premise_goal ?finish_payment ?ring-payment-status)
 )
 
 
 (defrule subgoal-lifecycle-rs-first-run-c2
-  (goal (class rs-run-c2firstrun) (params robot ?robot rs ?rs wp ?wp ring ?ring order-id ?order-id) (outcome COMPLETED))
+  (goal (class rs-run-c2firstrun) (params robot ?robot rs ?rs wp ?wp ring ?ring order-id ?order-id cs ?cs) (outcome COMPLETED))
   ?mps-occ <- (mps-occupied (mps ?rs))
   =>
   (retract ?mps-occ)
@@ -95,7 +114,7 @@
 							rs ?pre_rs
 							wp ?wp
 							ring ?pre_ring
-							order-id ?order-id) (outcome COMPLETED))
+							order-id ?order-id cs ?cs) (outcome COMPLETED))
   ?finish_payment <- (finish_payment (order-id ?order-id) (ring ?ring-color))
   ?ring-payment-status <- (ring_payment (order-id ?order-id) (ring ?ring-color))
   
@@ -123,15 +142,14 @@
                                       rs-side INPUT
                                       wp ?wp_now
 				      ring ?ring-color
-				      order-id ?order-id)))
+				      order-id ?order-id cs ?cs)))
   (retract ?trigger_goal ?premise_goal ?finish_payment ?ring-payment-status)
-  ; (modify ?used_rs (state PROCESSING))
   (assert (mps-occupied (mps ?rs)))
 )
 
 
 (defrule subgoal-lifecycle-rs-loop-run-c2
-  (goal (class rs-loop-c2run) (params robot ?robot pre_rs ?pre_rs pre_rs_side ?pre_rs_side rs ?rs rs-side ?rs-side wp ?wp ring ?ring order-id ?order-id) (outcome COMPLETED))
+  (goal (class rs-loop-c2run) (params robot ?robot pre_rs ?pre_rs pre_rs_side ?pre_rs_side rs ?rs rs-side ?rs-side wp ?wp ring ?ring order-id ?order-id cs ?cs) (outcome COMPLETED))
   ?mps-occ <- (mps-occupied (mps ?rs))
   =>
   (retract ?mps-occ)
@@ -149,7 +167,7 @@
                 		   rs-side ?rs-side
                      		   wp ?wp
                    		   ring ?ring-color
-				   order-id ?order-id) 
+				   order-id ?order-id cs ?cs) 
 	  			(outcome COMPLETED))
 
     ?trigger_goal <- (goal (id ?goal-id) (class trirs-cs-c2run) (mode FORMULATED) (params order-id ?order-id))
@@ -157,6 +175,8 @@
 
     ?cs-mps <- (machine (name ?cs) (type CS) (state IDLE)) ; randomly choose one CS to go
     ?ds-mps <- (machine (name ?ds) (type DS) (state IDLE))
+    
+    (cs-prepared (cs ?cs) (order-id ?order-id))
     
     (not (mps-occupied (mps ?cs)))
     (not (mps-occupied (mps ?ds)))
@@ -180,8 +200,6 @@
                 )))
 
     (retract ?trigger_goal ?premise_goal)
-    ; (modify ?cs-mps (state PROCESSING))
-    ; (modify ?ds-mps (state PROCESSING))
     (assert (mps-occupied (mps ?cs))
 	    (mps-occupied (mps ?ds)))
 )
@@ -203,6 +221,8 @@
   ?mps-occ-cs <- (mps-occupied (mps ?cs))
   ?mps-occ-ds <- (mps-occupied (mps ?ds))
   
+  ?cs-shield <- (cs-prepared (cs ?cs) (order-id ?order-id))
+  
   =>
   (modify ?current-order (quantity-requested (- ?req 1)) (quantity-delivered (+ ?done 1)))
   ; (assert (wm-fact (key domain fact at args? r ?robot x START)))
@@ -216,4 +236,5 @@
   )
   
   (retract ?mps-occ-cs ?mps-occ-ds ?premise_goal)
+  (retract ?cs-shield)
 )

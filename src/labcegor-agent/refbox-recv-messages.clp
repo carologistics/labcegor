@@ -136,9 +136,35 @@
   (delayed-do-for-all-facts ((?ra1 ring-assignment) (?ra2 ring-assignment)) (and (< (fact-index ?ra1) (fact-index ?ra2)) (eq ?ra1:machine ?ra2:machine))
     (retract ?ra1)
   )
-  (retract ?pb-msg)
+  ; (retract ?pb-msg)
 )
 
+(defrule refbox-recv-MachineReportInfo
+  ?pb-msg <- (protobuf-msg (type "llsf_msgs.MachineReportInfo") (ptr ?p))
+  =>
+  (bind ?machines (create$))
+
+  (foreach ?m (pb-field-list ?p "reported_types")
+    (bind ?m-name (sym-cat (pb-field-value ?m "name")))
+    (if (and
+          (any-factp ((?wm-fact wm-fact))
+              (and (wm-key-prefix ?wm-fact:key (create$ domain fact mps-state))
+                    (eq (wm-key-arg ?wm-fact:key m) ?m-name)
+              )
+          )
+          (not
+            (any-factp ((?wm-fact wm-fact))
+                (and (wm-key-prefix ?wm-fact:key (create$ refbox explored-machine))
+                      (eq (wm-key-arg ?wm-fact:key m) ?m-name)
+                )
+            )
+          )
+        )
+      then
+        (assert (wm-fact (key refbox explored-machine args? m ?m-name)))
+    )
+  )
+)
 
 
 (defrule refbox-recv-OrderInfo

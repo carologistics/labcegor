@@ -118,7 +118,7 @@
   (not (plan-action-sent (plan-id ?id)))
   (metadata-prepare-mps ?mps ?team-color ?peer-id $?instruction_info)
   (wm-fact (key domain fact mps-type args? m ?mps t ?mps-type) (value TRUE))
-  ; (protobuf-msg (type "llsf_msgs.MachineInfo"))
+  (protobuf-msg (type "llsf_msgs.MachineInfo"))
   ; (machine (name ?mps) (state IDLE))
   =>
   (bind ?machine-instruction (pb-create "llsf_msgs.PrepareMachine"))
@@ -159,7 +159,9 @@
   (pb-destroy ?machine-instruction)
   (printout t "Sent Prepare Msg for " ?mps " with " ?instruction_info  crlf) 
   (assert (plan-action-sent (plan-id ?id)))
+  ; (retract ?pb-msg)
 )
+
 
 (defrule refbox-action-prepare-mps-final
   "Finalize the prepare action if the desired machine state was reached"
