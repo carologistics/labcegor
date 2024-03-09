@@ -20,6 +20,7 @@
   (not (mps-occupied (mps ?bs)))
   (not (mps-occupied (mps ?rs)))
 
+  (not (finish-order (order-id ?order-id)))
   (not (cs-prepared (cs ?cs)))
   =>
   (bind ?bs-side OUTPUT)
@@ -153,7 +154,7 @@
                         	ds-side INPUT
                         	order-id ?order-id)
 			(outcome COMPLETED))
-  ?current-order <- (order (id ?order-id) (quantity-requested ?req) (quantity-delivered ?done))
+  ?current-order <- (order (id ?order-id) (quantity-requested ?req) (quantity-delivered ?done&:(> ?done 0)))
   ?mps-occ-cs <- (mps-occupied (mps ?cs))
   ?mps-occ-ds <- (mps-occupied (mps ?ds))
 
@@ -163,6 +164,7 @@
   (if (eq ?req ?done)
       then
         (assert (finish-order (order-id ?order-id)))
+        (printout t "finish one c1 expansion for order id " ?order-id crlf)
       else
         (printout t "" crlf)
   )

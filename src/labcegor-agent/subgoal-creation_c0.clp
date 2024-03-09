@@ -23,6 +23,8 @@
   (not (mps-occupied (mps ?cs)))
 
   (not (cs-prepared (cs ?cs)))
+
+  (not (finish-order (order-id ?order-id)))
   
   =>
   ;(modify ?mps-bs (state PROCESSING))
@@ -119,8 +121,7 @@
 
 (defrule update_c0_order
   ?premise_goal <- (goal (class C0-cs-ds-run) (params robot ?robot cs ?cs ds ?ds wp ?wp order-id ?id cap-color ?cap) (outcome COMPLETED))
-  ?current-order <- (order (id ?id) (quantity-requested ?req) (quantity-delivered ?done))
-
+  ?current-order <- (order (id ?id) (quantity-requested ?req) (quantity-delivered ?done&:(> ?done 0)))
   ?mps-occ-cs <- (mps-occupied (mps ?cs))
   ?mps-occ-ds <- (mps-occupied (mps ?ds))
   
@@ -134,6 +135,7 @@
   (if (eq ?req ?done)
       then
         (assert (finish-order (order-id ?id)))
+	(printout t "finish one c0 expansion for order id " ?id crlf)
       else
         (printout t "" crlf)
   )

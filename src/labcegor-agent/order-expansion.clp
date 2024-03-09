@@ -93,9 +93,9 @@
    (assert (goal (id (sym-cat rs-cs-c3run- (gensym*))) (class trirs-cs-c3run) (params order-id ?id)))                  
 )
 
-(defrule complete_oneorder_expansion
-  ?finished-order <- (order (id ?id) (complexity ?com) (quantity-requested 0))
-  ?finished-status <- (finish-order (order-id ?id))
-  =>
-  (printout t "finish " ?com " expansion for order id " ?id crlf)
-)
+; (defrule complete_oneorder_expansion
+;   ?finished-order <- (order (id ?id) (complexity ?com) (quantity-requested 0))
+;   ?finished-status <- (finish-order (order-id ?id))
+;   =>
+;   (printout t "finish " ?com " expansion for order id " ?id crlf)
+; )
