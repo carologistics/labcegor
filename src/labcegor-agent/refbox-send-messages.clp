@@ -189,28 +189,28 @@
   (modify ?pa (state EXECUTION-SUCCEEDED))
 )
 
-(defrule refbox-action-prepare-mps-final-ds-special-case
-  "Finalize the prepare action if the desired machine state was reached"
-  (time ?now)
-  ?pa <- (plan-action (plan-id ?plan-id) (goal-id ?goal-id) (id ?id)
-                      (state RUNNING)
-                      (action-name prepare_ds)
-                      (param-names $?param-names)
-                      (param-values $?param-values))
-  ?st <- (timer (name ?nst&:(eq ?nst
-                               (sym-cat prepare- ?goal-id - ?plan-id
-                                        - ?id -send-timer))))
-  ?at <- (timer (name ?nat&:(eq ?nat
-                               (sym-cat prepare- ?goal-id - ?plan-id
-                                        - ?id -abort-timer))))
-  ?md <- (metadata-prepare-mps ?mps $?date)
-  (machine (name ?mps) (state READY-AT-OUTPUT|WAIT-IDLE|PROCESSED|PREPARED))
-  ?plan-action-sent <- (plan-action-sent (plan-id ?id))
-  =>
-  (printout t "Action Prepare " ?mps " is final" crlf)
-  (retract ?st ?at ?md ?plan-action-sent)
-  (modify ?pa (state EXECUTION-SUCCEEDED))
-)
+;(defrule refbox-action-prepare-mps-final-ds-special-case
+;  "Finalize the prepare action if the desired machine state was reached"
+;  (time ?now)
+;  ?pa <- (plan-action (plan-id ?plan-id) (goal-id ?goal-id) (id ?id)
+;                      (state RUNNING)
+;                      (action-name prepare_ds)
+;                      (param-names $?param-names)
+;                      (param-values $?param-values))
+;  ?st <- (timer (name ?nst&:(eq ?nst
+;                               (sym-cat prepare- ?goal-id - ?plan-id
+;                                        - ?id -send-timer))))
+;  ?at <- (timer (name ?nat&:(eq ?nat
+;                               (sym-cat prepare- ?goal-id - ?plan-id
+;                                        - ?id -abort-timer))))
+;  ?md <- (metadata-prepare-mps ?mps $?date)
+;  (machine (name ?mps) (state READY-AT-OUTPUT|WAIT-IDLE|PROCESSED|PREPARED))
+;  ?plan-action-sent <- (plan-action-sent (plan-id ?id))
+;  =>
+;  (printout t "Action Prepare " ?mps " is final" crlf)
+;  (retract ?st ?at ?md ?plan-action-sent)
+;  (modify ?pa (state EXECUTION-SUCCEEDED))
+;)
 
 (defrule refbox-action-prepare-mps-abort-on-broken
   "Abort preparing if the mps got broken"

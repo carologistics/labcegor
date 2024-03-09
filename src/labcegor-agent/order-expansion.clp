@@ -19,7 +19,7 @@
   ?order_c0 <- (order (id ?id) (complexity C0) (base-color ?base-color) 
 			(quantity-requested ?quantity-requested&:(> ?quantity-requested 0)))
   (not (finish-order (order-id ?id)))
-  ; (debug)
+  (debug)
   =>
   ; expand this order
   (assert (goal (id (sym-cat tri-bs-c0firstrun- (gensym*))) (class tri-bs-c0firstrun) (params order-id ?id))) ; 
@@ -32,7 +32,7 @@
 (defrule order_expansion_c1
   ?order_c1 <- (order (id ?id) (complexity C1) (base-color ?base-color) (quantity-requested ?quantity-requested&:(> ?quantity-requested 0)) (ring-colors ?ring-color1))
   (ring-spec (color ?ring-color1) (cost ?cost))
-  ; (debug)
+  (debug)
   (not (finish-order (order-id ?id)))
   =>
   (assert 
@@ -49,7 +49,7 @@
   ; order info c2 and ring cost
   (ring-spec (color ?ring-color1) (cost ?cost-1))
   (ring-spec (color ?ring-color2) (cost ?cost-2))
-  (debug)
+  ; (debug)
   (not (finish-order (order-id ?id)))
   =>
   ; expand this order
@@ -90,12 +90,5 @@
    (assert (goal (id (sym-cat rs-loop2-c3run- (gensym*))) (class trirs-loop2-c3run) (params order-id ?id ring-color ?ring-color3)))
 
    ; go to rs-cs-ds
-   (assert (goal (id (sym-cat rs-cs-c3run- (gensym*))) (class trirs-cs-c3run) (params order-id ?id)))                  
-)
-
-; (defrule complete_oneorder_expansion
-;   ?finished-order <- (order (id ?id) (complexity ?com) (quantity-requested 0))
-;   ?finished-status <- (finish-order (order-id ?id))
-;   =>
-;   (printout t "finish " ?com " expansion for order id " ?id crlf)
-; )
+   (assert (goal (id (sym-cat rs-cs-c3run- (gensym*))) (class trirs-cs-c3run) (params order-id ?id)))
+)                  

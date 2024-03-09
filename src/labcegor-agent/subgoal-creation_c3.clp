@@ -20,9 +20,9 @@
   (not (mps-occupied (mps ?cs)))
   (not (mps-occupied (mps ?bs)))
   (not (mps-occupied (mps ?rs)))
-  
+
+  (not (finish-order (order-id ?order-id)))  
   (not (cs-prepared (cs ?cs)))
-  
   =>
   (bind ?bs-side OUTPUT)
   (bind ?rs-side INPUT)
@@ -262,20 +262,17 @@
 				 ds ?ds
 				 ds-side ?ds-side
 				 order-id ?id) (outcome COMPLETED))
-  ?current-order <- (order (id ?id) (quantity-requested ?req) (quantity-delivered ?done))
+  ?current-order <- (order (id ?id) (quantity-requested ?req) (quantity-delivered ?done&:(> ?done 0)))
   ?mps-occ-cs <- (mps-occupied (mps ?cs))
   ?mps-occ-ds <- (mps-occupied (mps ?ds))
   
   ?cs-shield <- (cs-prepared (cs ?cs) (order-id ?order-id))
   
   =>
-  (modify ?current-order (quantity-requested (- ?req 1)) (quantity-delivered (+ ?done 1)))
-  ; (assert (wm-fact (key domain fact at args? r ?robot x START)))
-  
-  (bind ?delivered-wp (+ ?done 1))
-  (if (eq ?req ?delivered-wp)
+  (if (eq ?req ?done)
       then
         (assert (finish-order (order-id ?id)))
+	(printout t "finish one c3 expansion for order id " ?order-id crlf)
       else
 	(printout t "" crlf)
   )

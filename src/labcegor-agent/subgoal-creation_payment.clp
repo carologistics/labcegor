@@ -14,6 +14,7 @@
   ?trigger_goal <- (goal (id ?goal-id) (class tri-payment) (mode FORMULATED) (params order-id ?order-id ring ?ring))
   ?ring-spec <- (ring-spec (color ?ring) (cost 0))
   (not (finish_payment (order-id ?order-id) (ring ?ring)))
+  (not (finish-order (order-id ?order-id)))
   =>
   (assert (finish_payment (order-id ?order-id) (ring ?ring)))
   (assert (ring_payment (order-id ?order-id) (ring ?ring) (ring_collect 0)))
@@ -33,6 +34,8 @@
   ?payment-mps <- (machine (name ?mps) (type CS) (state IDLE))
   (not (goal (class payment-first)))
   
+  (not (finish-order (order-id ?order-id)))
+
   (not (mps-occupied (mps ?mps)))
   (not (finish_payment (order-id ?order-id) (ring ?ring))) 
   =>
