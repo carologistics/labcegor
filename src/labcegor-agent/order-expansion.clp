@@ -1,4 +1,4 @@
-; made by Yuan,Chengzhi, last modified @20240307
+; made by Yuan,Chengzhi, last modified @20240310
 
 (deftemplate ring_payment
   (slot order-id (type INTEGER))
@@ -10,7 +10,7 @@
 (deftemplate finish_payment
   (slot order-id (type INTEGER))
   (slot ring (type SYMBOL))
-  (slot index (type INTEGER))
+  (slot index (type INTEGER))  ; index is the "floor" of ring position, e.g. a c3 order with ring_a ring_b ring_a, set index to distinguish the first and the last ring_a. 
 )
 
 (deftemplate finish-order                                                       
@@ -33,10 +33,8 @@
   ; (debug)
   =>
   ; expand this order
-  (assert (goal (id (sym-cat tri-bs-c0firstrun- (gensym*))) (class tri-bs-c0firstrun) (params order-id ?id))) ; 
+  (assert (goal (id (sym-cat tri-c0run- (gensym*))) (class tri-c0run) (params order-id ?id))) ; 
          
-  ; go to cs-ds
-  (assert (goal (id (sym-cat bs-cs-c0run- (gensym*))) (class tri-cs-c0run) (params order-id ?id)))
 )
 
 

@@ -58,7 +58,7 @@
 (defrule goal-reasoner-select-manually
   ?g <- (goal (id ?goal-id) 
 	      (mode FORMULATED) 
-	      (class bs-run-c2firstrun|rs-run-c2firstrun|payment-first|payment|rs-loop-c2run|rs-csds-c2run|bs-run-c2firstrun-c0|C0-cs-ds-run|bs-run-c1firstrun|rs-run-c1firstrun|rs-csds-c1run|bs-run-c3firstrun|rs-run-c3firstrun|rs-loop-c3run-second|rs-loop-c3run-final|rs-csds-c3run)
+	      (class bs-run-c2firstrun|rs-run-c2firstrun|payment-first|payment|rs-loop-c2run|rs-csds-c2run|bs-run-c1firstrun|rs-run-c1firstrun|rs-csds-c1run|bs-run-c3firstrun|rs-run-c3firstrun|rs-loop-c3run-second|rs-loop-c3run-final|rs-csds-c3run|c0-run)
 	) 
   =>
   (modify ?g (mode SELECTED))

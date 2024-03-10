@@ -42,29 +42,17 @@
                       				    bs ?bs
                       				    bs-side ?bs-side
                       				    rs ?rs
-						    cs ?cs
-						    cc ?cc
                       				    wp ?wp
                   				    ring ?ring
 						    order-id ?order-id))
-  (order (id ?order-id) (cap-color ?cap))
   =>
-  (bind ?from_side None)
-  (bind ?rs-wait-side WAIT)
-   
   (plan-assert-sequential (sym-cat PLAN-first-bs-rs-run- (gensym*)) ?goal-id ?robot
-		(plan-assert-action move ?curr-loc ?from_side ?cs INPUT ?robot)
-		(plan-assert-action pick_at_shelf ?robot ?cc ?cs)
-		(plan-assert-action place ?robot ?cc ?cs)
-		(plan-assert-action prepare_cs ?cs RETRIEVE_CAP)
-		(plan-assert-action cs_retrieve_cap ?cs ?cc ?cap)
-		(plan-assert-action move ?cs INPUT ?bs ?bs-side ?robot)
+		(plan-assert-action move ?curr-loc None ?bs ?bs-side ?robot)
 		(plan-assert-action prepare_bs ?bs ?bs-side ?wp)
                 (plan-assert-action pick_at_output ?robot (sym-cat ?bs (sym-cat - ?bs-side)) ?bs ?wp)
-		(plan-assert-action move ?bs ?bs-side ?rs ?rs-wait-side ?robot)
+		(plan-assert-action move ?bs ?bs-side ?rs WAIT ?robot)
   )
   (modify ?g (mode EXPANDED))
-  (assert (cs-prepared (cs ?cs) (order-id ?order-id)))
 )
 
 
@@ -92,15 +80,41 @@
 )
 
 
-
-
+(defrule goal-expander-first-rs-run-c1
+  ?g <- (goal (id ?goal-id) (mode SELECTED)
+	       (class rs-run-c1firstrun)
+	       (params robot ?robot
+                        rs    ?rs
+                        wp    ?wp
+                        ring  ?ring
+                        order-id ?order-id
+                        cs      ?cs
+                        cc      ?cc))
+  (order (id ?order-id) (cap-color ?cap))
+  =>
+  (bind ?wp-added (sym-cat ?wp (sym-cat - ?ring)))
+  (plan-assert-sequential (sym-cat PLAN-first-rs-run- (gensym*)) ?goal-id ?robot
+                        (plan-assert-action move ?rs WAIT ?rs INPUT ?robot)
+                        (plan-assert-action place ?robot ?wp ?rs)
+                        (plan-assert-action prepare_rs ?rs ?ring)  ; send instruction to refbox, and check mps-state
+                        (plan-assert-action move ?rs INPUT ?cs INPUT ?robot)
+                	(plan-assert-action pick_at_shelf ?robot ?cc ?cs)
+                	(plan-assert-action place ?robot ?cc ?cs)
+                	(plan-assert-action prepare_cs ?cs RETRIEVE_CAP)
+                	(plan-assert-action cs_retrieve_cap ?cs ?cc ?cap)
+			(plan-assert-action move ?cs INPUT ?rs OUTPUT ?robot)
+                        (plan-assert-action pick_at_output ?robot (sym-cat ?rs (sym-cat - OUTPUT)) ?rs ?wp-added)
+  )
+  (modify ?g (mode EXPANDED))
+  (assert (cs-prepared (cs ?cs) (order-id ?order-id)))
+)
 
 (defrule goal-expander-first-rs-run   ; move from rs wait side to input side, place wp on input side, prepare rs, move to output, pick wp at output side.
-  ?g <- (goal (id ?goal-id) (mode SELECTED) (class rs-run-c3firstrun|rs-run-c2firstrun|rs-run-c1firstrun) (params robot ?robot
+  ?g <- (goal (id ?goal-id) (mode SELECTED) (class rs-run-c3firstrun|rs-run-c2firstrun) (params robot ?robot
 									      rs ?rs
 									      wp ?wp
 									      ring ?ring
-									      order-id ?order-id cs ?cs))
+									      order-id ?order-id))
   =>
   (bind ?rs-wait-side WAIT)
   (bind ?rs-input-side INPUT)
@@ -117,16 +131,45 @@
   (modify ?g (mode EXPANDED))
 )
 
+(defrule goal-expander-c2c3-last-rs-run
+  ?g <- (goal (id ?goal-id) (mode SELECTED) (class rs-loop-c2run|rs-loop-c3run-final) 
+			      (params robot ?robot
+                                      pre_rs ?pre-rs
+                                      pre_rs_side ?pre-rs-side
+                                      rs ?rs
+                                      rs-side ?rs-side
+                                      wp ?wp_now
+                                      ring ?ring-color
+                                      order-id ?order-id cs ?cs cc ?cc))
+  (order (id ?order-id) (cap-color ?cap))
+  =>
+  (bind ?wp-added (sym-cat ?wp_now (sym-cat - ?ring-color)))
+  (plan-assert-sequential (sym-cat PLAN-rs-loop-run- (gensym*)) ?goal-id ?robot
+                              (plan-assert-action move ?pre-rs ?pre-rs-side ?rs ?rs-side ?robot)
+                              (plan-assert-action place ?robot ?wp_now ?rs)
+                              (plan-assert-action prepare_rs ?rs ?ring-color)
+                              (plan-assert-action move ?rs INPUT ?cs INPUT ?robot)
+                              (plan-assert-action pick_at_shelf ?robot ?cc ?cs)
+                              (plan-assert-action place ?robot ?cc ?cs)
+                              (plan-assert-action prepare_cs ?cs RETRIEVE_CAP)
+                              (plan-assert-action cs_retrieve_cap ?cs ?cc ?cap)
+                              (plan-assert-action move ?cs INPUT ?rs OUTPUT ?robot)
+                              (plan-assert-action pick_at_output ?robot (sym-cat ?rs (sym-cat - OUTPUT)) ?rs ?wp-added)
+  )
+  (modify ?g (mode EXPANDED))
+  (assert (cs-prepared (cs ?cs) (order-id ?order-id)))
+)
+
 
 (defrule goal-expander-rs-loop-run
-  ?g <- (goal (id ?goal-id) (class rs-loop-c3run-second|rs-loop-c3run-final|rs-loop-c2run) (mode SELECTED) (params robot ?robot
+  ?g <- (goal (id ?goal-id) (class rs-loop-c3run-second) (mode SELECTED) (params robot ?robot
 				  					pre_rs ?pre-rs
 									pre_rs_side ?pre-rs-side
 									rs ?rs
 									rs-side ?rs-side
 									wp ?wp_now
 									ring ?ring
-									order-id ?order-id cs ?cs))
+									order-id ?order-id))
   ?used_rs <- (machine (name ?rs) (type RS))
   =>
   (bind ?rs-output-side OUTPUT)
@@ -139,7 +182,6 @@
 				(plan-assert-action pick_at_output ?robot (sym-cat ?rs (sym-cat - ?rs-output-side)) ?rs ?wp-added)
   )
   (modify ?g (mode EXPANDED))
-  ; (modify ?used_rs (state IDLE))
 )
 
 
@@ -179,70 +221,42 @@
   (modify ?g (mode EXPANDED))
 )
 
-(defrule goal-expander-bs-cs-run-c0
- ?g <- (goal (id ?goal-id) (mode SELECTED) (class bs-run-c2firstrun-c0) 
+(defrule goal-expander-c0run
+ ?g <- (goal (id ?goal-id) (mode SELECTED) (class c0-run) 
 					    (params robot ?robot
 			        		    current-loc ?curr-loc
                       				    bs ?bs
                       				    bs-side ?bs-side
         					    cs ?cs
 						    cc ?cc
+						    ds ?ds
                       				    wp ?wp
         				 	    cap ?cap
 						    order-id ?order-id))
-  
-  ?used_bs <- (machine (name ?bs) (type BS))
-  ?used_cs <- (machine (name ?cs) (type CS))
   =>
-  (bind ?cap-carrier-side shelf-side) 
-  (plan-assert-sequential (sym-cat PLAN-first-bs-rs-run- (gensym*)) ?goal-id ?robot
-		(plan-assert-action move ?curr-loc None ?cs INPUT ?robot)
+  (bind ?cap-carrier-side shelf-side)
+  (bind ?wp-base-cap (sym-cat ?wp (sym-cat - ?cap))) 
+  (plan-assert-sequential (sym-cat PLAN-c0-run- (gensym*)) ?goal-id ?robot
+		(plan-assert-action move ?curr-loc None ?bs OUTPUT ?robot)
+		(plan-assert-action prepare_bs ?bs ?bs-side ?wp)
+		(plan-assert-action move ?bs ?bs-side ?cs INPUT ?robot)
 		(plan-assert-action pick_at_shelf ?robot ?cc ?cs)
 		(plan-assert-action place ?robot ?cc ?cs)
 		(plan-assert-action prepare_cs ?cs RETRIEVE_CAP)
 		(plan-assert-action cs_retrieve_cap ?cs ?cc ?cap)
-		(plan-assert-action move ?cs INPUT ?bs ?bs-side ?robot)
-		(plan-assert-action prepare_bs ?bs ?bs-side ?wp)
+		(plan-assert-action move ?cs INPUT ?bs OUTPUT ?robot)
     		(plan-assert-action pick_at_output ?robot (sym-cat ?bs (sym-cat - ?bs-side)) ?bs ?wp)
-		(plan-assert-action move ?bs ?bs-side ?cs INPUT ?robot)
+		(plan-assert-action move ?bs OUTPUT ?cs INPUT ?robot)
 		(plan-assert-action place ?robot ?wp ?cs)
+                (plan-assert-action move ?cs INPUT ?cs OUTPUT ?robot)
+                (plan-assert-action prepare_cs ?cs MOUNT_CAP)
+                (plan-assert-action cs_mount_cap ?cs ?cap)
+                (plan-assert-action pick_at_output ?robot (sym-cat ?cs (sym-cat - OUTPUT)) ?cs ?wp-base-cap)
+                (plan-assert-action move ?cs OUTPUT ?ds INPUT ?robot)
+                (plan-assert-action place ?robot ?wp-base-cap ?ds)
+                (plan-assert-action prepare_ds ?ds ?order-id)
+                (plan-assert-action move ?ds INPUT START None ?robot)		
   )
   (modify ?g (mode EXPANDED))
   (assert (cs-prepared (cs ?cs) (order-id ?order-id)))
-)
-
-
-
-
-(defrule goal-expander-cs-ds-run-c0
- ?g <- (goal (id ?goal-id) (mode SELECTED) (class C0-cs-ds-run) 
-					    (params robot ?robot
-				                    cs ?cs
-            	        	        	    ds ?ds
-                	        	    	    wp ?wp
-						    order-id ?order-id
-						    cap-color ?cap))
-
-  
-  (wp_on_output (mps ?cs) (wp ?wp-base-cap))
-  ; ?mps-ds <- (machine (name ?ds) (type DS) (state ~IDLE))
-  
-  =>
-   
-  (bind ?curr-loc (sym-cat ?cs INPUT))
-  (bind ?cs-output (sym-cat ?cs OUTPUT))
-  (bind ?ds-side (sym-cat ?ds INPUT))
-  
-  (plan-assert-sequential (sym-cat PLAN-first-bs-rs-run- (gensym*)) ?goal-id ?robot
-		(plan-assert-action move ?cs INPUT ?cs OUTPUT ?robot)
-		(plan-assert-action prepare_cs ?cs MOUNT_CAP)
-	        (plan-assert-action pick_at_output ?robot (sym-cat ?cs (sym-cat - OUTPUT)) ?cs ?wp-base-cap)
-		(plan-assert-action cs_mount_cap ?cs ?cap)
-  		(plan-assert-action move ?cs OUTPUT ?ds INPUT ?robot)
-		(plan-assert-action place ?robot ?wp-base-cap ?ds)
-		(plan-assert-action prepare_ds ?ds ?order-id)
-		(plan-assert-action move ?ds ?ds-side START None ?robot)
-  )
-  ; (assert (wm-fact (key domain fact at args? r ?robot x START)))
-  (modify ?g (mode EXPANDED))
 )

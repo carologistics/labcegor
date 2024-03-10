@@ -1,4 +1,7 @@
-(defrule subgoal-creation-bs-first-run-c1 ; move from start to bsoutput, prepare bs and pick base from output side, go to rs wait side.
+; made by Yuan,Chengzhi, last modified @20240310
+
+(defrule subgoal-creation-bs-first-run-c1 
+  ; move from start to bsoutput, prepare bs and pick base from output side, go to rs wait side.
   ?trigger_goal <- (goal (id ?goal-id)
                          (class tri-bs-c1firstrun)
                          (params order-id ?order-id ring-color ?ring-color))
@@ -10,18 +13,16 @@
   )
   (not (goal (class bs-run-c1firstrun)))
 
-  (wp-cap-color (cc ?cc) (cap-color ?cap))
-  (domain-fact (name wp-on-shelf) (param-values ?cc ?cs))
-  (machine (name ?cs) (type CS) (state IDLE))
+  ; to avoid deadlock, but reduce efficiency. deadlock: both two robot are not in the middle of expansion, and wait at RS wait side.
+  (finish_payment (order-id ?order-id) (ring ?ring-color))
+
   (machine (name ?bs) (type BS) (state IDLE))
   (machine (name ?rs) (type RS) (state IDLE))
 
-  ; (not (mps-occupied (mps ?cs)))
   (not (mps-occupied (mps ?bs)))
   (not (mps-occupied (mps ?rs)))
 
   (not (finish-order (order-id ?order-id)))
-  (not (cs-prepared (cs ?cs)))
   =>
   (bind ?bs-side OUTPUT)
   (bind ?rs-side INPUT)
@@ -33,8 +34,6 @@
                                      bs ?bs
                                      bs-side ?bs-side
                                      rs ?rs
-				     cs ?cs
-				     cc ?cc
                                      wp ?wp
                                      ring ?ring-color
 				     order-id ?order-id
@@ -44,18 +43,15 @@
   (retract ?trigger_goal ?robot-at-start)
   (assert (mps-occupied (mps ?bs))
 	  (mps-occupied (mps ?rs))
-	  ; (mps-occupied (mps ?cs))
   )
 
 )
 
 (defrule subgoal-lifecycle-bs-first-run-c1
-  (goal (class bs-run-c1firstrun) (params robot ?robot current-loc ?curr-loc bs ?bs bs-side ?bs-side rs ?rs cs ?cs cc ?cc wp ?wp ring ?ring order-id ?order-id) (outcome COMPLETED))
+  (goal (class bs-run-c1firstrun) (params robot ?robot current-loc ?curr-loc bs ?bs bs-side ?bs-side rs ?rs wp ?wp ring ?ring order-id ?order-id) (outcome COMPLETED))
   ?mps-occ-bs <- (mps-occupied (mps ?bs))
-  ; ?mps-occ-cs <- (mps-occupied (mps ?cs))
   =>
   (retract ?mps-occ-bs)
-  ; (retract ?mps-occ-bs ?mps-occ-cs)
 )
 
 
@@ -65,8 +61,6 @@
                                                            bs          ?bs
                                                            bs-side     ?bs-side
                                                            rs          ?rs
-							   cs	       ?cs
-							   cc	       ?cc
                                                            wp          ?wp
                                                            ring        ?ring
 							   order-id    ?order-id) (outcome COMPLETED))
@@ -74,30 +68,49 @@
   ?ring-payment-status <- (ring_payment (order-id ?order-id) (index 1) (ring ?ring))
   (not (goal (class rs-run-c1firstrun)))
   (mps-occupied (mps ?rs))
+
+  (order (id ?order-id) (cap-color ?cap))
+  (wp-cap-color (cc ?cc) (cap-color ?cap))
+  (domain-fact (name wp-on-shelf) (param-values ?cc ?cs))
+  (machine (name ?cs) (type CS) (state IDLE))
+ 
+  (not (mps-occupied (mps ?cs)))
+   
   =>
   (assert (goal (id (sym-cat rs-run-c1firstrun- (gensym*)))
                 (class rs-run-c1firstrun)
-                (params robot ?robot rs ?rs wp ?wp ring ?ring order-id ?order-id cs ?cs)))
+                (params robot ?robot 
+			rs    ?rs 
+			wp    ?wp 
+			ring  ?ring 
+			order-id ?order-id 
+			cs 	?cs
+			cc 	?cc))
+	  (mps-occupied (mps ?cs))
+  )
+  
   (retract ?premise_goal ?finish_payment ?ring-payment-status)
 )
 
 (defrule subgoal-lifecycle-rs-first-run-c1
-  (goal (class rs-run-c1firstrun) (params robot ?robot rs ?rs wp ?wp ring ?ring order-id ?order-id cs ?cs) (outcome COMPLETED))
-  ?mps-occ <- (mps-occupied (mps ?rs))
+  (goal (class rs-run-c1firstrun) (params robot ?robot rs ?rs wp ?wp ring ?ring order-id ?order-id cs ?cs cc ?cc) 
+	(outcome COMPLETED))
+  ?mps-occ-rs <- (mps-occupied (mps ?rs))
+  ?mps-occ-cs <- (mps-occupied (mps ?cs))
   =>
-  (retract ?mps-occ)
+  (retract ?mps-occ-rs ?mps-occ-cs)
 )
 
 
 (defrule goal-creation-rs-cs-ds-run-c1
-    ; move from rs to cs input, place, and move to cs output, pick, move to ds.
+   ; move from rs to cs input, place, and move to cs output, pick, move to ds.
    ?premise_goal <- (goal (class rs-run-c1firstrun)
                            (params robot ?robot
                                    rs ?rs
                                    wp ?wp
                                    ring ?ring-color
 				   order-id ?order-id
-				   cs ?cs)
+				   cs ?cs cc ?cc)
                                 (outcome COMPLETED))
     
     ?trigger_goal <- (goal (id ?goal-id) (class trirs-cs-c1run) (mode FORMULATED) (params order-id ?order-id))

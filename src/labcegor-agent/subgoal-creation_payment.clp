@@ -1,3 +1,5 @@
+; made by Yuan,Chengzhi, last modified @20240310
+
 ; (deftemplate ring_payment
 ;   (slot order-id (type INTEGER))
 ;   (slot ring (type SYMBOL))
@@ -37,7 +39,7 @@
   
   (not (finish-order (order-id ?order-id)))
 
-  (not (mps-occupied (mps ?mps)))
+  ; (not (mps-occupied (mps ?mps)))
   (not (finish_payment (order-id ?order-id) (ring ?ring) (index ?index))) 
   =>
   (assert (goal (id (sym-cat payment-first- (gensym*)))
@@ -53,23 +55,23 @@
    
    (assert (ring_payment (order-id ?order-id) (ring ?ring) (index ?index) (ring_collect 0)))
    (retract ?trigger-goal ?robot-at-start)
-   (assert (mps-occupied (mps ?mps)))
+   ; (assert (mps-occupied (mps ?mps)))
 )
 
 
-(defrule subgoal-lifecycle-payment
-  (goal (class payment-first|payment) (params robot ?robot
-                                                current-loc ?curr-loc
-                                                current-side ?curr-side
-                                                payment-mps ?prev-payment-mps
-                                                payment-side ?prev-payment-side
-                                                rs ?rs
-                                                ring ?ring
-						order-id ?order-id index ?index) (outcome COMPLETED))
-  ?mps-occ <- (mps-occupied (mps ?prev-payment-mps))
-  =>
-  (retract ?mps-occ)
-)
+;(defrule subgoal-lifecycle-payment
+;  (goal (class payment-first|payment) (params robot ?robot
+;                                                current-loc ?curr-loc
+;                                                current-side ?curr-side
+;                                                payment-mps ?prev-payment-mps
+;                                                payment-side ?prev-payment-side
+;                                                rs ?rs
+;                                                ring ?ring
+;						order-id ?order-id index ?index) (outcome COMPLETED))
+;  ?mps-occ <- (mps-occupied (mps ?prev-payment-mps))
+;  =>
+;  (retract ?mps-occ)
+;)
 
 
 (defrule subgoal-creation-trigger-loop-payment ; fire if payment >= 1
@@ -84,7 +86,7 @@
   ?ring-spec <- (ring-spec (color ?ring) (cost ?cost))
   ?rp <- (ring_payment (order-id ?order-id) (ring ?ring) (index ?index) (ring_collect ?now_payment))
   ?payment-mps <- (machine (name ?mps) (type CS) (state IDLE))
-  (not (mps-occupied (mps ?mps)))
+  ;(not (mps-occupied (mps ?mps)))
 
   ; -/+
   (not (finish_payment (order-id ?order-id) (ring ?ring) (index ?index)))
@@ -108,7 +110,7 @@
                             rs ?rs
                             ring ?ring
 			    order-id ?order-id index ?index))
-		(mps-occupied (mps ?mps))
+		;(mps-occupied (mps ?mps))
 	)
     else
       (printout t "finish collecting ring " ?ring " payment for order id " ?order-id crlf)
