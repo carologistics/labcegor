@@ -76,7 +76,8 @@
 								    	  	  payment-side ?mps-side
 								    	  	  rs ?rs
 								    	  	  ring ?ring
-									          order-id ?order-id) (outcome ~COMPLETED))
+									          order-id ?order-id 
+										  index ?index) (outcome ~COMPLETED))
   =>
   (bind ?wp-payment additional_base)
   (bind ?rs-side slide-side)
@@ -193,7 +194,6 @@
   ?used_bs <- (machine (name ?bs) (type BS))
   ?used_cs <- (machine (name ?cs) (type CS))
   =>
-  (bind ?wp-add (sym-cat ?wp ?cap))
   (bind ?cap-carrier-side shelf-side) 
   (plan-assert-sequential (sym-cat PLAN-first-bs-rs-run- (gensym*)) ?goal-id ?robot
 		(plan-assert-action move ?curr-loc None ?cs INPUT ?robot)
@@ -205,7 +205,7 @@
 		(plan-assert-action prepare_bs ?bs ?bs-side ?wp)
     		(plan-assert-action pick_at_output ?robot (sym-cat ?bs (sym-cat - ?bs-side)) ?bs ?wp)
 		(plan-assert-action move ?bs ?bs-side ?cs INPUT ?robot)
-		(plan-assert-action place ?robot ?wp-add ?cs)
+		(plan-assert-action place ?robot ?wp ?cs)
   )
   (modify ?g (mode EXPANDED))
   (assert (cs-prepared (cs ?cs) (order-id ?order-id)))
