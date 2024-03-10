@@ -27,6 +27,8 @@
   (not (mps-occupied (mps ?rs)))
   (not (finish-order (order-id ?order-id)))
 
+  (not (order-is-expanding (order-id ?order-id)))
+
   =>
   (bind ?bs-side OUTPUT)
   (bind ?rs-side INPUT)
@@ -49,7 +51,7 @@
   (assert (mps-occupied (mps ?bs))
           (mps-occupied (mps ?rs))
   )
-
+  (assert (order-is-expanding (order-id ?order-id)))
 )
 
 (defrule subgoal-lifecycle-bs-first-run
@@ -220,9 +222,10 @@
   ?mps-occ-ds <- (mps-occupied (mps ?ds))
   
   ?cs-shield <- (cs-prepared (cs ?cs) (order-id ?order-id))
-  
+
+  ?current-order-expanding <- (order-is-expanding (order-id ?order-id))  
   =>
-  (if (eq ?req ?done)
+  (if (<= ?req ?done)
       then
         (assert (finish-order (order-id ?id)))
         (printout t "finish one c2 expansion for order id " ?order-id crlf)
@@ -231,4 +234,5 @@
   )
   
   (retract ?mps-occ-cs ?mps-occ-ds ?premise_goal ?cs-shield)
+  (retract ?current-order-expanding)
 )

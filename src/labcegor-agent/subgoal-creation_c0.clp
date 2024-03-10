@@ -1,4 +1,7 @@
 ; made by Yuan,Chengzhi, last modified @20240310
+(deftemplate c0-order-expanded
+  (slot order-id (type INTEGER))
+)
 
 (defrule subgoal-creation-c0run
   ?trigger_goal <- (goal (id ?goal-id) 
@@ -21,7 +24,10 @@
   (not (cs-prepared (cs ?cs)))
 
   (not (finish-order (order-id ?order-id)))
-  
+
+  ; to avoid repeat expanding of a same order
+  (not (order-is-expanding (order-id ?order-id)))
+
   =>
   (bind ?bs-side OUTPUT)
   
@@ -45,7 +51,7 @@
 	  (mps-occupied (mps ?cs))
 	  (mps-occupied (mps ?ds))
   )
-  
+  (assert (order-is-expanding (order-id ?order-id)))
   (retract ?trigger_goal ?robot-at-start)
 )
 
@@ -62,14 +68,15 @@
                                  wp ?wp
                                  cap ?cap
                                  order-id ?order-id) (outcome COMPLETED))
-
+  
   ?current-order <- (order (id ?id) (quantity-requested ?req) (quantity-delivered ?done&:(> ?done 0)))
   ?mps-occ-bs <- (mps-occupied (mps ?bs))
   ?mps-occ-cs <- (mps-occupied (mps ?cs))
   ?mps-occ-ds <- (mps-occupied (mps ?ds))
   
   ?cs-shield <- (cs-prepared (cs ?cs) (order-id ?order-id))
-  
+
+  ?current-expanding-status <- (order-is-expanding (order-id ?order-id)) 
   =>
   (if (eq ?req ?done)
       then
@@ -78,7 +85,7 @@
       else
         (printout t "" crlf)
   )
-  
   (retract ?premise_goal ?mps-occ-bs ?mps-occ-cs ?mps-occ-ds ?cs-shield)
+  (retract ?current-expanding-status)
 )
 

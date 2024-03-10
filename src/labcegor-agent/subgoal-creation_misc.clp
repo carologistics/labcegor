@@ -8,3 +8,8 @@
   (slot cs (type SYMBOL))
   (slot order-id (type INTEGER))
 )
+
+(deftemplate order-is-expanding
+  (slot order-id (type INTEGER))
+)
+
