@@ -41,7 +41,7 @@ clips_executive:
           - core/wm-domain-sync.clp
       - name: domain
         # file: labcegor-agent/domain.clp
-        file: labcegor-agent/simple_moving_domain.clp
+        file: labcegor-agent/complex_moving_domain.clp
       - name: refbox-comm
         file: labcegor-agent/refbox-comm-init.clp
       - name: refbox-recv
