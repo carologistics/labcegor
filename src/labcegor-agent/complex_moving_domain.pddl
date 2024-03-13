@@ -140,9 +140,7 @@
   (:action cs_retrieve_cap
 	:parameters (?m - mps ?cc - cap-carrier ?capcol - cap-color)
 	:precondition (and (mps-type ?m CS)
-	                   (or (mps-state ?m PROCESSING)
-	                       (mps-state ?m READY-AT-OUTPUT)
-	                   )
+	                   (mps-state ?m READY-AT-OUTPUT)
 	              )
 	:effect (and (cs-can-perform ?m MOUNT_CAP)
 	        )
@@ -152,9 +150,7 @@
   (:action cs_mount_cap
 	:parameters (?m - mps ?capcol - cap-color)
 	:precondition (and (mps-type ?m CS)
-	                   (or (mps-state ?m PROCESSING)
-	                       (mps-state ?m READY-AT-OUTPUT)
-	                   )
+	                   (mps-state ?m READY-AT-OUTPUT)
 	              )
 	:effect (and (cs-can-perform ?m RETRIEVE_CAP)
 	             (not (cs-can-perform ?m MOUNT_CAP))

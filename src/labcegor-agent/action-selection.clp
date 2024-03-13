@@ -10,7 +10,6 @@
 	(modify ?pa (state PENDING))
 )
 
-
 (defrule action-selection-done
 	(plan (id ?plan-id) (goal-id ?goal-id))
 	?g <- (goal (id ?goal-id) (mode DISPATCHED))

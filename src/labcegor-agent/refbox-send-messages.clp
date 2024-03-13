@@ -181,6 +181,7 @@
                                (sym-cat prepare- ?goal-id - ?plan-id
                                         - ?id -abort-timer))))
   ?md <- (metadata-prepare-mps ?mps $?date)
+  ; (machine (name ?mps) (state READY-AT-OUTPUT|WAIT-IDLE|PROCESSED|PREPARED))
   (machine (name ?mps) (state READY-AT-OUTPUT|WAIT-IDLE|PROCESSED))
   ?plan-action-sent <- (plan-action-sent (plan-id ?id))
   =>
@@ -222,10 +223,6 @@
                                    prepare_rs)
                       (param-names $?param-names)
                       (param-values $?param-values))
-  ; (domain-obj-is-of-type ?mps&:(eq ?mps (plan-action-arg m
-  ;                                                        ?param-names
-  ;                                                        ?param-values))
-  ;                     					 mps)
   ?st <- (timer (name ?nst&:(eq ?nst
                                (sym-cat prepare- ?goal-id - ?plan-id
                                         - ?id -send-timer))))
@@ -233,7 +230,7 @@
                                (sym-cat prepare- ?goal-id - ?plan-id
                                         - ?id -abort-timer))))
   ?md <- (metadata-prepare-mps ?mps $?date)
-  (wm-fact (key domain fact mps-state args? m ?mps s BROKEN))
+  (machine (name ?mps) (state BROKEN))
   =>
   (printout t "Action Prepare " ?mps " is Aborted because mps is broken" crlf)
   (retract ?st ?md ?at)
