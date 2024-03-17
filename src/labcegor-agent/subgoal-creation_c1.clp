@@ -54,8 +54,10 @@
 (defrule subgoal-lifecycle-bs-first-run-c1
   (goal (class bs-run-c1firstrun) (params robot ?robot current-loc ?curr-loc bs ?bs bs-side ?bs-side rs ?rs wp ?wp ring ?ring order-id ?order-id) (outcome COMPLETED))
   ?mps-occ-bs <- (mps-occupied (mps ?bs))
+  (not (already_fire_lifecycle (order-id ?order-id) (index 1)))
   =>
   (retract ?mps-occ-bs)
+  (assert (already_fire_lifecycle (order-id ?order-id) (index 1)))
 )
 
 
@@ -100,9 +102,12 @@
   (goal (class rs-run-c1firstrun) (params robot ?robot rs ?rs wp ?wp ring ?ring order-id ?order-id cs ?cs cc ?cc) 
 	(outcome COMPLETED))
   ?mps-occ-rs <- (mps-occupied (mps ?rs))
-  ?mps-occ-cs <- (mps-occupied (mps ?cs))
+  ; ?mps-occ-cs <- (mps-occupied (mps ?cs))
+  (not (already_fire_lifecycle (order-id ?order-id) (index 2)))
   =>
-  (retract ?mps-occ-rs ?mps-occ-cs)
+  (retract ?mps-occ-rs)
+  ; (retract ?mps-occ-rs ?mps-occ-cs)
+  (assert (already_fire_lifecycle (order-id ?order-id) (index 2)))
 )
 
 
@@ -125,7 +130,7 @@
     
     (cs-prepared (cs ?cs) (order-id ?order-id))
     
-    (not (mps-occupied (mps ?cs)))
+    (mps-occupied (mps ?cs))
     (not (mps-occupied (mps ?ds)))
     
     =>
@@ -145,13 +150,8 @@
                         ds-side INPUT
                         order-id ?order-id
                 )))
-
     (retract ?trigger_goal ?premise_goal)
-
-    (assert (mps-occupied (mps ?cs))
-	    (mps-occupied (mps ?ds))
-    )
-
+    (assert (mps-occupied (mps ?ds)))
 )
 
 

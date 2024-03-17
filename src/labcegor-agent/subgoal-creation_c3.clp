@@ -62,8 +62,10 @@
                                      ring ?ring-color
 				     order-id ?order-id) (outcome COMPLETED))
   ?mps-occ-bs <- (mps-occupied (mps ?bs))
+  (not (already_fire_lifecycle (order-id ?order-id) (index 1)))
   =>
   (retract ?mps-occ-bs)
+  (assert (already_fire_lifecycle (order-id ?order-id) (index 1)))
 )
 
 
@@ -92,8 +94,10 @@
 (defrule subgoal-lifecycle-rs-first-run-c3
   (goal (class rs-run-c3firstrun) (params robot ?robot rs ?rs wp ?wp ring ?ring order-id ?order-id) (outcome COMPLETED))
   ?mps-occ <- (mps-occupied (mps ?rs))
+  (not (already_fire_lifecycle (order-id ?order-id) (index 2)))
   =>
   (retract ?mps-occ)
+  (assert (already_fire_lifecycle (order-id ?order-id) (index 2)))
 )
 
 
@@ -136,8 +140,10 @@
 (defrule subgoal-lifecycle-rs-loop-run1-c3
   (goal (class rs-loop-c3run-second) (params robot ?robot pre_rs ?pre_rs pre_rs_side ?pre_rs_side rs ?rs rs-side ?rs-side wp ?wp ring ?ring order-id ?order-id) (outcome COMPLETED))
   ?mps-occ <- (mps-occupied (mps ?rs))
+  (not (already_fire_lifecycle (order-id ?order-id) (index 3)))
   =>
   (retract ?mps-occ)
+  (assert (already_fire_lifecycle (order-id ?order-id) (index 3)))
 )
 
 
@@ -193,9 +199,12 @@
 (defrule subgoal-lifecycle-rs-loop-run2-c3
   (goal (class rs-loop-c3run-final) (params robot ?robot pre_rs ?pre_rs pre_rs_side ?pre_rs_side rs ?rs rs-side ?rs-side wp ?wp ring ?ring order-id ?order-id cs ?cs cc ?cc) (outcome COMPLETED))
   ?mps-occ-rs <- (mps-occupied (mps ?rs))
-  ?mps-occ-cs <- (mps-occupied (mps ?cs))
+  ; ?mps-occ-cs <- (mps-occupied (mps ?cs))
+  (not (already_fire_lifecycle (order-id ?order-id) (index 4)))
   =>
-  (retract ?mps-occ-rs ?mps-occ-cs)
+  (retract ?mps-occ-rs)
+  ; (retract ?mps-occ-rs ?mps-occ-cs)
+  (assert (already_fire_lifecycle (order-id ?order-id) (index 4)))
 )
 
 
@@ -220,7 +229,7 @@
 
     (cs-prepared (cs ?cs) (order-id ?order-id))
 
-    (not (mps-occupied (mps ?cs)))
+    (mps-occupied (mps ?cs))
     (not (mps-occupied (mps ?ds)))
     (not (goal (class rs-csds-c3run)))
 
@@ -243,8 +252,7 @@
                 )))
 
     (retract ?trigger_goal ?premise_goal)
-    (assert (mps-occupied (mps ?cs))
-            (mps-occupied (mps ?ds)))
+    (assert (mps-occupied (mps ?ds)))
 )
 
 

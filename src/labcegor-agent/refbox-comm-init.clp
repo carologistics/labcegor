@@ -87,7 +87,10 @@
     then
       (printout t "Enabling local peer (cyan only)" crlf)
       (bind ?peer-id (pb-peer-create-local-crypto ?address ?cyan-send-port ?cyan-recv-port ?key ?cipher))
-   )
+    else
+      (printout t "Enabling local peer (magenta only)" crlf)
+      (bind ?peer-id (pb-peer-create-local-crypto ?address ?magenta-send-port ?magenta-recv-port ?key ?cipher))
+  )
   (assert (refbox-peer (name refbox-private) (peer-id ?peer-id)))
 )
 

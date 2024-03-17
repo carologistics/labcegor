@@ -48,6 +48,7 @@
    ?r-peer <- (refbox-peer (name refbox-private) (peer-id ?peer-id))
    (wm-fact (key refbox phase) (value SETUP|PRODUCTION))
    ?tf <- (timer (name refbox-beacon) (time ?t&:(> (- ?now ?t) 1)) (seq ?seq))
+   (wm-fact (id "/refbox/team-color") (value ?team-color&:(neq ?team-color nil)))
    =>
    (bind ?bs (modify ?bs (value (+ ?seq 1))))
    (bind ?beacon (pb-create "llsf_msgs.BeaconSignal"))
@@ -60,8 +61,8 @@
    (bind ?robot-number (string-to-field (sub-string ?name-length ?name-length (str-cat ?robot))))
    (pb-set-field ?beacon "number" ?robot-number)
    (pb-set-field ?beacon "team_name" ?team-name)
-   (pb-set-field ?beacon "team_color" CYAN)
- 
+   (pb-set-field ?beacon "team_color" ?team-color)
+   
    (pb-set-field ?beacon "seq" ?seq)
    (pb-broadcast ?peer-id ?beacon)
    (pb-destroy ?beacon)
@@ -170,7 +171,6 @@
                       (state RUNNING)
                       (action-name prepare_bs|
                                    prepare_cs|
-                                   prepare_ds|
                                    prepare_rs)
                       (param-names $?param-names)
                       (param-values $?param-values))
@@ -190,28 +190,28 @@
   (modify ?pa (state EXECUTION-SUCCEEDED))
 )
 
-;(defrule refbox-action-prepare-mps-final-ds-special-case
-;  "Finalize the prepare action if the desired machine state was reached"
-;  (time ?now)
-;  ?pa <- (plan-action (plan-id ?plan-id) (goal-id ?goal-id) (id ?id)
-;                      (state RUNNING)
-;                      (action-name prepare_ds)
-;                      (param-names $?param-names)
-;                      (param-values $?param-values))
-;  ?st <- (timer (name ?nst&:(eq ?nst
-;                               (sym-cat prepare- ?goal-id - ?plan-id
-;                                        - ?id -send-timer))))
-;  ?at <- (timer (name ?nat&:(eq ?nat
-;                               (sym-cat prepare- ?goal-id - ?plan-id
-;                                        - ?id -abort-timer))))
-;  ?md <- (metadata-prepare-mps ?mps $?date)
-;  (machine (name ?mps) (state READY-AT-OUTPUT|WAIT-IDLE|PROCESSED|PREPARED))
-;  ?plan-action-sent <- (plan-action-sent (plan-id ?id))
-;  =>
-;  (printout t "Action Prepare " ?mps " is final" crlf)
-;  (retract ?st ?at ?md ?plan-action-sent)
-;  (modify ?pa (state EXECUTION-SUCCEEDED))
-;)
+(defrule refbox-action-prepare-mps-final-ds-special-case
+  "Finalize the prepare action if the desired machine state was reached"
+  (time ?now)
+  ?pa <- (plan-action (plan-id ?plan-id) (goal-id ?goal-id) (id ?id)
+                      (state RUNNING)
+                      (action-name prepare_ds)
+                      (param-names $?param-names)
+                      (param-values $?param-values))
+  ?st <- (timer (name ?nst&:(eq ?nst
+                               (sym-cat prepare- ?goal-id - ?plan-id
+                                        - ?id -send-timer))))
+  ?at <- (timer (name ?nat&:(eq ?nat
+                               (sym-cat prepare- ?goal-id - ?plan-id
+                                        - ?id -abort-timer))))
+  ?md <- (metadata-prepare-mps ?mps $?date)
+  (machine (name ?mps) (state READY-AT-OUTPUT|WAIT-IDLE|PROCESSED|PREPARED))
+  ?plan-action-sent <- (plan-action-sent (plan-id ?id))
+  =>
+  (printout t "Action Prepare " ?mps " is final" crlf)
+  (retract ?st ?at ?md ?plan-action-sent)
+  (modify ?pa (state EXECUTION-SUCCEEDED))
+)
 
 (defrule refbox-action-prepare-mps-abort-on-broken
   "Abort preparing if the mps got broken"
