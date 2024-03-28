@@ -10,9 +10,6 @@
 	(modify ?pa (state PENDING))
 )
 
-; FIXME: stick on the above rule
-; TOOD: how to convert pending state to final or failed?
-
 (defrule action-selection-done
 	(plan (id ?plan-id) (goal-id ?goal-id))
 	?g <- (goal (id ?goal-id) (mode DISPATCHED))

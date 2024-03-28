@@ -1,40 +1,63 @@
-; made by Yuan,Chengzhi @20240121
+; made by Yuan,Chengzhi, last modified @20240310
+
+(deftemplate ring_payment
+  (slot order-id (type INTEGER))
+  (slot ring (type SYMBOL))
+  (slot index (type INTEGER))
+  (slot ring_collect (type INTEGER))
+)
+
+(deftemplate finish_payment
+  (slot order-id (type INTEGER))
+  (slot ring (type SYMBOL))
+  (slot index (type INTEGER))  ; index is the "floor" of ring position, e.g. a c3 order with ring_a ring_b ring_a, set index to distinguish the first and the last ring_a. 
+)
+
+(deftemplate finish-order                                                       
+  (slot order-id (type INTEGER))                                                
+) 
 
 (defrule order_expansion_c0
   ?order_c0 <- (order (id ?id) (complexity C0) (base-color ?base-color) 
-			(quantity-requested ?quantity-requested&:(> ?quantity-requested 0)) )
+			(quantity-requested ?quantity-requested&:(> ?quantity-requested 0)))
+  
+  ; sort id index within same complexity, starting from lowest one
+  ; if not exists one order with lower id,
+  ; or there exists and already finished. 
+  (or  (not (order (id ?other-id&:(< ?other-id ?id)) (complexity C0)))
+       (and (order (id ?other-id) (complexity C0))
+       	    (finish-order (order-id ?other-id))
+       )
+  )
+  (not (finish-order (order-id ?id)))
   ; (debug)
   =>
-   (if (eq ?quantity-requested 0)
-       then ; finish delivery
-         (printout t "delivered one c0" crlf)
-         (retract ?order_c0)
-       else 
-         ; expand this order
-         (assert (goal (id (sym-cat tri-bs-c0firstrun- (gensym*))) (class tri-bs-c0firstrun) (params order-id ?id))) ; 
+  ; expand this order
+  (assert (goal (id (sym-cat tri-c0run- (gensym*))) (class tri-c0run) (params order-id ?id))) ; 
          
-         ; go to cs-ds
-         (assert (goal (id (sym-cat bs-cs-c0run- (gensym*))) (class tri-cs-c0run) (params order-id ?id)))          
-   )
 )
 
 
 (defrule order_expansion_c1
   ?order_c1 <- (order (id ?id) (complexity C1) (base-color ?base-color) (quantity-requested ?quantity-requested&:(> ?quantity-requested 0)) (ring-colors ?ring-color1))
   (ring-spec (color ?ring-color1) (cost ?cost))
-  (machine (name C-BS) (state IDLE))
   ; (debug)
+  (not (finish-order (order-id ?id)))
+
+  ; sort id index within same complexity, starting from lowest one
+  ; if not exists one order with lower id,
+  ; or there exists and already finished.
+  (or  (not (order (id ?other-id&:(< ?other-id ?id)) (complexity C1)))
+       (and (order (id ?other-id) (complexity C1))
+            (finish-order (order-id ?other-id))
+       )
+  )
+
   =>
-  (if (eq ?quantity-requested 0)
-    then
-      (printout t "all delivered" crlf)
-      (retract ?order_c1)
-    else
-      (assert 
-          (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params ring ?ring-color1))
-	  (goal (id (sym-cat tri-bs-c1firstrun- (gensym*))) (class tri-bs-c1firstrun) (params order-id ?id ring-color ?ring-color1)) ; bs-rs
-	  (goal (id (sym-cat rs-cs-c1run- (gensym*))) (class trirs-cs-c1run) (params order-id ?id)) ; rs - cs
-      )
+  (assert 
+     (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params order-id ?id ring ?ring-color1 index 1))
+     (goal (id (sym-cat tri-bs-c1firstrun- (gensym*))) (class tri-bs-c1firstrun) (params order-id ?id ring-color ?ring-color1)) ; bs-rs
+     (goal (id (sym-cat rs-cs-c1run- (gensym*))) (class trirs-cs-c1run) (params order-id ?id)) ; rs - cs
   )
 )
 
@@ -46,25 +69,32 @@
   (ring-spec (color ?ring-color1) (cost ?cost-1))
   (ring-spec (color ?ring-color2) (cost ?cost-2))
   ; (debug)
-  =>
-   (if (eq ?quantity-requested 0)
-       then ; finish delivery
-         (printout t "all delivered" crlf)
-         (retract ?order_c2)
-       else 
-         ; expand this order
-         (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params ring ?ring-color1)))
-         (assert (goal (id (sym-cat tri-bs-c2firstrun- (gensym*))) (class tri-bs-c2firstrun) (params order-id ?id ring-color ?ring-color1)))
-         
-         ; 2nd run rs-loop
-         (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params ring ?ring-color2)))
-         (assert (goal (id (sym-cat rs-loop-c2run- (gensym*))) (class trirs-loop-c2run) (params order-id ?id ring-color ?ring-color2)))
+  (not (finish-order (order-id ?id)))
 
-         ; go to rs-cs-ds
-         (assert (goal (id (sym-cat rs-cs-c2run- (gensym*))) (class trirs-cs-c2run) (params order-id ?id)))         
+
+  ; sort id index within same complexity, starting from lowest one
+  ; if not exists one order with lower id,
+  ; or there exists and already finished.
+  (or  (not (order (id ?other-id&:(< ?other-id ?id)) (complexity C2)))
+       (and (order (id ?other-id) (complexity C2))
+            (finish-order (order-id ?other-id))
+       )
+  )
+
+  =>
+  ; expand this order
+  (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params order-id ?id ring ?ring-color1 index 1)))
+  (assert (goal (id (sym-cat tri-bs-c2firstrun- (gensym*))) (class tri-bs-c2firstrun) (params order-id ?id ring-color ?ring-color1)))
          
-   )
+  ; 2nd run rs-loop
+  (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params order-id ?id ring ?ring-color2 index 2)))
+  (assert (goal (id (sym-cat rs-loop-c2run- (gensym*))) (class trirs-loop-c2run) (params order-id ?id ring-color ?ring-color2)))
+
+  ; go to rs-cs-ds
+  (assert (goal (id (sym-cat rs-cs-c2run- (gensym*))) (class trirs-cs-c2run) (params order-id ?id)))         
+         
 )
+
 
 
 
@@ -76,26 +106,30 @@
   (ring-spec (color ?ring-color2) (cost ?cost-2))
   (ring-spec (color ?ring-color2) (cost ?cost-3))
   ; (debug)
+  (not (finish-order (order-id ?id)))
+
+  ; sort id index within same complexity, starting from lowest one
+  ; if not exists one order with lower id,
+  ; or there exists and already finished.
+  (or  (not (order (id ?other-id&:(< ?other-id ?id)) (complexity C3)))
+       (and (order (id ?other-id) (complexity C3))
+            (finish-order (order-id ?other-id))
+       )
+  )
+
+
   =>
-   (if (eq ?quantity-requested 0)
-       then ; finish delivery
-         (printout t "all delivered" crlf)
-         (retract ?order_c3)
-    else 
-      ; expand this order
-       (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params ring ?ring-color1)))
-       (assert (goal (id (sym-cat tri-bs-c3firstrun- (gensym*))) (class tri-bs-c3firstrun) (params order-id ?id ring-color ?ring-color1)))
+   (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params order-id ?id ring ?ring-color1 index 1)))
+   (assert (goal (id (sym-cat tri-bs-c3firstrun- (gensym*))) (class tri-bs-c3firstrun) (params order-id ?id ring-color ?ring-color1)))
          
-      ; 2nd run, rs-loop-1
-       (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params ring ?ring-color2)))
-       (assert (goal (id (sym-cat rs-loop1-c3run- (gensym*))) (class trirs-loop1-c3run) (params order-id ?id ring-color ?ring-color2)))
+   ; 2nd run, rs-loop-1
+   (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params order-id ?id ring ?ring-color2 index 2)))
+   (assert (goal (id (sym-cat rs-loop1-c3run- (gensym*))) (class trirs-loop1-c3run) (params order-id ?id ring-color ?ring-color2)))
 
-      ; 3rd run, rs-loop-2
-       (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params ring ?ring-color3)))
-       (assert (goal (id (sym-cat rs-loop2-c3run- (gensym*))) (class trirs-loop2-c3run) (params order-id ?id ring-color ?ring-color3)))
+   ; 3rd run, rs-loop-2
+   (assert (goal (id (sym-cat tri-payment- (gensym*))) (class tri-payment) (params order-id ?id ring ?ring-color3 index 3)))
+   (assert (goal (id (sym-cat rs-loop2-c3run- (gensym*))) (class trirs-loop2-c3run) (params order-id ?id ring-color ?ring-color3)))
 
-      ; go to rs-cs-ds
-       (assert (goal (id (sym-cat rs-cs-c3run- (gensym*))) (class trirs-cs-c3run) (params order-id ?id)))                  
-   )
-)
-
+   ; go to rs-cs-ds
+   (assert (goal (id (sym-cat rs-cs-c3run- (gensym*))) (class trirs-cs-c3run) (params order-id ?id)))
+)                  

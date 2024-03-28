@@ -41,7 +41,7 @@ clips_executive:
           - core/wm-domain-sync.clp
       - name: domain
         # file: labcegor-agent/domain.clp
-        file: labcegor-agent/simple_moving_domain.clp
+        file: labcegor-agent/complex_moving_domain.clp
       - name: refbox-comm
         file: labcegor-agent/refbox-comm-init.clp
       - name: refbox-recv
@@ -51,7 +51,8 @@ clips_executive:
       - name: order-expansion
         file: labcegor-agent/order-expansion.clp
       - name: subgoal-creation
-        files: 
+        files:
+          - labcegor-agent/subgoal-creation_misc.clp 
           - labcegor-agent/subgoal-creation_payment.clp
           - labcegor-agent/subgoal-creation_c3.clp
           - labcegor-agent/subgoal-creation_c2.clp
@@ -59,8 +60,9 @@ clips_executive:
           - labcegor-agent/subgoal-creation_c0.clp
       - name: goal-reasoner
         file: labcegor-agent/goal-reasoner.clp
-      - name: fixed-sequence
-        file: labcegor-agent/fixed-sequence.clp
+      - name: fixed-sequence  # FIXME: only used one
+        file: labcegor-agent/fixed-sequence_on_new_domain.clp
+        # file: labcegor-agent/fixed-sequence.clp
       - name: action-selection
         file: labcegor-agent/action-selection.clp
       - name: action-execution
@@ -77,16 +79,44 @@ clips_executive:
       pick:
         mapped_to: say{text='hello world!'}
         executor: dummy_skiller
+      pick_at_slide:
+        mapped_to: say{text='hello world!'}
+        executor: dummy_skiller
+      pick_at_output:
+        mapped_to: say{text='hello world!'}
+        executor: dummy_skiller
+      pick_at_shelf:
+        mapped_to: say{text='hello world!'}
+        executor: dummy_skiller
       place:
         mapped_to: say{text='hello world!'}
         executor: dummy_skiller
+      place_at_slide:
+        mapped_to: say{text='hello world!'}
+        executor: dummy_skiller
+      cs_retrieve_cap:
+        mapped_to: say{text='hello world!'}
+        executor: dummy_skiller
+      cs_mount_cap:
+        mapped_to: say{text='hello world!'}
+        executor: dummy_skiller
+      # prepare_bs:
+      #   mapped_to: say{text='hello world!'}
+      #   executor: dummy_skiller
+      # prepare_cs:
+      #   mapped_to: say{text='hello world!'}
+      #   executor: dummy_skiller
+      # prepare_rs:
+      #   mapped_to: say{text='hello world!'}
+      #   executor: dummy_skiller
 
     parameters:
       simtest:
         enabled: false
         testbed: FULL  # defined in simtest.clp
       rcll:
-        peer-address: 172.26.255.255
+        # peer-address: 172.26.255.255
+        peer-address: 127.0.0.1
         peer-recv-port: 4444
         peer-send-port: 4445
         cyan-recv-port: 4441

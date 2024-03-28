@@ -24,6 +24,12 @@
   (slot peer-id (type INTEGER))
 )
 
+
+(deftemplate my_timer
+  (slot name (type SYMBOL))
+  (slot time (type INTEGER))
+)
+
 (defrule refbox-comm-enable-public
   "Enable peer connection to the unencrypted refbox channel"
   ; (declare (salience ?*PRIORITY-LOW*))
@@ -81,7 +87,10 @@
     then
       (printout t "Enabling local peer (cyan only)" crlf)
       (bind ?peer-id (pb-peer-create-local-crypto ?address ?cyan-send-port ?cyan-recv-port ?key ?cipher))
-   )
+    else
+      (printout t "Enabling local peer (magenta only)" crlf)
+      (bind ?peer-id (pb-peer-create-local-crypto ?address ?magenta-send-port ?magenta-recv-port ?key ?cipher))
+  )
   (assert (refbox-peer (name refbox-private) (peer-id ?peer-id)))
 )
 
@@ -109,17 +118,30 @@
   (assert (refbox-peer (name refbox-private) (peer-id ?peer-id)))
 )
 
+;(defrule refbox-beacon-init
+;  (time ?now)
+;  (wm-fact (key central agent robot args? r ?robot))
+;  (not (timer (name ?timer-name&:(eq ?timer-name (sym-cat refbox-beacon-timer- ?robot)))))
+;  =>
+;  (assert (timer (name (sym-cat refbox-beacon-timer- ?robot))
+;                 (time ?now)
+;          )
+;          (wm-fact (key refbox robot task seq args? r ?robot) (type UINT) (value 1))
+;  )
+;
+
+
 (defrule refbox-beacon-init
   (time $?now)
   ; (wm-fact (key central agent robot args? r ?robot))
   ; (not (timer (name ?timer-name&:(eq ?timer-name (sym-cat refbox-beacon-timer- ?robot)))))
   (not (wm-fact (key refbox robot task seq args? r ?robot)))
   =>
-  (assert ;(timer (name (sym-cat refbox-beacon-timer- ?robot))
-          ;       (time 00)
-          ;)
+  (assert (timer (name refbox-beacon)
+                 (time 0.0)
+          )
           (wm-fact (key config agent team) (value "Carologistics"))
           (wm-fact (key refbox robot task seq args? r robot1) (type UINT) (value 1))
+	  (wm-fact (key refbox robot task seq args? r robot2) (type UINT) (value 1))
   )
 )
-
