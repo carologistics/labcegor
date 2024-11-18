@@ -1,0 +1,202 @@
+[0.149s] Invoking command in '/home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/build/labcegor-bringup': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/cmuehrke/ros2/deps_clips_executive_ws/install/rclpy_cascade_lifecycle DEBUGINFOD_URLS=https://debuginfod.fedoraproject.org/ OLDPWD=${OLDPWD}
+BASH_FUNC_ml%%=() {  eval "$($LMOD_DIR/ml_cmd "$@")"
+}
+BASH_FUNC_module%%=() {  if [ -z "${LMOD_SH_DBG_ON+x}" ]; then
+ case "$-" in
+ *v*x*)
+ __lmod_sh_dbg='vx'
+ ;;
+ *v*)
+ __lmod_sh_dbg='v'
+ ;;
+ *x*)
+ __lmod_sh_dbg='x'
+ ;;
+ esac;
+ fi;
+ if [ -n "${__lmod_sh_dbg:-}" ]; then
+ set +$__lmod_sh_dbg;
+ echo "Shell debugging temporarily silenced: export LMOD_SH_DBG_ON=1 for Lmod's output" 1>&2;
+ fi;
+ eval "$($LMOD_CMD shell "$@")" && eval "$(${LMOD_SETTARG_CMD:-:} -s sh)";
+ __lmod_my_status=$?;
+ if [ -n "${__lmod_sh_dbg:-}" ]; then
+ echo "Shell debugging restarted" 1>&2;
+ set -$__lmod_sh_dbg;
+ fi;
+ unset __lmod_sh_dbg;
+ return $__lmod_my_status
+} _=/usr/bin/env /usr/bin/cmake /home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=OFF -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/install/labcegor-bringup
+[0.575s] -- The C compiler identification is GNU 14.2.1
+[0.788s] -- The CXX compiler identification is GNU 14.2.1
+[0.825s] -- Detecting C compiler ABI info
+[1.101s] -- Detecting C compiler ABI info - done
+[1.130s] -- Check for working C compiler: /usr/lib64/ccache/cc - skipped
+[1.130s] -- Detecting C compile features
+[1.131s] -- Detecting C compile features - done
+[1.146s] -- Detecting CXX compiler ABI info
+[1.410s] -- Detecting CXX compiler ABI info - done
+[1.436s] -- Check for working CXX compiler: /usr/lib64/ccache/c++ - skipped
+[1.436s] -- Detecting CXX compile features
+[1.437s] -- Detecting CXX compile features - done
+[1.656s] -- Found ament_cmake: 2.5.2 (/usr/lib64/ros2-jazzy/share/ament_cmake/cmake)
+[3.873s] -- Found Python3: /usr/bin/python3 (found version "3.12.7") found components: Interpreter
+[4.005s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[6.071s] -- Configuring done (5.8s)
+[6.191s] -- Generating done (0.1s)
+[6.199s] -- Build files have been written to: /home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/build/labcegor-bringup
+[6.204s] Invoked command in '/home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/build/labcegor-bringup' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/cmuehrke/ros2/deps_clips_executive_ws/install/rclpy_cascade_lifecycle DEBUGINFOD_URLS=https://debuginfod.fedoraproject.org/ OLDPWD=${OLDPWD}
+BASH_FUNC_ml%%=() {  eval "$($LMOD_DIR/ml_cmd "$@")"
+}
+BASH_FUNC_module%%=() {  if [ -z "${LMOD_SH_DBG_ON+x}" ]; then
+ case "$-" in
+ *v*x*)
+ __lmod_sh_dbg='vx'
+ ;;
+ *v*)
+ __lmod_sh_dbg='v'
+ ;;
+ *x*)
+ __lmod_sh_dbg='x'
+ ;;
+ esac;
+ fi;
+ if [ -n "${__lmod_sh_dbg:-}" ]; then
+ set +$__lmod_sh_dbg;
+ echo "Shell debugging temporarily silenced: export LMOD_SH_DBG_ON=1 for Lmod's output" 1>&2;
+ fi;
+ eval "$($LMOD_CMD shell "$@")" && eval "$(${LMOD_SETTARG_CMD:-:} -s sh)";
+ __lmod_my_status=$?;
+ if [ -n "${__lmod_sh_dbg:-}" ]; then
+ echo "Shell debugging restarted" 1>&2;
+ set -$__lmod_sh_dbg;
+ fi;
+ unset __lmod_sh_dbg;
+ return $__lmod_my_status
+} _=/usr/bin/env /usr/bin/cmake /home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=OFF -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/install/labcegor-bringup
+[6.208s] Invoking command in '/home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/build/labcegor-bringup': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/cmuehrke/ros2/deps_clips_executive_ws/install/rclpy_cascade_lifecycle DEBUGINFOD_URLS=https://debuginfod.fedoraproject.org/ OLDPWD=${OLDPWD}
+BASH_FUNC_ml%%=() {  eval "$($LMOD_DIR/ml_cmd "$@")"
+}
+BASH_FUNC_module%%=() {  if [ -z "${LMOD_SH_DBG_ON+x}" ]; then
+ case "$-" in
+ *v*x*)
+ __lmod_sh_dbg='vx'
+ ;;
+ *v*)
+ __lmod_sh_dbg='v'
+ ;;
+ *x*)
+ __lmod_sh_dbg='x'
+ ;;
+ esac;
+ fi;
+ if [ -n "${__lmod_sh_dbg:-}" ]; then
+ set +$__lmod_sh_dbg;
+ echo "Shell debugging temporarily silenced: export LMOD_SH_DBG_ON=1 for Lmod's output" 1>&2;
+ fi;
+ eval "$($LMOD_CMD shell "$@")" && eval "$(${LMOD_SETTARG_CMD:-:} -s sh)";
+ __lmod_my_status=$?;
+ if [ -n "${__lmod_sh_dbg:-}" ]; then
+ echo "Shell debugging restarted" 1>&2;
+ set -$__lmod_sh_dbg;
+ fi;
+ unset __lmod_sh_dbg;
+ return $__lmod_my_status
+} _=/usr/bin/env /usr/bin/cmake --build /home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/build/labcegor-bringup -- -j16 -l16
+[6.626s] Invoked command in '/home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/build/labcegor-bringup' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/cmuehrke/ros2/deps_clips_executive_ws/install/rclpy_cascade_lifecycle DEBUGINFOD_URLS=https://debuginfod.fedoraproject.org/ OLDPWD=${OLDPWD}
+BASH_FUNC_ml%%=() {  eval "$($LMOD_DIR/ml_cmd "$@")"
+}
+BASH_FUNC_module%%=() {  if [ -z "${LMOD_SH_DBG_ON+x}" ]; then
+ case "$-" in
+ *v*x*)
+ __lmod_sh_dbg='vx'
+ ;;
+ *v*)
+ __lmod_sh_dbg='v'
+ ;;
+ *x*)
+ __lmod_sh_dbg='x'
+ ;;
+ esac;
+ fi;
+ if [ -n "${__lmod_sh_dbg:-}" ]; then
+ set +$__lmod_sh_dbg;
+ echo "Shell debugging temporarily silenced: export LMOD_SH_DBG_ON=1 for Lmod's output" 1>&2;
+ fi;
+ eval "$($LMOD_CMD shell "$@")" && eval "$(${LMOD_SETTARG_CMD:-:} -s sh)";
+ __lmod_my_status=$?;
+ if [ -n "${__lmod_sh_dbg:-}" ]; then
+ echo "Shell debugging restarted" 1>&2;
+ set -$__lmod_sh_dbg;
+ fi;
+ unset __lmod_sh_dbg;
+ return $__lmod_my_status
+} _=/usr/bin/env /usr/bin/cmake --build /home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/build/labcegor-bringup -- -j16 -l16
+[6.699s] Invoking command in '/home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/build/labcegor-bringup': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/cmuehrke/ros2/deps_clips_executive_ws/install/rclpy_cascade_lifecycle DEBUGINFOD_URLS=https://debuginfod.fedoraproject.org/ OLDPWD=${OLDPWD}
+BASH_FUNC_ml%%=() {  eval "$($LMOD_DIR/ml_cmd "$@")"
+}
+BASH_FUNC_module%%=() {  if [ -z "${LMOD_SH_DBG_ON+x}" ]; then
+ case "$-" in
+ *v*x*)
+ __lmod_sh_dbg='vx'
+ ;;
+ *v*)
+ __lmod_sh_dbg='v'
+ ;;
+ *x*)
+ __lmod_sh_dbg='x'
+ ;;
+ esac;
+ fi;
+ if [ -n "${__lmod_sh_dbg:-}" ]; then
+ set +$__lmod_sh_dbg;
+ echo "Shell debugging temporarily silenced: export LMOD_SH_DBG_ON=1 for Lmod's output" 1>&2;
+ fi;
+ eval "$($LMOD_CMD shell "$@")" && eval "$(${LMOD_SETTARG_CMD:-:} -s sh)";
+ __lmod_my_status=$?;
+ if [ -n "${__lmod_sh_dbg:-}" ]; then
+ echo "Shell debugging restarted" 1>&2;
+ set -$__lmod_sh_dbg;
+ fi;
+ unset __lmod_sh_dbg;
+ return $__lmod_my_status
+} _=/usr/bin/env /usr/bin/cmake --install /home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/build/labcegor-bringup
+[6.715s] -- Install configuration: "Debug"
+[6.718s] -- Execute custom install script
+[6.723s] [31mCMake Error at ament_cmake_symlink_install/ament_cmake_symlink_install.cmake:100 (message):
+[6.724s]   ament_cmake_symlink_install_directory() can't find
+[6.724s]   '/home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/launch'
+[6.724s] Call Stack (most recent call first):
+[6.724s]   ament_cmake_symlink_install/ament_cmake_symlink_install.cmake:314 (ament_cmake_symlink_install_directory)
+[6.724s]   cmake_install.cmake:46 (include)
+[6.724s] 
+[6.724s] [0m
+[6.725s] Invoked command in '/home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/build/labcegor-bringup' returned '1': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/cmuehrke/ros2/deps_clips_executive_ws/install/rclpy_cascade_lifecycle DEBUGINFOD_URLS=https://debuginfod.fedoraproject.org/ OLDPWD=${OLDPWD}
+BASH_FUNC_ml%%=() {  eval "$($LMOD_DIR/ml_cmd "$@")"
+}
+BASH_FUNC_module%%=() {  if [ -z "${LMOD_SH_DBG_ON+x}" ]; then
+ case "$-" in
+ *v*x*)
+ __lmod_sh_dbg='vx'
+ ;;
+ *v*)
+ __lmod_sh_dbg='v'
+ ;;
+ *x*)
+ __lmod_sh_dbg='x'
+ ;;
+ esac;
+ fi;
+ if [ -n "${__lmod_sh_dbg:-}" ]; then
+ set +$__lmod_sh_dbg;
+ echo "Shell debugging temporarily silenced: export LMOD_SH_DBG_ON=1 for Lmod's output" 1>&2;
+ fi;
+ eval "$($LMOD_CMD shell "$@")" && eval "$(${LMOD_SETTARG_CMD:-:} -s sh)";
+ __lmod_my_status=$?;
+ if [ -n "${__lmod_sh_dbg:-}" ]; then
+ echo "Shell debugging restarted" 1>&2;
+ set -$__lmod_sh_dbg;
+ fi;
+ unset __lmod_sh_dbg;
+ return $__lmod_my_status
+} _=/usr/bin/env /usr/bin/cmake --install /home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/build/labcegor-bringup

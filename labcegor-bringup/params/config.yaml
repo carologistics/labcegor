@@ -1,0 +1,24 @@
+clips_manager:
+  ros__parameters:
+    environments: ["cx_config"]
+    cx_config:
+      plugins: ["ament_index", "config","executive", "ros_msgs", "files"]
+      log_clips_to_file: true
+      watch: ["facts", "rules"]
+
+    ament_index:
+      plugin: "cx::AmentIndexPlugin"
+    config:
+      plugin: "cx::ConfigPlugin"
+    files:
+      plugin: "cx::FileLoadPlugin"
+      pkg_share_dirs: ["labcegor-bringup"]
+      load: [
+        "clips/labcegor-bringup/ros_msg.clp"]
+    executive:
+      plugin: "cx::ExecutivePlugin"
+      publish_on_refresh: false
+      assert_time: true
+      refresh_rate: 10
+    ros_msgs:
+      plugin: "cx::RosMsgsPlugin"

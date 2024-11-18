@@ -1,0 +1,22 @@
+-- Install configuration: "Debug"
+-- Execute custom install script
+-- Up-to-date symlink: /home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/install/labcegor-bringup/share/labcegor-bringup/launch/cx_launch.py
+-- Up-to-date symlink: /home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/install/labcegor-bringup/share/labcegor-bringup/params/config.yaml
+-- Up-to-date symlink: /home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/install/labcegor-bringup/share/labcegor-bringup/clips/labcegor-bringup//config.clp
+-- Up-to-date symlink: /home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/install/labcegor-bringup/share/labcegor-bringup/clips/labcegor-bringup//ros_msg.clp
+-- Up-to-date symlink: /home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/install/labcegor-bringup/share/labcegor-bringup/clips/labcegor-bringup//turtle_rider.clp
+-- Up-to-date symlink: /home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/install/labcegor-bringup/share/ament_index/resource_index/package_run_dependencies/labcegor-bringup
+-- Up-to-date symlink: /home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/install/labcegor-bringup/share/ament_index/resource_index/parent_prefix_path/labcegor-bringup
+-- Up-to-date symlink: /home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/install/labcegor-bringup/share/labcegor-bringup/environment/ament_prefix_path.sh
+-- Up-to-date symlink: /home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/install/labcegor-bringup/share/labcegor-bringup/environment/ament_prefix_path.dsv
+-- Up-to-date symlink: /home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/install/labcegor-bringup/share/labcegor-bringup/environment/path.sh
+-- Up-to-date symlink: /home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/install/labcegor-bringup/share/labcegor-bringup/environment/path.dsv
+-- Up-to-date symlink: /home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/install/labcegor-bringup/share/labcegor-bringup/local_setup.bash
+-- Up-to-date symlink: /home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/install/labcegor-bringup/share/labcegor-bringup/local_setup.sh
+-- Up-to-date symlink: /home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/install/labcegor-bringup/share/labcegor-bringup/local_setup.zsh
+-- Up-to-date symlink: /home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/install/labcegor-bringup/share/labcegor-bringup/local_setup.dsv
+-- Symlinking: /home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/install/labcegor-bringup/share/labcegor-bringup/package.dsv
+-- Up-to-date symlink: /home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/install/labcegor-bringup/share/ament_index/resource_index/packages/labcegor-bringup
+-- Up-to-date symlink: /home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/install/labcegor-bringup/share/labcegor-bringup/cmake/labcegor-bringupConfig.cmake
+-- Up-to-date symlink: /home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/install/labcegor-bringup/share/labcegor-bringup/cmake/labcegor-bringupConfig-version.cmake
+-- Up-to-date symlink: /home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/install/labcegor-bringup/share/labcegor-bringup/package.xml
