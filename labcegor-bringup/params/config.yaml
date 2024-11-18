@@ -14,7 +14,7 @@ clips_manager:
       plugin: "cx::FileLoadPlugin"
       pkg_share_dirs: ["labcegor-bringup"]
       load: [
-        "clips/labcegor-bringup/ros_msg.clp"]
+        "clips/labcegor-bringup/turtle_rider.clp"]
     executive:
       plugin: "cx::ExecutivePlugin"
       publish_on_refresh: false
