@@ -100,9 +100,8 @@
 ;; Functions
 ;; Euclidean distance calculation
 (deffunction euclidean-distance (?pos1 ?pos2)
-    =>
-    (sqrt (+ (^ (- (nth 0 ?pos1) (nth 0 ?pos2)) 2)
-             (^ (- (nth 1 ?pos1) (nth 1 ?pos2)) 2))))
+    (sqrt (+ (** (- (nth 0 ?pos1) (nth 0 ?pos2)) 2)
+             (** (- (nth 1 ?pos1) (nth 1 ?pos2)) 2))))
 
 ;; Publish message (simulated as printout)
 (deffunction publish-message (?content)
