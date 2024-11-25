@@ -5,12 +5,11 @@
 ;     (slot speed (type float32) (default ?None)))
 
 (defrule ros-msgs-pub-init
-" Create publisher for turtleSim/turtle1/cmd_vel."
-  (not (ros-msgs-publisher (topic "testy")))
+  ; Create Publisher 
+  (not (ros-msgs-publisher (topic "/turtle1/cmd_vel")))
   (not (executive-finalize))
 =>
-  ; create the publisher
-  (ros-msgs-create-publisher "testy" "geometry_msgs/msg/Twist")
+  (ros-msgs-create-publisher "/turtle1/cmd_vel" "geometry_msgs/msg/Twist")
   (printout info "Publishing on /turtle1/cmd_vel" crlf)
 )
 
@@ -22,7 +21,12 @@
   =>
   (printout yellow "Sending Command" crlf)
   (bind ?msg (ros-msgs-create-message "geometry_msgs/msg/Twist"))
-  (ros-msgs-set-field ?msg "send_data" "{linear: {x: 2.0, y: 4.0, z: 0.0}, angular: {x: 1.0, y: 2.0, z: 0}}")
+  (ros-msgs-set-field ?msg "linear.x" 2.0)
+  (ros-msgs-set-field ?msg "linear.y" 4.0)
+  (ros-msgs-set-field ?msg "linear.z" 0.0)
+  (ros-msgs-set-field ?msg "angular.x" 1.0)
+  (ros-msgs-set-field ?msg "angular.y" 2.0)
+  (ros-msgs-set-field ?msg "angular.z" 0.0)
   (ros-msgs-publish ?msg ?topic)
   (ros-msgs-destroy-message ?msg)
 )
@@ -41,8 +45,10 @@
   (ros-msgs-subscription (topic ?sub))
   ?msg-f <- (ros-msgs-message (topic ?sub) (msg-ptr ?inc-msg))
   =>
-  (bind ?recv (ros-msgs-get-field ?inc-msg "recieved_data"))
-  (printout blue "Recieved via " ?sub ": " ?recv crlf)
+  (bind ?x (ros-msgs-get-field ?inc-msg "x"))
+  (bind ?y (ros-msgs-get-field ?inc-msg "y"))
+  (bind ?theta (ros-msgs-get-field ?inc-msg "theta"))
+  (printout blue "Received position: x=" ?x ", y=" ?y ", theta=" ?theta crlf)
   (ros-msgs-destroy-message ?inc-msg)
   (retract ?msg-f)
 )
