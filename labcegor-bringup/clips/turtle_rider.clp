@@ -26,8 +26,6 @@
   (ros-msgs-message)
 =>
   (printout yellow "Sending Command" crlf)
-
-  ;; Create and populate a `twist` fact
   (assert (twist (linear_x 2.0)
                  (linear_y 4.0)
                  (linear_z 0.0)
@@ -35,7 +33,6 @@
                  (angular_y 2.0)
                  (angular_z 0.0)))
 
-  ;; Retrieve the `twist` fact and map to ROS 2 message
   (bind ?msg (ros-msgs-create-message "geometry_msgs/msg/Twist"))
   (ros-msgs-set-field ?msg "linear.x" 2.0)
   (ros-msgs-set-field ?msg "linear.y" 4.0)
@@ -43,8 +40,7 @@
   (ros-msgs-set-field ?msg "angular.x" 1.0)
   (ros-msgs-set-field ?msg "angular.y" 2.0)
   (ros-msgs-set-field ?msg "angular.z" 0.0)
-
-  ;; Publish the message
+  
   (ros-msgs-publish ?msg "/turtle1/cmd_vel")
   (ros-msgs-destroy-message ?msg))
 
