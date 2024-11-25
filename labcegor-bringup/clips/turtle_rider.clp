@@ -1,8 +1,8 @@
-(deftemplate rider
-    (slot target_point (default ?None))
-    (slot current_pos (type float32[2] static array)(default ?None))
-    (slot margin (type float32) (default ?None))
-    (slot speed (type float32) (default ?None)))
+; (deftemplate rider
+;     (slot target_point (default ?None))
+;     (slot current_pos (type float32[2] static array)(default ?None))
+;     (slot margin (type float32) (default ?None))
+;     (slot speed (type float32) (default ?None)))
 
 (defrule ros-msgs-pub-init
 " Create publisher for turtleSim/cmd_val."
