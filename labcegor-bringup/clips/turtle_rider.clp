@@ -10,7 +10,7 @@
   (not (executive-finalize))
 =>
   ; create the publisher
-  (ros-msgs-create-publisher "turtle1/cmd_vel" "geometry_msgs/msg/Twist")
+  (ros-msgs-create-publisher "turtle1/cmd_vel" "std_msgs/msg/String")
   (printout info "Publishing on /turtle1/cmd_vel" crlf)
 )
 
