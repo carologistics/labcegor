@@ -25,9 +25,9 @@
   ;; Create the Twist message
   (bind ?msg (ros-msgs-create-message "geometry_msgs/msg/Twist"))
 
-  ;; Set the fields for linear and angular vectors
-  (ros-msgs-set-field ?msg "linear" 2.0, 4.0, 0.0)
-  (ros-msgs-set-field ?msg "angular" 2.0, 4.0, 0.0)
+  (ros-msgs-set-field ?msg "data" {linear: {x: 2.0, y: 4.0, z: 0.0}, angular: {x: 1.0, y: 2.0, z: 0}})
+  ; (ros-msgs-set-field ?msg "linear" [2.0, 4.0, 0.0])
+  ; (ros-msgs-set-field ?msg "angular" 2.0, 4.0, 0.0)
 
   ;; Publish the message
   (ros-msgs-publish ?msg "/turtle1/cmd_vel")
