@@ -32,7 +32,7 @@
   (not (ros-msgs-subscription (topic "turtle1/pose")))
   (not (executive-finalize))
 =>
-  (ros-msgs-create-subscription "turtle1/pose" "std_msgs/msg/String")
+  (ros-msgs-create-subscription "turtle1/pose" "turtlesim/msg/Pose")
   (printout info "Listening for messages on /turtle1/pose" crlf)
 )
 
@@ -46,6 +46,7 @@
   (ros-msgs-destroy-message ?inc-msg)
   (retract ?msg-f)
 )
+
 (defrule ros-msgs-sub-finalize
 " Delete the subscription on executive finalize. "
   (executive-finalize)
