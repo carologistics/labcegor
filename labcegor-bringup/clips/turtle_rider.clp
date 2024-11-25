@@ -10,7 +10,7 @@
   (not (executive-finalize))
 =>
   ; create the publisher
-  (ros-msgs-create-publisher "testy" "std_msgs/msg/String")
+  (ros-msgs-create-publisher "testy" "geometry_msgs/msg/Twist")
   (printout info "Publishing on /turtle1/cmd_vel" crlf)
 )
 
@@ -21,7 +21,7 @@
   (ros-msgs-message)
   =>
   (printout yellow "Sending Command" crlf)
-  (bind ?msg (ros-msgs-create-message "std_msgs/msg/String"))
+  (bind ?msg (ros-msgs-create-message "geometry_msgs/msg/Twist"))
   (ros-msgs-set-field ?msg "send_data" "{linear: {x: 2.0, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 0}}")
   (ros-msgs-publish ?msg ?topic)
   (ros-msgs-destroy-message ?msg)
