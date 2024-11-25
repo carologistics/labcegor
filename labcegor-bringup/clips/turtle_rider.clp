@@ -32,7 +32,7 @@
   (not (ros-msgs-subscription (topic "turtle1/pose")))
   (not (executive-finalize))
 =>
-  (ros-msgs-create-subscription "turtle1/pose" "turtlesim/msg/Pose")
+  (ros-msgs-create-subscription "turtle1/pose" "std_msgs/msg/String")
   (printout info "Listening for messages on /turtle1/pose" crlf)
 )
 
