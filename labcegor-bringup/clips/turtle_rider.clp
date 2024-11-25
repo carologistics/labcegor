@@ -28,8 +28,8 @@
   (printout yellow "Sending Command" crlf)
   (bind ?msg (ros-msgs-create-message "geometry_msgs/msg/Twist"))
 
-  (assert (twist (linear 2.0 4.0 0.0)
-                 (angular 1.0 2.0 0.0)))
+  (assert (twist (linear [2.0 4.0 0.0])
+                 (angular [1.0 2.0 0.0])))
 
 
   (ros-msgs-set-field ?msg "data" twist)
