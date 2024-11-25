@@ -20,8 +20,8 @@
   (ros-msgs-publisher (topic ?topic))
   (ros-msgs-message)
   =>
-  (printout yellow "Sending Hello World Message!" crlf)
-  (bind ?msg (ros-msgs-create-message "geometry_msgs/msg/Twist"))
+  (printout yellow "Sending Command" crlf)
+  (bind ?msg (ros-msgs-create-message "std_msgs/msg/String"))
   (ros-msgs-set-field ?msg "data" "{linear: {x: 2.0, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 0}}")
   (ros-msgs-publish ?msg ?topic)
   (ros-msgs-destroy-message ?msg)
@@ -32,7 +32,7 @@
   (not (ros-msgs-subscription (topic "turtle1/pose")))
   (not (executive-finalize))
 =>
-  (ros-msgs-create-subscription "turtle1/pose" "turtlesim/msg/Pose")
+  (ros-msgs-create-subscription "turtle1/pose" "std_msgs/msg/String")
   (printout info "Listening for messages on /turtle1/pose" crlf)
 )
 
