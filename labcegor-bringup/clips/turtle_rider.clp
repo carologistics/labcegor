@@ -5,8 +5,8 @@
 ;     (slot speed (type float32) (default ?None)))
 
 (deftemplate twist
-(slot linear (type Vector3))
-(slot angular (type Vector3))
+(slot linear (type FLOAT[3]))
+(slot angular (type FLOAT[3]))
 )
 
 
