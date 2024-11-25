@@ -5,13 +5,13 @@
 ;     (slot speed (type float32) (default ?None)))
 
 (defrule ros-msgs-pub-init
-" Create publisher for turtleSim/cmd_val."
-  (not (ros-msgs-publisher (topic "cmd_val")))
+" Create publisher for turtleSim/turtle1/cmd_vel."
+  (not (ros-msgs-publisher (topic "turtle1/cmd_vel")))
   (not (executive-finalize))
 =>
   ; create the publisher
-  (ros-msgs-create-publisher "cmd_val" "geometry_msgs/msg/Twist")
-  (printout info "Publishing on /cmd_val" crlf)
+  (ros-msgs-create-publisher "turtle1/cmd_vel" "geometry_msgs/msg/Twist")
+  (printout info "Publishing on /turtle1/cmd_vel" crlf)
 )
 
 (defrule ros-msgs-pub-hello
@@ -29,11 +29,11 @@
 
 (defrule ros-msgs-sub-init
 " Create a simple subscriber using the generated bindings. "
-  (not (ros-msgs-subscription (topic "pose")))
+  (not (ros-msgs-subscription (topic "turtle1/pose")))
   (not (executive-finalize))
 =>
-  (ros-msgs-create-subscription "pose" "turtlesim/msg/Pose")
-  (printout info "Listening for messages on /pose" crlf)
+  (ros-msgs-create-subscription "turtle1/pose" "turtlesim/msg/Pose")
+  (printout info "Listening for messages on /turtle1/pose" crlf)
 )
 
 (defrule ros-msgs-receive
