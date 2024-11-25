@@ -22,7 +22,7 @@
   =>
   (printout yellow "Sending Command" crlf)
   (bind ?msg (ros-msgs-create-message "geometry_msgs/msg/Twist"))
-  (ros-msgs-set-field ?msg "send_data" "{linear: {x: 2.0, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 0}}")
+  (ros-msgs-set-field ?msg "send_data" "{linear: {x: 2.0, y: 4.0, z: 0.0}, angular: {x: 1.0, y: 2.0, z: 0}}")
   (ros-msgs-publish ?msg ?topic)
   (ros-msgs-destroy-message ?msg)
 )
