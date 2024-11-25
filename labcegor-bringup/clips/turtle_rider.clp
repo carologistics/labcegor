@@ -3,13 +3,7 @@
 ;     (slot current_pos (type float32[2] static array)(default ?None))
 ;     (slot margin (type float32) (default ?None))
 ;     (slot speed (type float32) (default ?None)))
-(deftemplate twist
-    (slot linear_x (type FLOAT) (default 0.0))
-    (slot linear_y (type FLOAT) (default 0.0))
-    (slot linear_z (type FLOAT) (default 0.0))
-    (slot angular_x (type FLOAT) (default 0.0))
-    (slot angular_y (type FLOAT) (default 0.0))
-    (slot angular_z (type FLOAT) (default 0.0)))
+
 
 (defrule ros-msgs-pub-init
   ; Create Publisher 
@@ -32,8 +26,8 @@
   (bind ?msg (ros-msgs-create-message "geometry_msgs/msg/Twist"))
 
   ;; Set the fields for linear and angular vectors
-  (ros-msgs-set-field ?msg "linear" "{2.0, 4.0, 0.0}")
-  (ros-msgs-set-field ?msg "angular" "{2.0, 4.0, 0.0}")
+  (ros-msgs-set-field ?msg "linear" 2.0, 4.0, 0.0)
+  (ros-msgs-set-field ?msg "angular" 2.0, 4.0, 0.0)
 
   ;; Publish the message
   (ros-msgs-publish ?msg "/turtle1/cmd_vel")
