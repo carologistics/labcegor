@@ -6,11 +6,11 @@
 
 (defrule ros-msgs-pub-init
 " Create publisher for turtleSim/turtle1/cmd_vel."
-  (not (ros-msgs-publisher (topic "turtle1/cmd_vel")))
+  (not (ros-msgs-publisher (topic "testy")))
   (not (executive-finalize))
 =>
   ; create the publisher
-  (ros-msgs-create-publisher "turtle1/cmd_vel" "std_msgs/msg/String")
+  (ros-msgs-create-publisher "testy" "std_msgs/msg/String")
   (printout info "Publishing on /turtle1/cmd_vel" crlf)
 )
 
@@ -22,7 +22,7 @@
   =>
   (printout yellow "Sending Command" crlf)
   (bind ?msg (ros-msgs-create-message "std_msgs/msg/String"))
-  (ros-msgs-set-field ?msg "data" "{linear: {x: 2.0, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 0}}")
+  (ros-msgs-set-field ?msg "send_data" "{linear: {x: 2.0, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 0}}")
   (ros-msgs-publish ?msg ?topic)
   (ros-msgs-destroy-message ?msg)
 )
@@ -41,7 +41,7 @@
   (ros-msgs-subscription (topic ?sub))
   ?msg-f <- (ros-msgs-message (topic ?sub) (msg-ptr ?inc-msg))
   =>
-  (bind ?recv (ros-msgs-get-field ?inc-msg "data"))
+  (bind ?recv (ros-msgs-get-field ?inc-msg "recieved_data"))
   (printout blue "Recieved via " ?sub ": " ?recv crlf)
   (ros-msgs-destroy-message ?inc-msg)
   (retract ?msg-f)
