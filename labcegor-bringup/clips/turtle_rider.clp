@@ -3,6 +3,13 @@
 ;     (slot current_pos (type float32[2] static array)(default ?None))
 ;     (slot margin (type float32) (default ?None))
 ;     (slot speed (type float32) (default ?None)))
+(deftemplate twist
+    (slot linear_x (type FLOAT) (default 0.0))
+    (slot linear_y (type FLOAT) (default 0.0))
+    (slot linear_z (type FLOAT) (default 0.0))
+    (slot angular_x (type FLOAT) (default 0.0))
+    (slot angular_y (type FLOAT) (default 0.0))
+    (slot angular_z (type FLOAT) (default 0.0)))
 
 (defrule ros-msgs-pub-init
   ; Create Publisher 
@@ -14,12 +21,21 @@
 )
 
 (defrule ros-msgs-pub-hello
-" Whenever a message comes in, send out a Hello World message in response. "
   (declare (salience 1))
-  (ros-msgs-publisher (topic ?topic))
+  (ros-msgs-publisher (topic "/turtle1/cmd_vel"))
   (ros-msgs-message)
-  =>
+=>
   (printout yellow "Sending Command" crlf)
+
+  ;; Create and populate a `twist` fact
+  (assert (twist (linear_x 2.0)
+                 (linear_y 4.0)
+                 (linear_z 0.0)
+                 (angular_x 1.0)
+                 (angular_y 2.0)
+                 (angular_z 0.0)))
+
+  ;; Retrieve the `twist` fact and map to ROS 2 message
   (bind ?msg (ros-msgs-create-message "geometry_msgs/msg/Twist"))
   (ros-msgs-set-field ?msg "linear.x" 2.0)
   (ros-msgs-set-field ?msg "linear.y" 4.0)
@@ -27,9 +43,10 @@
   (ros-msgs-set-field ?msg "angular.x" 1.0)
   (ros-msgs-set-field ?msg "angular.y" 2.0)
   (ros-msgs-set-field ?msg "angular.z" 0.0)
-  (ros-msgs-publish ?msg ?topic)
-  (ros-msgs-destroy-message ?msg)
-)
+
+  ;; Publish the message
+  (ros-msgs-publish ?msg "/turtle1/cmd_vel")
+  (ros-msgs-destroy-message ?msg))
 
 (defrule ros-msgs-sub-init
 " Create a simple subscriber using the generated bindings. "
