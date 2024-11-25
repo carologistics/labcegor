@@ -21,18 +21,12 @@
   (ros-msgs-message)
 =>
   (printout yellow "Sending Command" crlf)
-
-  ;; Create the Twist message
   (bind ?msg (ros-msgs-create-message "geometry_msgs/msg/Twist"))
 
   (ros-msgs-set-field ?msg "data" {linear: {x: 2.0, y: 4.0, z: 0.0}, angular: {x: 1.0, y: 2.0, z: 0}})
   ; (ros-msgs-set-field ?msg "linear" [2.0, 4.0, 0.0])
   ; (ros-msgs-set-field ?msg "angular" 2.0, 4.0, 0.0)
-
-  ;; Publish the message
   (ros-msgs-publish ?msg "/turtle1/cmd_vel")
-
-  ;; Destroy the message to free resources
   (ros-msgs-destroy-message ?msg)
 )
 
@@ -53,7 +47,7 @@
   (bind ?x (ros-msgs-get-field ?inc-msg "x"))
   (bind ?y (ros-msgs-get-field ?inc-msg "y"))
   (bind ?theta (ros-msgs-get-field ?inc-msg "theta"))
-  (printout blue "Received position: x=" ?x ", y=" ?y ", theta=" ?theta crlf)
+  ; (printout blue "Received position: x=" ?x ", y=" ?y ", theta=" ?theta crlf)
   (ros-msgs-destroy-message ?inc-msg)
   (retract ?msg-f)
 )
