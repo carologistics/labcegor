@@ -21,28 +21,30 @@
 )
 
 (defrule ros-msgs-pub-hello
+  "Send a Twist message with properly structured Vector3 fields."
   (declare (salience 1))
   (ros-msgs-publisher (topic "/turtle1/cmd_vel"))
   (ros-msgs-message)
 =>
   (printout yellow "Sending Command" crlf)
-  (assert (twist (linear_x 2.0)
-                 (linear_y 4.0)
-                 (linear_z 0.0)
-                 (angular_x 1.0)
-                 (angular_y 2.0)
-                 (angular_z 0.0)))
 
+  ;; Create the Twist message
   (bind ?msg (ros-msgs-create-message "geometry_msgs/msg/Twist"))
+
+  ;; Set the fields for linear and angular vectors
   (ros-msgs-set-field ?msg "linear.x" 2.0)
   (ros-msgs-set-field ?msg "linear.y" 4.0)
   (ros-msgs-set-field ?msg "linear.z" 0.0)
   (ros-msgs-set-field ?msg "angular.x" 1.0)
   (ros-msgs-set-field ?msg "angular.y" 2.0)
   (ros-msgs-set-field ?msg "angular.z" 0.0)
-  
+
+  ;; Publish the message
   (ros-msgs-publish ?msg "/turtle1/cmd_vel")
-  (ros-msgs-destroy-message ?msg))
+
+  ;; Destroy the message to free resources
+  (ros-msgs-destroy-message ?msg)
+)
 
 (defrule ros-msgs-sub-init
 " Create a simple subscriber using the generated bindings. "
