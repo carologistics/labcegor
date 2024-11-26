@@ -1,0 +1,36 @@
+clips_manager:
+  ros__parameters:
+    environments: ["cx_rcll"]
+    cx_rcll:
+      redirect_stdout_to_debug: false
+      log_clips_to_file: true
+      watch: ["facts", "rules"]
+      plugins: ["executive",
+                "ament_index",
+                "config",
+                "protobuf",
+                "files"]
+
+    ament_index:
+      plugin: "cx::AmentIndexPlugin"
+    config:
+      plugin: "cx::ConfigPlugin"
+    executive:
+      plugin: "cx::ExecutivePlugin"
+      publish_on_refresh: false
+      assert_time: true
+      refresh_rate: 10
+    files:
+      plugin: "cx::FileLoadPlugin"
+      pkg_share_dirs: ["labcegor_bringup"]
+      batch: [
+        "clips/labcegor_bringup/rcll/deftemplates.clp",
+        "clips/labcegor_bringup/rcll/init.clp",
+        "clips/labcegor_bringup/rcll/refbox-comm-init.clp",
+        "clips/labcegor_bringup/rcll/sim-comm-init.clp",
+        "clips/labcegor_bringup/rcll/refbox-recv.clp",
+       ]
+    protobuf:
+      plugin: "cx::ProtobufPlugin"
+      pkg_share_dirs: ["rcll_protobuf_msgs"]
+      proto_paths: ["rcll-protobuf-msgs"]
