@@ -1,9 +1,0 @@
-/home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/build/labcegor-bringup/CMakeFiles/uninstall.dir
-/home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/build/labcegor-bringup/CMakeFiles/labcegor-bringup_uninstall.dir
-/home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/build/labcegor-bringup/CMakeFiles/test.dir
-/home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/build/labcegor-bringup/CMakeFiles/edit_cache.dir
-/home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/build/labcegor-bringup/CMakeFiles/rebuild_cache.dir
-/home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/build/labcegor-bringup/CMakeFiles/list_install_components.dir
-/home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/build/labcegor-bringup/CMakeFiles/install.dir
-/home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/build/labcegor-bringup/CMakeFiles/install/local.dir
-/home/cmuehrke/ros2/labcegor_ws/src/labcegor/labcegor-bringup/build/labcegor-bringup/CMakeFiles/install/strip.dir
