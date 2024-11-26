@@ -4,7 +4,7 @@ clips_manager:
     cx_rcll:
       redirect_stdout_to_debug: false
       log_clips_to_file: true
-      watch: []
+      watch: ["rules"]
       plugins: ["executive",
                 "ament_index",
                 "config",
