@@ -9,7 +9,7 @@
   
   (bind ?msg (pb-create "llsf_msgs.AgentTask"))
   (pb-set-field ?msg "team_color" MAGENTA)
-  (pb-set-field ?msg "task_id" (+ ?global_task_id_base ?r_id))
+  (pb-set-field ?msg "task_id" (+ ?*global_task_id_base* ?r_id))
   (pb-set-field ?msg "robot_id" ?r_id)
   (pb-set-field ?msg "move" ?move_msg)
   (pb-broadcast ?peer-id ?msg)
