@@ -16,13 +16,14 @@
   (pb-destroy ?msg)
 )
 
+
  
 (defrule peer-send-agent-task-msg
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   (test (eq ?n ROBOT1))
   =>
-  (send_target_to_robot 1 "M-CS2" "output" ?peer-id)
-
+  (assert (send_target_to_robot 1 "M-CS2" "output" ?peer-id))
+  
   (printout info task_id crlf)
   (printout red "end testing" crlf)
 )
