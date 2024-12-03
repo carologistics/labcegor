@@ -7,7 +7,7 @@
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   (?n == "ROBOT1")
   =>
-  (bind ?msg (protobuf-msg (type "llsf_msgs.AgentTask")))
+  (bind ?msg (pb-create "llsf_msgs.AgentTask"))
 
   (printout info "start testing" crlf)
   (printout info ?peer-id crlf)
