@@ -1,5 +1,5 @@
 ; Here is my stuff
-(defglobal ?global_task_id_base 0)
+(defglobal ?global_task_id_base = 0)
 
 ; create function for send task
 (deffunction send_target_to_robot (?r_id ?r_target $?m_point $?peer-id)
@@ -22,7 +22,7 @@
   (test (eq ?n ROBOT1))
   =>
   (send_target_to_robot 1 "M-CS2" "output" ?peer-id)
-  
+
   (printout info task_id crlf)
   (printout red "end testing" crlf)
 )
