@@ -34,7 +34,7 @@
 ; Here is my stuff
 (defrule peer-send-agent-task-msg
   (protobuf-peer (name ?n) (peer-id ?peer-id))
-  (test (eq ?n "ROBOT1"))
+  (test (eq ?n ROBOT1))
   =>
   (bind ?msg (pb-create "llsf_msgs.AgentTask"))
   (printout info "start testing" crlf)
