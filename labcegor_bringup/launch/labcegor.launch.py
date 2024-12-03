@@ -7,6 +7,7 @@ from launch.actions import DeclareLaunchArgument, SetEnvironmentVariable
 from launch.actions import OpaqueFunction
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
+from rclpy.logging import get_logger
 
 
 def launch_with_context(context, *args, **kwargs):
