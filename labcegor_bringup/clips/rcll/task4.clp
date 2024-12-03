@@ -4,7 +4,7 @@
   (game-state (state RUNNING))
   =>
   (printout t "Sending move command to " ?robot-name crlf)
-  (bind ?task (create-protobuf-msg "llsf_msgs.AgentTask"))
+  (bind ?task (pb-create "llsf_msgs.AgentTask"))
   (pb-field-set ?task "task_id" 1)
   (pb-field-set ?task "robot_id" 101)
   (pb-field-create-message ?task "move")
