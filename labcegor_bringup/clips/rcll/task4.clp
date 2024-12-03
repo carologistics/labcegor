@@ -21,5 +21,5 @@
   (pb-destroy ?msg)
 
   (printout info task_id crlf)
-  (printout error "end testing" crlf)
+  (printout red "end testing" crlf)
 )
