@@ -8,7 +8,7 @@
   (bind ?msg (pb-create "llsf_msgs.AgentTask"))
   (bind ?robot_id 1)
   (bind ?move_msg (pb-create "llsf_msgs.Move"))
-  (pb-set-field ?move_msg "waypoint" "M-Cs2")
+  (pb-set-field ?move_msg "waypoint" "M-CS2")
   (pb-set-field ?move_msg "machine_point" "outpot")
 
   (printout info "start testing" crlf)
