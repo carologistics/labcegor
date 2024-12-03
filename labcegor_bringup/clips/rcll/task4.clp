@@ -19,7 +19,7 @@
   (pb-set-field ?msg "move" ?move_msg)
   (pb-broadcast ?peer-id ?msg)
   (pb-destroy ?msg)
-  
+
   (printout info task_id crlf)
-  (printout info "end testing" crlf)
+  (printout error "end testing" crlf)
 )
