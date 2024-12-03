@@ -4,9 +4,8 @@
 
 ; Here is my stuff
 (defrule peer-send-agent-task-msg
-  (client ?pb-peer-create-local-crypto)
-  (protobuf-client-connected ?pb-peer-create-local-crypto)
-  (not (protobuf-msg))
+  (protobuf-peer (name ?n) (peer-id ?peer-id))
+  (?n == "ROBOT1")
   =>
   (bind ?msg (pb-create "AgentTask"))
 
@@ -15,7 +14,7 @@
   (pb-set-field ?msg "task_id" "0")
   (pb-set-field ?msg "robot_id" "0")
   (pb-set-field ?msg "move" "C_Z18")
-  (pb-send ?peer-id ?msg)
+  (pb-brodcast ?peer-id ?msg)
   (pb-destroy ?msg)
   (printout info "end testing" crlf)
 )
