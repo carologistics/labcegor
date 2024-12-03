@@ -12,10 +12,7 @@
   (pb-set-field ?msg "task_id" 0)
   (pb-set-field ?msg "robot_id" 0)
   (pb-set-field ?msg "move" "C_Z18")
-  (pb-brodcast ?peer-id ?msg)
+  (pb-broadcast ?peer-id ?msg)
   (pb-destroy ?msg)
   (printout info "end testing" crlf)
 )
-
-
-
