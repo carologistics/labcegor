@@ -61,7 +61,7 @@
 ; (bind ?res (pb-field-list ?msg ?field-name))
 ; (bind ?res (pb-field-is-list ?msg ?field-name))
 ; (bind ?res (pb-create ?full-name))
-; (pb-set-field ?msg ?field-name ?value)
+(pb-set-field ?msg ?field-name ?value)
 ; (pb-add-list ?msg ?field-name ?list)
 ; ;
 ; (bind ?res (pb-tostring ?msg))
