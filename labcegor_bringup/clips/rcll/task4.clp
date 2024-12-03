@@ -9,7 +9,7 @@
   (bind ?robot_id 1)
   (bind ?move_msg (pb-create "llsf_msgs.Move"))
   (pb-set-field ?move_msg "waypoint" "M-CS2")
-  (pb-set-field ?move_msg "machine_point" "outpot")
+  (pb-set-field ?move_msg "machine_point" "output")
 
   (printout info "start testing" crlf)
   (printout info ?peer-id crlf)
