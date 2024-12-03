@@ -22,8 +22,8 @@
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   (test (eq ?n ROBOT1))
   =>
-  (assert (send_target_to_robot 1 "M-CS2" "output" ?peer-id))
-  
+  (send_target_to_robot 1 "M-CS2" "output" ?peer-id)
+
   (printout info task_id crlf)
   (printout red "end testing" crlf)
 )
