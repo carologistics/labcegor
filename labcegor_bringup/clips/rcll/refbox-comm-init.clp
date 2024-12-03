@@ -17,6 +17,7 @@
 
 (defrule refbox-comm-enable-local-team-private
   "Enable local peer connection to the encrypted team channel"
+  (not (executive-finalize))
   (game-state (team-color ?team-color&~NOT-SET))
   (protobuf-peer (name refbox-public))
   (confval (path "/game/parameters/rcll/peer_address") (value ?address))
