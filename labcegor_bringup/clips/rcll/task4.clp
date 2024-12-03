@@ -14,6 +14,7 @@
   (printout info ?peer-id crlf)
   (printout info ?n crlf)
   (printout info "start testing" crlf)
+  (bind ?msg (pb-create "AgentTask"))
   (pb-set-field ?msg "team_color" "0")
   (pb-set-field ?msg "task_id" "0")
   (pb-set-field ?msg "robot_id" "0")
