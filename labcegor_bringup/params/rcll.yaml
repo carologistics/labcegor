@@ -29,7 +29,7 @@ clips_manager:
         "clips/labcegor_bringup/rcll/refbox-comm-init.clp",
         "clips/labcegor_bringup/rcll/sim-comm-init.clp",
         "clips/labcegor_bringup/rcll/refbox-recv.clp",
-        "clips/labcegor_bringup/rcll/aa-robo-control-t4"
+        "clips/labcegor_bringup/rcll/aa-robo-control-t4.clp"
        ]
     protobuf:
       plugin: "cx::ProtobufPlugin"
