@@ -19,6 +19,17 @@
   (assert (move_is_sentR1))
 )
 
+(defrule r1_move_takeCap
+  (protobuf-msg (type "llsf_msgs.AgentTask") (comp-id ?comp-id) (msg-type ?msg-type)
+    (rcvd-via ?via) (rcvd-from ?address ?port) (rcvd-at ?rcvd-at)
+    (client-type PEER) (client-id 1) (ptr ?msg))
+  (move_is_sentR1)
+  =>
+  (printout green ?msg crlf)
+)
+
+
+
 (defrule r2_move
   (protobuf-peer (name ROBOT2) (peer-id ?peer-id))
   ;(test (eq ?n ))
@@ -38,10 +49,15 @@
   (pb-destroy ?msg)
   (assert (move_is_sentR2))
 )
+
+
+
+
+
+
 (defrule unwatch-all-stuff
   (not (unwatched))
   =>
-  (unwatch facts protobuf-msg)
   (unwatch facts order)
   (assert (unwatched))
 )
