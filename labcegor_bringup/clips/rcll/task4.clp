@@ -2,7 +2,7 @@
 (defglobal ?*global_task_id_base* = 0)
 
 ; create function for send task
-(deffunction send_target_to_robot (?r_id ?r_target $?m_point $?peer-id)
+(deffunction send_target_to_robot (?r_id ?r_target ?m_point ?peer-id)
   (bind ?move_msg (pb-create "llsf_msgs.Move"))
   (pb-set-field ?move_msg "waypoint" ?r_target)
   (pb-set-field ?move_msg "machine_point" ?m_point)
