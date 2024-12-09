@@ -25,6 +25,7 @@
     (client-type PEER) (client-id 1) (ptr ?msg))
   (move_is_sentR1)
   =>
+  ;(bind ?res (pb-field-value ?msg ?field-name))
   (printout green ?msg crlf)
 )
 
