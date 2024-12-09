@@ -25,8 +25,20 @@
     (client-type PEER) (client-id 1) (ptr ?msg))
   (move_is_sentR1)
   =>
-  ;(bind ?res (pb-field-value ?msg ?field-name))
-  (printout green ?msg crlf)
+  (bind ?robo_id (pb-field-value ?msg "robot_id"))
+  (printout green ?robo_id crlf)
+  (bind ?task_id (pb-field-value ?msg "task_id"))
+  (printout green ?task_id crlf)
+  (bind ?success (pb-field-value ?msg "successful"))
+  (printout green ?success crlf)
+
+  (if (and (eq ?robo_id 1) (eq ?task_id 101) (eq ?success TRUE))
+  then
+    (printout green "MOVE TASK DONE - ROBO1" crlf)
+  
+  else
+    (printout yellow "still moving - ROBO1" crlf)
+  )
 )
 
 
