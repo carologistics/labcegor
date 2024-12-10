@@ -27,11 +27,11 @@
   (not (check_complete_101))
   =>
   (bind ?robo_id (pb-field-value ?msg "robot_id"))
-  (printout green ?robo_id crlf)
+  ;(printout green ?robo_id crlf)
   (bind ?task_id (pb-field-value ?msg "task_id"))
-  (printout green ?task_id crlf)
+  ;(printout green ?task_id crlf)
   (bind ?success (pb-field-value ?msg "successful"))
-  (printout green ?success crlf)
+  ;(printout green ?success crlf)
 
   (if (and (eq ?robo_id 1) (eq ?task_id 101) (eq ?success TRUE))
   then
@@ -63,9 +63,28 @@
   (printout INFO "CAP retrieved")
 )
 
+(defrule r1_retrieve_check
+  (protobuf-msg (type "llsf_msgs.AgentTask") (comp-id ?comp-id) (msg-type ?msg-type)
+    (rcvd-via ?via) (rcvd-from ?address ?port) (rcvd-at ?rcvd-at)
+    (client-type PEER) (client-id 1) (ptr ?msg))
+  (move_is_sentR1)
+  (not (check_complete_102))
+  =>
+  (bind ?robo_id (pb-field-value ?msg "robot_id"))
+  (printout green ?robo_id crlf)
+  (bind ?task_id (pb-field-value ?msg "task_id"))
+  (printout green ?task_id crlf)
+  (bind ?success (pb-field-value ?msg "successful"))
+  (printout green ?success crlf)
 
-
-
+  (if (and (eq ?robo_id 1) (eq ?task_id 102) (eq ?success TRUE))
+  then
+    (printout green "retrieve TASK DONE - ROBO1" crlf)
+    (assert(check_complete_102))
+  else
+    (printout yellow "still retrieving - ROBO1" crlf)
+  )
+)
 
 
 
@@ -90,9 +109,28 @@
   (assert (move_is_sentR2))
 )
 
+(defrule r2_move_check
+  (protobuf-msg (type "llsf_msgs.AgentTask") (comp-id ?comp-id) (msg-type ?msg-type)
+    (rcvd-via ?via) (rcvd-from ?address ?port) (rcvd-at ?rcvd-at)
+    (client-type PEER) (client-id 2) (ptr ?msg))
+  (move_is_sentR2)
+  (not (check_complete_201))
+  =>
+  (bind ?robo_id (pb-field-value ?msg "robot_id"))
+  ;(printout green ?robo_id crlf)
+  (bind ?task_id (pb-field-value ?msg "task_id"))
+  ;(printout green ?task_id crlf)
+  (bind ?success (pb-field-value ?msg "successful"))
+  ;(printout green ?success crlf)
 
-
-
+  (if (and (eq ?robo_id 2) (eq ?task_id 201) (eq ?success TRUE))
+  then
+    (printout blue "MOVE TASK DONE - ROBO2" crlf)
+    (assert(check_complete_201))
+  else
+    (printout yellow "still moving - ROBO2" crlf)
+  )
+)
 
 
 (defrule unwatch-all-stuff
