@@ -27,6 +27,7 @@
   (confval (path "/game/parameters/rcll/magenta_recv_port") (value ?magenta-recv-port))
   (confval (path "/game/parameters/rcll/magenta_send_port") (value ?magenta-send-port))
   (not (protobuf-peer (name refbox-private)))
+  (not (executive-finalize))
   =>
   (if (eq ?team-color CYAN)
     then
@@ -47,4 +48,11 @@
   (printout info "Closing peer " ?name crlf)
   (pb-peer-destroy ?peer-id)
   (retract ?pe)
+)
+
+
+(defrule dings
+ (protobuf-peer (peer-id ?peer-id))
+=>
+  (printout green ?peer-id crlf)
 )

@@ -60,3 +60,8 @@
   (slot delivery-end (type INTEGER))
   (slot competitive (type SYMBOL))
 )
+
+(deftemplate currentTask
+  (slot robotID (type INTEGER))
+  (slot taskID (type INTEGER))
+)

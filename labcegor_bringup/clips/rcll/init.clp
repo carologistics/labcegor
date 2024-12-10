@@ -6,4 +6,7 @@
   (assert (yaml-loaded))
   (assert (game-state (team "Carologistics")))
   (assert (game-time 0.)) 
+
+  (assert (taskID 1))
+  (assert (task "moveInput"))
 )

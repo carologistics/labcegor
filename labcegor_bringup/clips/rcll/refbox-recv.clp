@@ -108,8 +108,7 @@
 )
 
 (defrule refbox-recv-RobotInfo
-  "Receive robot state information to detect if a robot is placed into (or
-	recovered from) maintenance."
+  "Receive robot state information to detect if a robot is placed into (or recovered from) maintenance."
   ?pb-msg <- (protobuf-msg (type "llsf_msgs.RobotInfo") (ptr ?r))
   (game-state (team ?team) (team-color ?team-color))
   =>
