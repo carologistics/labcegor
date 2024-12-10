@@ -1,10 +1,7 @@
 (defrule r1-move
   (protobuf-peer (name ROBOT1) (peer-id ?peer-id))
-  ;(test (eq ?n ))
-  ;(not (protobuf-msg))
   (not (move_is_sentR1))
   =>
-  ;(printout green "TEST" crlf)
   (bind ?msg (pb-create "llsf_msgs.AgentTask"))
   (pb-set-field ?msg "team_color" MAGENTA)
   (pb-set-field ?msg "task_id" 101)
@@ -27,18 +24,15 @@
   (not (check_complete_101))
   =>
   (bind ?robo_id (pb-field-value ?msg "robot_id"))
-  ;(printout green ?robo_id crlf)
   (bind ?task_id (pb-field-value ?msg "task_id"))
-  ;(printout green ?task_id crlf)
   (bind ?success (pb-field-value ?msg "successful"))
-  ;(printout green ?success crlf)
 
   (if (and (eq ?robo_id 1) (eq ?task_id 101) (eq ?success TRUE))
   then
     (printout green "MOVE TASK DONE - ROBO1" crlf)
     (assert(check_complete_101))
   else
-    (printout yellow "still moving - ROBO1" crlf)
+    ;(printout yellow "still moving - ROBO1" crlf)
   )
 )
 
@@ -48,7 +42,6 @@
   (not (get_cap_sent_R1))
   =>
   (assert (get_cap_sent_R1))
-  ;(printout green "TEST" crlf)
   (bind ?msg (pb-create "llsf_msgs.AgentTask"))
   (pb-set-field ?msg "team_color" MAGENTA)
   (pb-set-field ?msg "task_id" 102)
@@ -60,8 +53,6 @@
   (pb-set-field ?msg "retrieve" ?retrieve-msg)
   (pb-broadcast ?peer-id ?msg)
   (pb-destroy ?msg)
-
-  ;(printout INFO "CAP retrieved")
 )
 (defrule r1_retrieve_check
   (protobuf-msg (type "llsf_msgs.AgentTask") (comp-id ?comp-id) (msg-type ?msg-type)
@@ -71,11 +62,8 @@
   (not (check_complete_102))
   =>
   (bind ?robo_id (pb-field-value ?msg "robot_id"))
-  ;(printout green ?robo_id crlf)
   (bind ?task_id (pb-field-value ?msg "task_id"))
-  ;(printout green ?task_id crlf)
   (bind ?success (pb-field-value ?msg "successful"))
-  ;(printout green ?success crlf)
 
   (if (and (eq ?robo_id 1) (eq ?task_id 102) (eq ?success TRUE))
   then
@@ -93,7 +81,6 @@
   (not (place_cap_sent_R1))
   =>
   (assert (place_cap_sent_R1))
-  ;(printout green "TEST" crlf)
   (bind ?msg (pb-create "llsf_msgs.AgentTask"))
   (pb-set-field ?msg "team_color" MAGENTA)
   (pb-set-field ?msg "task_id" 103)
@@ -105,7 +92,6 @@
   (pb-broadcast ?peer-id ?msg)
   (pb-destroy ?msg)
 
-  ;(printout INFO "CAP deliverd")
 )
 
 (defrule r1_place_check
@@ -116,18 +102,15 @@
   (not (check_complete_103))
   =>
   (bind ?robo_id (pb-field-value ?msg "robot_id"))
-  (printout green ?robo_id crlf)
   (bind ?task_id (pb-field-value ?msg "task_id"))
-  (printout green ?task_id crlf)
   (bind ?success (pb-field-value ?msg "successful"))
-  (printout green ?success crlf)
 
   (if (and (eq ?robo_id 1) (eq ?task_id 103) (eq ?success TRUE))
   then
     (printout green "deliver TASK DONE - ROBO1" crlf)
     (assert(check_complete_103))
   else
-    (printout yellow "still delivering - ROBO1" crlf)
+    ;(printout yellow "still delivering - ROBO1" crlf)
   )
 )
 
@@ -136,10 +119,8 @@
   (check_complete_103)
   (not (retrive_cap_sent_CS1))
   =>
-  (printout green "TEST" crlf)
   (bind ?msg (pb-create "llsf_msgs.PrepareMachine"))
   (pb-set-field ?msg "team_color" MAGENTA)
-  ;(pb-set-field ?msg "task_id" 401)
   (pb-set-field ?msg "machine" "M-CS1")
   (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionCS")) 
   (pb-set-field ?prep-msg "operation" "RETRIEVE_CAP")
@@ -154,13 +135,13 @@
 (defrule cs1_retriverd_check
   (machine (name M-CS1) (state ?m-state))
   (retrive_cap_sent_CS1)
-  (not (check_complete_401))
+  (not (check_complete_CS1))
   =>
   (printout red ?m-state crlf)
   (if (eq ?m-state READY-AT-OUTPUT)
   then
     (printout blue "CAP Retrieved - BASE at out" crlf)
-    (assert(check_complete_401))
+    (assert(check_complete_CS1))
   else
     (printout yellow "still Retrieving - CS1" crlf)
   )
@@ -168,11 +149,8 @@
 
 (defrule r2_move
   (protobuf-peer (name ROBOT2) (peer-id ?peer-id))
-  ;(test (eq ?n ))
-  ;(not (protobuf-msg))
   (not (move_is_sentR2))
   =>
-  ;(printout yellow "TEST" crlf)
   (bind ?msg (pb-create "llsf_msgs.AgentTask"))
   (pb-set-field ?msg "team_color" MAGENTA)
   (pb-set-field ?msg "task_id" 201)
@@ -194,11 +172,8 @@
   (not (check_complete_201))
   =>
   (bind ?robo_id (pb-field-value ?msg "robot_id"))
-  ;(printout green ?robo_id crlf)
   (bind ?task_id (pb-field-value ?msg "task_id"))
-  ;(printout green ?task_id crlf)
   (bind ?success (pb-field-value ?msg "successful"))
-  ;(printout green ?success crlf)
 
   (if (and (eq ?robo_id 2) (eq ?task_id 201) (eq ?success TRUE))
   then
@@ -214,8 +189,9 @@
   ;(test (eq ?n ))
   (not (pickup_send_r2))
   (check_complete_201)
-  (check_complete_401)
+  (check_complete_CS1)
   =>
+  (assert (pickup_send_r2))
   ;(printout yellow "TEST" crlf)
   (bind ?msg (pb-create "llsf_msgs.AgentTask"))
   (pb-set-field ?msg "team_color" MAGENTA)
@@ -224,11 +200,10 @@
   (bind ?retrieve-msg (pb-create "llsf_msgs.Retrieve")) 
   (pb-set-field ?retrieve-msg "machine_id" "M-CS1")
   (pb-set-field ?retrieve-msg "machine_point" "output")
-
   (pb-set-field ?msg "retrieve" ?retrieve-msg)
   (pb-broadcast ?peer-id ?msg)
   (pb-destroy ?msg)
-  (assert (pickup_send_r2))
+  (printout red "R2 holding Base TASK COMPLETE" crlf)
 )
 
 
