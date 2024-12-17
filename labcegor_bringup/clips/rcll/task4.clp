@@ -50,32 +50,41 @@
 ; 1. send Robot 1 to cs1 input
 (defrule send-robot-one-to-mashine
   (protobuf-peer (name ?n) (peer-id ?peer-id))
+  (not (rob1-to-mashine-one))
   (test (eq ?n ROBOT1))
   =>
   (send_move_to_cmd 1 "M-CS1" "input" ?peer-id)
 
-  (printout info task_id crlf)
+  (printout blue task_id crlf)
+  (assert rob1-to-mashine-one)
 )
 
 
 ; 5. send Robot 2 to cs1 output 
 (defrule send-robot-two-to-mashine
+  (game-state (team-color ?team-color))
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   (test (eq ?n ROBOT2))
   =>
   (send_move_to_cmd 2 "M-CS1" "output" ?peer-id)
 
-  (printout info task_id crlf)
+  (printout red task_id crlf)
 )
+
 
 ; 2. Retrieve Caps
 (defrule retrieve-cap-robot-one
+  ?pb-msg <- (protobuf-msg (type "llsf_msgs.AgentTask") (ptr ?p))
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   (test (eq ?n ROBOT1))
+  (test (eq ?p.task_id 1))
+  (test (?p.succsefull)) ; ?? ?p.succsefull für p.task_id = x
+  ; ToDo did previous if existing finished?
+  ; ToDo did 1. finished?
   =>
   (send_retrieve_from_cmd 1 "M-CS1" "input" ?peer-id)
 
-  (printout info task_id crlf)
+  (printout yellow task_id crlf)
 )
 
 
@@ -83,10 +92,11 @@
 (defrule peer-send-agent-task-msg
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   (test (eq ?n ROBOT1))
+  ; ToDo did previous task finished?
   =>
   (send_deliver_to_cmd 1 "M-CS1" "input" ?peer-id)
 
-  (printout info task_id crlf)
+  (printout green task_id crlf)
 )
 
 ; Make Rule to grab message and if "succsefull" allow for next step
