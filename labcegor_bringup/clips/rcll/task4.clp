@@ -92,7 +92,7 @@
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?succsefull (pb-field-value ?msg "successful"))
   (bind ?task_id (pb-field-value ?msg "robot_id"))
-  (if (and ?succsefull (eq ?task_id 1)) then (assert (?cm FALSE)))
+  (if (and ?succsefull (eq ?task_id 1)) then (modify ?tasks_overview (can_move FALSE)))
   ; Todo If Robot id == 1 and task-id == 1 and succesfull allow for next things to happen
   (retract ?tasks_overview)
 )
