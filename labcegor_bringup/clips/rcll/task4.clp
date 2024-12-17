@@ -79,7 +79,7 @@
   =>
   (send_move_to_cmd 1 "M-CS1" "input" ?peer-id)
   (assert (robot-one-is-send))
-  (modify (?tasks_overview (can_move FALSE)))
+  (assert (?tasks_overview (can_move FALSE)))
   retract ?tasks_overview
 )
 
@@ -125,7 +125,7 @@
 
   (printout yellow task_id crlf)
   (assert (robot1_retrieved))
-  (modify (?tasks_overview (can_retrieve FALSE)))
+  (assert (?tasks_overview (can_retrieve FALSE)))
   retract ?tasks_overview
 )
 
@@ -144,7 +144,7 @@
 
   (printout green task_id crlf)
   (assert (robot1_delivered))
-  (modify (?tasks_overview (can_retrieve FALSE)))
+  (assert (?tasks_overview (can_retrieve FALSE)))
   retract ?tasks_overview
 )
 
