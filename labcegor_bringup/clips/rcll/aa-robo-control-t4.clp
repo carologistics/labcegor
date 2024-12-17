@@ -1,4 +1,7 @@
 (deffacts stop (move_is_sentR1))
+(deffacts stop (move_is_sentR2))
+(deffacts stop (retrive_cap_sent_CS1))
+
 (defrule r1-move
   (protobuf-peer (name ROBOT1) (peer-id ?peer-id))
   (not (move_is_sentR1))
