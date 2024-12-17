@@ -94,7 +94,7 @@
   (bind ?task_id (pb-field-value ?msg "robot_id"))
   (if (and ?succsefull (eq ?task_id 1)) then (assert (?cm FALSE)))
   ; Todo If Robot id == 1 and task-id == 1 and succesfull allow for next things to happen
-  retract ?tasks_overview
+  (retract ?tasks_overview)
 )
 
 
@@ -125,7 +125,7 @@
 
   (printout yellow task_id crlf)
   (assert (robot1_retrieved))
-  retract ?tasks_overview
+  (retract ?tasks_overview)
 )
 
 
@@ -143,7 +143,7 @@
 
   (printout green task_id crlf)
   (assert (robot1_delivered))
-  retract ?tasks_overview
+  (retract ?tasks_overview)
 )
 
 ; Make Rule to grab message and if "succsefull" allow for next step
