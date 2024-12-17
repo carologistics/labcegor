@@ -2,17 +2,17 @@
 (defglobal ?*global_task_id_base* = 0)
 
 ; facts
-(deftemplate tasks
+(deftemplate tasks_overview
   (slot robot_id (type INTEGER))
   (slot can_move (type BOOLEAN))
   (slot can_retrieve (type BOOLEAN))
   (slot can_deliver (type BOOLEAN))
 )
 
-(deffacts robottask
-  (tasks (robot_id 1) (can_move FALSE) (can_retrieve FALSE) (can_deliver FALSE))
-  (tasks (robot_id 2) (can_move FALSE) (can_retrieve FALSE) (can_deliver FALSE))
-  (tasks (robot_id 3) (can_move FALSE) (can_retrieve FALSE) (can_deliver FALSE))
+(deffacts robottasks
+  (tasks_overview (robot_id 1) (can_move FALSE) (can_retrieve FALSE) (can_deliver FALSE))
+  (tasks_overview (robot_id 2) (can_move FALSE) (can_retrieve FALSE) (can_deliver FALSE))
+  (tasks_overview (robot_id 3) (can_move FALSE) (can_retrieve FALSE) (can_deliver FALSE))
 )
 
 ; Move
