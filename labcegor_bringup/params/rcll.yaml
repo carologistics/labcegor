@@ -4,7 +4,7 @@ clips_manager:
     cx_rcll:
       redirect_stdout_to_debug: false
       log_clips_to_file: true
-      watch: ["facts", "rules"]
+      watch: ["facts", "rules", "compilations"]
       plugins: ["executive",
                 "ament_index",
                 "config",
@@ -29,7 +29,8 @@ clips_manager:
         "clips/labcegor_bringup/rcll/refbox-comm-init.clp",
         "clips/labcegor_bringup/rcll/sim-comm-init.clp",
         "clips/labcegor_bringup/rcll/refbox-recv.clp",
-        "clips/labcegor_bringup/rcll/aa-robo-control-t4.clp"
+        "clips/labcegor_bringup/rcll/aa-robo-control-t4.clp",
+        "clips/labcegor_bringup/rcll/aa-robo-control-orders.clp"
        ]
     protobuf:
       plugin: "cx::ProtobufPlugin"
