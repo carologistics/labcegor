@@ -94,7 +94,6 @@
   (bind ?task_id (pb-field-value ?msg "robot_id"))
   ; (if (?succsefull && (eq ?task_id 1)) then (assert (?cm FALSE)))
   ; Todo If Robot id == 1 and task-id == 1 and succesfull allow for next things to happen
-  (assert ?tasks_overview (can_retrieve TRUE))
   retract ?tasks_overview
 )
 
@@ -126,7 +125,6 @@
 
   (printout yellow task_id crlf)
   (assert (robot1_retrieved))
-  (assert (?tasks_overview (can_retrieve FALSE)))
   retract ?tasks_overview
 )
 
@@ -145,7 +143,6 @@
 
   (printout green task_id crlf)
   (assert (robot1_delivered))
-  (assert (?tasks_overview (can_retrieve FALSE)))
   retract ?tasks_overview
 )
 
