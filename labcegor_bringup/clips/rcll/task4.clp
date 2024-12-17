@@ -73,28 +73,28 @@
 ; 1. send Robot 1 to cs1 input
 (defrule send-robot-one-to-mashine
   (protobuf-peer (name ?n) (peer-id ?peer-id))
-  ?tasks <- (tasks (robot_id 1) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd))
+  ?tasks_overview <- (tasks_overview (robot_id 1) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd))
   (test (eq ?n ROBOT1))
   (not (robot-one-is-send))
   =>
   (send_move_to_cmd 1 "M-CS1" "input" ?peer-id)
   (assert (robot-one-is-send))
   (assert (?cm FALSE))
-  retract ?tasks
+  retract ?tasks_overview
 )
 
 
 ; Check if Robot 1 did what he was intended to do... 
 (defrule check-rob1
   (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id 1) (ptr ?msg))
-  ?tasks <- (tasks (robot_id 1) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd))
+  ?tasks_overview <- (tasks_overview (robot_id 1) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd))
   =>
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?succsefull (pb-field-value ?msg "successful"))
   (bind ?task_id (pb-field-value ?msg "robot_id"))
   (if (?succsefull && (eq ?task_id 1)) then (assert (?cm FALSE)))
   ; Todo If Robot id == 1 and task-id == 1 and succesfull allow for next things to happen
-  retract ?tasks
+  retract ?tasks_overview
 )
 
 
@@ -112,12 +112,12 @@
 
 ; 2. Retrieve Caps
 (defrule retrieve-cap-robot-one
-  ?tasks <- (tasks (robot_id 1) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd))
+  ?tasks_overview <- (tasks_overview (robot_id 1) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd))
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   (robot_one_moved)
   (not (robot1_retrieved))
   (test (eq ?n ROBOT1))
-  (?cr)
+  (test (eq ?cr TRUE))
   ; ToDo did previous if existing finished?
   ; ToDo did 1. finished?
   =>
@@ -125,22 +125,25 @@
 
   (printout yellow task_id crlf)
   (assert (robot1_retrieved))
+  retract ?tasks_overview
 )
 
 
 ; Deliver Caps
 (defrule peer-send-agent-task-msg
+  ?tasks_overview <- (tasks_overview (robot_id 1) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd))
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   (robot_one_moved)
   (test (eq ?n ROBOT1))
   (not (robot1_delivered))
-  (?cd)
+  (test (eq ?cd TRUE))
   ; ToDo did previous task finished?
   =>
   (send_deliver_to_cmd 1 "M-CS2" "input" ?peer-id)
 
   (printout green task_id crlf)
   (assert (robot1_delivered))
+  retract ?tasks_overview
 )
 
 ; Make Rule to grab message and if "succsefull" allow for next step
