@@ -14,6 +14,9 @@
   (pb-set-field ?msg "move" ?move_msg)
   (pb-broadcast ?peer-id ?msg)
   (pb-destroy ?msg)
+  (printout red "task_id move" crlf)
+  (printout red ?r_id crlf)
+  (printout red (+ ?*global_task_id_base* ?r_id) crlf)
 )
 
 ; Retrieve
@@ -29,6 +32,9 @@
   (pb-set-field ?msg "retrieve" ?move_msg)
   (pb-broadcast ?peer-id ?msg)
   (pb-destroy ?msg)
+  (printout green "task_id Retrieve" crlf)
+  (printout green ?r_id crlf)
+  (printout green (+ ?*global_task_id_base* ?r_id) crlf)
 )
 
 ; Deliver
@@ -44,6 +50,9 @@
   (pb-set-field ?msg "deliver" ?move_msg)
   (pb-broadcast ?peer-id ?msg)
   (pb-destroy ?msg)
+  (printout blue "task_id delivery" crlf)
+  (printout blue ?r_id crlf)
+  (printout blue (+ ?*global_task_id_base* ?r_id) crlf)
 )
 
 ; Move robots 
@@ -55,7 +64,6 @@
   =>
   (send_move_to_cmd 1 "M-CS1" "input" ?peer-id)
 
-  (printout blue task_id crlf)
   (assert rob1-to-mashine-one)
 )
 
