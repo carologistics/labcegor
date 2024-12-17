@@ -31,6 +31,7 @@
   (printout red "task_id move" crlf)
   (printout red ?r_id crlf)
   (printout red (+ ?*global_task_id_base* ?r_id) crlf)
+  (modify ?*global_task_id_base* (+ ?*global_task_id_base* 3))
 )
 
 ; Retrieve
@@ -49,6 +50,7 @@
   (printout green "task_id Retrieve" crlf)
   (printout green ?r_id crlf)
   (printout green (+ ?*global_task_id_base* ?r_id) crlf)
+  (modify ?*global_task_id_base* (+ ?*global_task_id_base* 3))
 )
 
 ; Deliver
@@ -67,6 +69,7 @@
   (printout blue "task_id delivery" crlf)
   (printout blue ?r_id crlf)
   (printout blue (+ ?*global_task_id_base* ?r_id) crlf)
+  (modify ?*global_task_id_base* (+ ?*global_task_id_base* 3))
 )
 
 ; Move robots 
@@ -122,6 +125,7 @@
   ; ToDo did 1. finished?
   =>
   (send_retrieve_from_cmd 1 "M-CS1" "input" ?peer-id)
+  (send_move_to_cmd 1 "M-CS2" "output" ?peer-id)
 
   (printout yellow task_id crlf)
   (assert (robot1_retrieved))
