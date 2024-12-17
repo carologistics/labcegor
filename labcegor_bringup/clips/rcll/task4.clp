@@ -70,8 +70,8 @@
 (defrule check-rob1
   (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id 1) (ptr ?msg))
   =>
-  (bind ?task_id (pb-field-value ?msg "task-id"))
-  (bind ?succsefull (pb-field-value ?msg "succsefull"))
+  (bind ?task_id (pb-field-value ?msg "task_id"))
+  (bind ?succsefull (pb-field-value ?msg "successful"))
   (bind ?task_id (pb-field-value ?msg "robot_id"))
 
   ; Todo If Robot id == 1 and task-id == 1 and succesfull allow for next things to happen
@@ -96,7 +96,7 @@
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   (test (eq ?n ROBOT1))
   (test (eq ?p.task_id 1))
-  (test (?p.succsefull)) ; ?? ?p.succsefull für p.task_id = x
+  (test (?p.successful)) ; ?? ?p.succsefull für p.task_id = x
   ; ToDo did previous if existing finished?
   ; ToDo did 1. finished?
   =>
