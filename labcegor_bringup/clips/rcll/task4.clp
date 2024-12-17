@@ -73,14 +73,14 @@
 ; 1. send Robot 1 to cs1 input
 (defrule send-robot-one-to-mashine
   (protobuf-peer (name ?n) (peer-id ?peer-id))
-  ?tasks_overview <- (tasks_overview (robot_id 1) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd))
+  ;?tasks_overview <- (tasks_overview (robot_id 1) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd))
   (test (eq ?n ROBOT1))
   (not (robot-one-is-send))
   =>
   (send_move_to_cmd 1 "M-CS1" "input" ?peer-id)
   (assert (robot-one-is-send))
-  (assert (?tasks_overview (can_move FALSE)))
-  retract ?tasks_overview
+  ;(assert (?tasks_overview (can_move FALSE)))
+  ;retract ?tasks_overview
 )
 
 
@@ -94,6 +94,7 @@
   (bind ?task_id (pb-field-value ?msg "robot_id"))
   ; (if (?succsefull && (eq ?task_id 1)) then (assert (?cm FALSE)))
   ; Todo If Robot id == 1 and task-id == 1 and succesfull allow for next things to happen
+  (assert ?tasks_overview (can_retrieve TRUE))
   retract ?tasks_overview
 )
 
