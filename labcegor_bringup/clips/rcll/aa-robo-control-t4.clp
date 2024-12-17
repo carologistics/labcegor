@@ -1,3 +1,4 @@
+(deffacts stop (move_is_sentR1))
 (defrule r1-move
   (protobuf-peer (name ROBOT1) (peer-id ?peer-id))
   (not (move_is_sentR1))
@@ -73,7 +74,6 @@
     ;(printout yellow "still retrieving - ROBO1" crlf)
   )
 )
-
 
 (defrule r1-place-cap
   (protobuf-peer (name ROBOT1) (peer-id ?peer-id))
@@ -186,13 +186,11 @@
 
 (defrule r2_retrieve-atout
   (protobuf-peer (name ROBOT2) (peer-id ?peer-id))
-  ;(test (eq ?n ))
   (not (pickup_send_r2))
   (check_complete_201)
   (check_complete_CS1)
   =>
   (assert (pickup_send_r2))
-  ;(printout yellow "TEST" crlf)
   (bind ?msg (pb-create "llsf_msgs.AgentTask"))
   (pb-set-field ?msg "team_color" MAGENTA)
   (pb-set-field ?msg "task_id" 202)
@@ -207,16 +205,10 @@
 )
 
 
-
-
-
-
-
-
-(defrule unwatch-all-stuff
-  (not (unwatched))
-  =>
-  (unwatch facts order)
-  (assert (unwatched))
-)
+;(defrule unwatch-all-stuff
+;  (not (unwatched))
+;  =>
+;  (unwatch facts order)
+;  (assert (unwatched))
+;)
 
