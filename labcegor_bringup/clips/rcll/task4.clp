@@ -3,9 +3,9 @@
 
 (deftemplate tasks_overview
   (slot robot_id (type INTEGER))
-  (slot can_move (type BOOL))
-  (slot can_retrieve (type BOOL))
-  (slot can_deliver (type BOOL))
+  (slot can_move (type SYMBOL) (allowed-values FALSE TRUE))
+  (slot can_retrieve (type SYMBOL) (allowed-values FALSE TRUE))
+  (slot can_deliver (type SYMBOL) (allowed-values FALSE TRUE))
 )
 
 ; facts
@@ -79,7 +79,7 @@
   =>
   (send_move_to_cmd 1 "M-CS1" "input" ?peer-id)
   (assert (robot-one-is-send))
-  (assert (not (?cm)))
+  (assert (?cm FALSE))
   retract ?tasks
 )
 
@@ -92,7 +92,7 @@
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?succsefull (pb-field-value ?msg "successful"))
   (bind ?task_id (pb-field-value ?msg "robot_id"))
-  (if (?succsefull && (eq ?task_id 1)) then (assert (not (?cm))))
+  (if (?succsefull && (eq ?task_id 1)) then (assert (?cm FALSE)))
   ; Todo If Robot id == 1 and task-id == 1 and succesfull allow for next things to happen
   retract ?tasks
 )
