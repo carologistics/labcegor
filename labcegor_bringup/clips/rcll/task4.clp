@@ -1,6 +1,9 @@
 ; Here is my stuff
 (defglobal ?*global_task_id_base* = 0)
 
+; facts
+
+
 ; Move
 (deffunction send_move_to_cmd (?r_id ?r_target ?m_point ?peer-id)
   (bind ?move_msg (pb-create "llsf_msgs.Move"))
@@ -73,7 +76,7 @@
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?succsefull (pb-field-value ?msg "successful"))
   (bind ?task_id (pb-field-value ?msg "robot_id"))
-
+  (if (?succsefull && (eq ?task_id 1)) then (assert robot_one_moved))
   ; Todo If Robot id == 1 and task-id == 1 and succesfull allow for next things to happen
 )
 
@@ -92,18 +95,17 @@
 
 ; 2. Retrieve Caps
 (defrule retrieve-cap-robot-one
-  ?pb-msg <- (protobuf-msg (type "llsf_msgs.AgentTask") (ptr ?p))
   (protobuf-peer (name ?n) (peer-id ?peer-id))
+  (robot_one_moved)
+  (not (robot1_retrieved))
   (test (eq ?n ROBOT1))
-  (test (eq ?p.task_id 1))
-  (test (?p.successful)) ; ?? ?p.succsefull für p.task_id = x
   ; ToDo did previous if existing finished?
   ; ToDo did 1. finished?
   =>
   (send_retrieve_from_cmd 1 "M-CS1" "input" ?peer-id)
 
   (printout yellow task_id crlf)
-  (retract ?pb-msg)
+  (assert (robot1_retrieved))
 )
 
 
