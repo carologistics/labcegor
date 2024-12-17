@@ -17,8 +17,6 @@
   (printout red "task_id move" crlf)
   (printout red ?r_id crlf)
   (printout red (+ ?*global_task_id_base* ?r_id) crlf)
-
-  (assert *global_task_id_base* (+ *global_task_id_base* 3))
 )
 
 ; Retrieve
@@ -37,8 +35,6 @@
   (printout green "task_id Retrieve" crlf)
   (printout green ?r_id crlf)
   (printout green (+ ?*global_task_id_base* ?r_id) crlf)
-
-  (assert *global_task_id_base* (+ *global_task_id_base* 3))
 )
 
 ; Deliver
@@ -57,15 +53,12 @@
   (printout blue "task_id delivery" crlf)
   (printout blue ?r_id crlf)
   (printout blue (+ ?*global_task_id_base* ?r_id) crlf)
-
-  (assert *global_task_id_base* (+ *global_task_id_base* 3))
 )
 
 ; Move robots 
 ; 1. send Robot 1 to cs1 input
 (defrule send-robot-one-to-mashine
   (protobuf-peer (name ?n) (peer-id ?peer-id))
-  (not (rob1-to-mashine-one))
   (test (eq ?n ROBOT1))
   =>
   (send_move_to_cmd 1 "M-CS1" "input" ?peer-id)
