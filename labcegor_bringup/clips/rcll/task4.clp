@@ -3,9 +3,9 @@
 
 (deftemplate tasks_overview
   (slot robot_id (type INTEGER))
-  (slot can_move (type BOOL))
-  (slot can_retrieve (type BOOL))
-  (slot can_deliver (type BOOL))
+  (slot can_move (type BOOLEAN))
+  (slot can_retrieve (type BOOLEAN))
+  (slot can_deliver (type BOOLEAN))
 )
 
 ; facts
