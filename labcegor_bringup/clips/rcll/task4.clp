@@ -1,14 +1,14 @@
 ; Here is my stuff
 (defglobal ?*global_task_id_base* = 0)
 
-; facts
 (deftemplate tasks_overview
   (slot robot_id (type INTEGER))
-  (slot can_move (type BOOLEAN))
-  (slot can_retrieve (type BOOLEAN))
-  (slot can_deliver (type BOOLEAN))
+  (slot can_move (type BOOL))
+  (slot can_retrieve (type BOOL))
+  (slot can_deliver (type BOOL))
 )
 
+; facts
 (deffacts robottasks
   (tasks_overview (robot_id 1) (can_move FALSE) (can_retrieve FALSE) (can_deliver FALSE))
   (tasks_overview (robot_id 2) (can_move FALSE) (can_retrieve FALSE) (can_deliver FALSE))
@@ -84,6 +84,7 @@
 )
 
 
+; Check if Robot 1 did what he was intended to do... 
 (defrule check-rob1
   (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id 1) (ptr ?msg))
   ?tasks <- (tasks (robot_id 1) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd))
