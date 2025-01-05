@@ -11,7 +11,7 @@
 
 (deftemplate machine_task_overview
   (slot machine_id (type SYMBOL))
-  (slot task (type SYMBOL))
+  (slot machine_task (type SYMBOL))
 )
 ; facts
 (deffacts robottasks
@@ -21,7 +21,7 @@
 )
 
 (deffacts machine_facts
-  (machine_task_overview (machine_id M-CS1) (task 0))
+  (machine_task_overview (machine_id M-CS1) (machine_task NOT-SET))
 )
 
 
@@ -253,7 +253,7 @@
 ; Check Machine 
 (defrule check_machine_M-CS1
   (machine (name M-CS1) (state ?s) (type ?t))
-  (machine_task_overview (machine_id M-CS1) (task ?mt))
+  (machine_task_overview (machine_id M-CS1) (machine_task ?mt))
   =>
   (printout red "M-CS1 is in state " ?s " and of type " ?t " and task " ?mt crlf)
 )
