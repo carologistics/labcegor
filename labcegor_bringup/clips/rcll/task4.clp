@@ -227,9 +227,9 @@
   ; ==========
   ; check task 1 for robot 2
   (if (and (eq ?robot_id 2) (eq ?task_id 1) (eq ?successful TRUE)) then 
-    (modify ?tasks_overview_two (can_move FALSE))
-    (modify ?tasks_overview_two (can_retrieve TRUE))
-    (modify ?tasks_overview_two (task_id (+ ?task_id 1)))
+    (modify ?tasks_overview (can_move FALSE))
+    (modify ?tasks_overview (can_retrieve TRUE))
+    (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (printout green "robot two finished his task " ?task_id crlf)
   )
   (retract ?pb-msg)
