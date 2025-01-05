@@ -218,7 +218,7 @@
 )
 
 ; Check Machine 
-(defrule check_machine_
+(defrule check_machine_M-CS1
   (machine (name M-CS1) (state ?s) (type ?t))
   =>
   (printout red "M-CS1 is in state " ?s " and of type " ?t crlf)
