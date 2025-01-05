@@ -109,15 +109,15 @@
   (printout green ?msg crlf)
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
-  (bind ?succesfull (pb-field-value ?msg "successful"))
-  (if (and (eq ?robot_id 1)(eq ?succsefull TRUE)) then 
+  (bind ?successful (pb-field-value ?msg "successful"))
+  (if (and (eq ?robot_id 1)(eq ?successful TRUE)) then 
     (printout green ?tasks_overview crlf)
     (modify ?tasks_overview (can_move FALSE))
     (assert(rob_1_checked))
     (printout green ?tasks_overview crlf)
     (printout green ?task_id crlf)
   )
-  ; Todo If Robot id == 1 and task-id == 1 and succesfull allow for next things to happen
+  ; Todo If Robot id == 1 and task-id == 1 and successful allow for next things to happen
 )
 
 (defrule check-rob2
@@ -130,15 +130,15 @@
   (printout green ?msg crlf)
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
-  (bind ?succesfull (pb-field-value ?msg "successful"))
-  (if (and (eq ?robot_id 2)(eq ?succsefull TRUE)) then 
+  (bind ?successful (pb-field-value ?msg "successful"))
+  (if (and (eq ?robot_id 2)(eq ?successful TRUE)) then 
     (printout green ?tasks_overview crlf)
     (modify ?tasks_overview (can_move FALSE))
     (assert(rob_2_checked))
     (printout green ?tasks_overview crlf)
     (printout green ?task_id crlf)
   )
-  ; Todo If Robot id == 1 and task-id == 1 and succesfull allow for next things to happen
+  ; Todo If Robot id == 1 and task-id == 1 and successful allow for next things to happen
 )
 
 
@@ -181,7 +181,7 @@
   (retract ?tasks_overview)
 )
 
-; Make Rule to grab message and if "succsefull" allow for next step
+; Make Rule to grab message and if "successful" allow for next step
 ; ToDo: find Shelf and get one disk
 ; ToDo fetch robot status, for next Rule
 ; ToDo recieve mashine output
