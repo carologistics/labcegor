@@ -80,7 +80,7 @@
   (pb-set-field ?msg "team_color" MAGENTA)
   (pb-set-field ?msg "task_id" ?task_id)
   (pb-set-field ?msg "robot_id" ?r_id)
-  (pb-set-field ?msg "bufferstation" ?move_msg)
+  (pb-set-field ?msg "BufferStation" ?move_msg)
   (pb-broadcast ?peer-id ?msg)
   (pb-destroy ?msg)
   (printout blue "BufferStation: robot: " ?r_id " task " ?task_id crlf)
@@ -113,9 +113,7 @@
   (test (eq ?n ROBOT1))
   (not (robot-one-buffer-cap))
   => 
-  (printout blue "BufferStation" crlf)
-  (printout blue ?cm crlf)
-  (printout blue ?cr crlf)
+  (printout green "BufferStation" ?task_id " " ?robot_id " current_id:" ?tid crlf)
   (if (and (eq ?cm FALSE) (eq ?cr TRUE) (not (eq ?tid 1))) then
     (send_robot_to_bufferStation 1 "M-CS1" ?peer-id ?tid)
     (assert (robot-one-buffer-cap))
@@ -180,6 +178,7 @@
   (if (and (eq ?robot_id 2)(eq ?successful TRUE)) then 
     (modify ?tasks_overview (can_move FALSE))
     (assert(rob_2_checked))
+    (printout green "robot two finished his task " ?task_id crlf)
   )
   ; Todo If Robot id == 1 and task-id == 1 and successful allow for next things to happen
 )
