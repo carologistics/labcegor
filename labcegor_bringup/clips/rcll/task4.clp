@@ -140,7 +140,7 @@
   (robot-one-buffer-cap)
   (not (proces_cap_one_CS1))
   =>
-  (printout blue "prepare_machine robot_one task_id " ?tid_one crlf)
+  (printout red "prepare_machine robot_one task_id " ?tid_one " " ?cr_one " test: " (< ?tid_one 1) " " (> ?tid_one 1) crlf)
   (if (and (< ?tid_one 1) (eq ?cm_one TRUE) (eq ?cr_one TRUE)) then
     (send_cmd_to_machine "M-CS1" "RETRIEVE_CAP" ?peer-id)
     (assert (proces_cap_one_CS1))
