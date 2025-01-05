@@ -140,7 +140,7 @@
   (not (proces_cap_one_CS1))
   (robot-one-buffer-cap)
   =>
-  (if (and (< tid_one 1) (eq ?cm TRUE) (eq ?cr TRUE)) then
+  (if (and (< ?tid_one 1) (eq ?cm TRUE) (eq ?cr TRUE)) then
     (send_cmd_to_machine "M-CS1" "RETRIEVE_CAP" ?peer-id)
     (assert proces_cap_one_CS1)
   )
@@ -176,13 +176,14 @@
   (bind ?successful (pb-field-value ?msg "successful"))
   (printout green ?task_id " " ?robot_id " current_id_one:" ?tid_one " current_id_two:" ?tid_two crlf)
   (printout yellow ?task_id " " ?robot_id ?successful " " ?cm_one " " ?cr_one crlf)
-  ; did task 1 finish? 
+  ; did task 1 for robot 1 finish? 
   (if (and (eq ?robot_id 1) (eq ?task_id 1) (eq ?successful TRUE)) then 
     (modify ?tasks_overview_one (can_retrieve TRUE))
     (printout green "robot one finished his task " ?task_id crlf)
     (modify ?tasks_overview_one (task_id (+ ?task_id 1)))
     (printout green ?task_id crlf)
   )
+  ; did task 2 for robot 1 finish? 
   (if (and (eq ?robot_id 1) (eq ?task_id 2) (eq ?successful TRUE) (eq ?cm_one FALSE) (eq ?cr_one TRUE)) then 
     (modify ?tasks_overview_one (can_move TRUE))
     (modify ?tasks_overview_one (can_retrieve TRUE))
@@ -206,50 +207,4 @@
     (assert(rob_2_checked))
     (printout green "robot two finished his task " ?task_id crlf)
   )
-  ; Todo If Robot id == 1 and task-id == 1 and successful allow for next things to happen
 )
-
-
-
-
-; ; 2. Retrieve Caps
-; (defrule retrieve-cap-robot-one
-;   ?tasks_overview <- (tasks_overview (robot_id 1) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd))
-;   (protobuf-peer (name ?n) (peer-id ?peer-id))
-;   (robot_one_moved)
-;   (not (robot1_retrieved))
-;   (test (eq ?n ROBOT1))
-;   (test (eq ?cr TRUE))
-;   ; ToDo did previous if existing finished?
-;   ; ToDo did 1. finished?
-;   =>
-;   (send_retrieve_from_cmd 1 "M-CS1" "input" ?peer-id ?tid)
-;   (send_move_to_cmd 1 "M-CS2" "output" ?peer-id?tid)
-
-;   (printout yellow task_id crlf)
-;   (assert (robot1_retrieved))
-;   (retract ?tasks_overview)
-; )
-
-
-; ; Deliver Caps
-; (defrule peer-send-agent-task-msg
-;   ?tasks_overview <- (tasks_overview (robot_id 1) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd))
-;   (protobuf-peer (name ?n) (peer-id ?peer-id))
-;   (robot_one_moved)
-;   (test (eq ?n ROBOT1))
-;   (not (robot1_delivered))
-;   (test (eq ?cd TRUE))
-;   ; ToDo did previous task finished?
-;   =>
-;   (send_deliver_to_cmd 1 "M-CS2" "input" ?peer-id ?tid)
-
-;   (printout green task_id crlf)
-;   (assert (robot1_delivered))
-;   (retract ?tasks_overview)
-; )
-
-; Make Rule to grab message and if "successful" allow for next step
-; ToDo: find Shelf and get one disk
-; ToDo fetch robot status, for next Rule
-; ToDo recieve mashine output
