@@ -9,6 +9,10 @@
   (slot can_deliver (type SYMBOL) (allowed-values FALSE TRUE))
 )
 
+(deftemplate machine_task_overview
+  (slot machine_id (type SYMBOL))
+  (slot task (type SYMBOL))
+)
 ; facts
 (deffacts robottasks
   (tasks_overview (robot_id 1) (task_id 1) (can_move FALSE) (can_retrieve FALSE) (can_deliver FALSE))
@@ -16,6 +20,9 @@
   (tasks_overview (robot_id 3) (task_id 1) (can_move FALSE) (can_retrieve FALSE) (can_deliver FALSE))
 )
 
+(deffacts machine_facts
+  (machine_task_overview (machine_id M-CS1) (task 0))
+)
 
 
 ; ==================================================================================
@@ -169,7 +176,7 @@
   (test (eq ?n ROBOT2))
   => 
   ; if prepare Machine.Successfull and robot_two ready then pick-up
-  (if (and (< ?tid 1) (eq ?cm TRUE) (eq ?cr FALSE)) then
+  (if (and (eq ?tid 2) (eq ?cm TRUE) (eq ?cr FALSE)) then
     (send_retrieve_from_cmd 2 "M-CS1" "output" ?peer-id ?tid)
     (assert (robot_two_picked_up_disk))
     (printout blue "Robot 2 tried something " crlf)
@@ -242,10 +249,9 @@
 ; Check Machine 
 (defrule check_machine_M-CS1
   (machine (name M-CS1) (state ?s) (type ?t))
-  (robot-two-is-send)
-  (proces_cap_one_CS1)
+  ?mto <- (machine_task_overview (machine_id M-CS1) (task ?mt))
   =>
-  (printout red "M-CS1 is in state " ?s " and of type " ?t crlf)
+  (printout red "M-CS1 is in state " ?s " and of type " ?t " and task " ?mt crlf)
 )
 
 ; (defrule check-rob2
