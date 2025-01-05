@@ -161,8 +161,9 @@
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
   (bind ?successful (pb-field-value ?msg "successful"))
+  (printout green ?task_id ?robot_id crlf)
   ; did task 1 finish? 
-  (if (and (eq ?robot_id 1) (eq ?successful TRUE) (eq ?task_id 1)) then 
+  (if (and (eq ?robot_id 1) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr FALSE)) then 
     (modify ?tasks_overview (can_move FALSE))
     (modify ?tasks_overview (can_retrieve TRUE))
     (printout green "robot one finished his task" crlf)
