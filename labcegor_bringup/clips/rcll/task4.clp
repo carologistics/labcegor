@@ -192,7 +192,7 @@
   ; ROBOT 1
   ; ==========
   ; did task 1 for robot 1 finish? 
-  (if (and (eq ?robot_id 1) (eq ?task_id 1) (eq ?successful TRUE) (robot-one-is-send)) then 
+  (if (and (eq ?robot_id 1) (eq ?task_id 1) (eq ?successful TRUE)) then 
     (modify ?tasks_overview_one (can_retrieve TRUE))
     (printout green "robot one finished his task " ?task_id crlf)
     (modify ?tasks_overview_one (task_id (+ ?task_id 1)))
@@ -209,7 +209,7 @@
   ; ROBOT 2
   ; ==========
   ; check task 1 for robot 2
-  (if (and (eq ?robot_id 2) (eq ?task_id 1) (eq ?successful TRUE) (robot-two-is-send)) then 
+  (if (and (eq ?robot_id 2) (eq ?task_id 1) (eq ?successful TRUE)) then 
     (modify ?tasks_overview_two (can_move FALSE))
     (modify ?tasks_overview_two (can_retrieve TRUE))
     (modify ?tasks_overview_two (task_id (+ ?task_id 1)))
