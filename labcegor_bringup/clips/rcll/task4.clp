@@ -87,7 +87,7 @@
 )
 
 ; Retrieve from Machine
-(deffunction send_cmd_to_machine (?m_id ?operation)
+(deffunction send_cmd_to_machine (?m_id ?operation ?peer-id)
   (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionCS")) 
   (pb-set-field ?prep-msg "operation" ?operation) ; "RETRIEVE_CAP")
 
@@ -141,7 +141,7 @@
   (robot-one-buffer-cap)
   =>
   (if (and (< tid_one 1) (eq ?cm TRUE) (eq ?cr TRUE)) then
-    (send_cmd_to_machine "M-CS1" "RETRIEVE_CAP")
+    (send_cmd_to_machine "M-CS1" "RETRIEVE_CAP" ?peer-id)
     (assert proces_cap_one_CS1)
   )
 )
