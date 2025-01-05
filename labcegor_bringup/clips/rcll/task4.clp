@@ -164,8 +164,8 @@
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   ?tasks_overview <- (tasks_overview (robot_id 2) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd))
   (proces_cap_one_CS1)
-  (not robot_two_picked_up_disk)
-
+  (not (robot_two_picked_up_disk))
+  (test (eq ?n ROBOT2))
   => 
   ; if prepare Machine.Successfull and robot_two ready then pick-up
   (assert (robot_two_picked_up_disk))
