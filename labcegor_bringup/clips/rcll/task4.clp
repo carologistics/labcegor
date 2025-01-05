@@ -136,13 +136,13 @@
 ; 4. Prepare Machine
 (defrule prepare_machine
   (protobuf-peer (name ?n) (peer-id ?peer-id))
-  ?tasks_overview_one <- (tasks_overview (robot_id 1) (task_id ?tid_one) (can_move ?cm_one) (can_retrieve ?cr_one) (can_deliver ?cd))
+  ?tasks_overview_one <- (tasks_overview (robot_id 1) (task_id ?tid_one) (can_move ?cm_one) (can_retrieve ?cr_one) (can_deliver ?cd_one))
   (robot-one-buffer-cap)
   (not (proces_cap_one_CS1))
   =>
   (printout yellow "prepare_machine : name " ?n " robot_one task_id " ?tid_one crlf)
 
-  (if (and (< ?tid_one 1) (eq ?cm TRUE) (eq ?cr TRUE)) then
+  (if (and (< ?tid_one 1) (eq ?cm_one TRUE) (eq ?cr_one TRUE)) then
     (send_cmd_to_machine "M-CS1" "RETRIEVE_CAP" ?peer-id)
     (assert (proces_cap_one_CS1))
   )
@@ -169,8 +169,8 @@
 ; Check if Robot 1 did what he was intended to do... 
 (defrule check-rob1
   (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id 1) (ptr ?msg))
-  ?tasks_overview_one <- (tasks_overview (robot_id 1) (task_id ?tid_one) (can_move ?cm_one) (can_retrieve ?cr_one) (can_deliver ?cd))
-  ?tasks_overview_two <- (tasks_overview (robot_id 2) (task_id ?tid_two) (can_move ?cm_two) (can_retrieve ?cr_two) (can_deliver ?cd))
+  ?tasks_overview_one <- (tasks_overview (robot_id 1) (task_id ?tid_one) (can_move ?cm_one) (can_retrieve ?cr_one) (can_deliver ?cd_one))
+  ?tasks_overview_two <- (tasks_overview (robot_id 2) (task_id ?tid_two) (can_move ?cm_two) (can_retrieve ?cr_two) (can_deliver ?cd_two))
   (robot-one-is-send)
   =>
   (bind ?task_id (pb-field-value ?msg "task_id"))
