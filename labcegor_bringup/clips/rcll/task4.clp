@@ -198,22 +198,24 @@
   =>
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
-  (bind ?successful (pb-field-value ?msg "successful"))
-  
-  ; did task 1 for robot 1 finish? 
-  (if (and (eq ?robot_id 1) (eq ?task_id 1) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr FALSE)) then 
-    (modify ?tasks_overview (can_retrieve TRUE))
-    (printout green "robot one finished his task " ?task_id crlf)
-    (modify ?tasks_overview (task_id (+ ?task_id 1)))
-    (printout green ?task_id ?tid crlf)
-  )
-  ; did task 2 for robot 1 finish? 
-  (if (and (eq ?robot_id 1) (eq ?task_id 2) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr TRUE)) then 
-    (modify ?tasks_overview (can_move TRUE))
-    (modify ?tasks_overview (can_retrieve TRUE))
-    (printout green "robot one finished his task " ?task_id crlf)
-    (modify ?tasks_overview (task_id (+ ?task_id 1)))
-    (printout green ?task_id ?tid crlf)
+  (bind ?successfull (pb-field-value ?msg "successfull"))
+
+  (if (not (eq ?successfull NOT-SET)) then
+    ; did task 1 for robot 1 finish? 
+    (if (and (eq ?robot_id 1) (eq ?task_id 1) (eq ?successfull TRUE) (eq ?cm FALSE) (eq ?cr FALSE)) then 
+      (modify ?tasks_overview (can_retrieve TRUE))
+      (printout green "robot one finished his task " ?task_id crlf)
+      (modify ?tasks_overview (task_id (+ ?task_id 1)))
+      (printout green ?task_id ?tid crlf)
+    )
+    ; did task 2 for robot 1 finish? 
+    (if (and (eq ?robot_id 1) (eq ?task_id 2) (eq ?successfull TRUE) (eq ?cm FALSE) (eq ?cr TRUE)) then 
+      (modify ?tasks_overview (can_move TRUE))
+      (modify ?tasks_overview (can_retrieve TRUE))
+      (printout green "robot one finished his task " ?task_id crlf)
+      (modify ?tasks_overview (task_id (+ ?task_id 1)))
+      (printout green ?task_id ?tid crlf)
+    )
   )
   (retract ?pb-msg)
 )
@@ -227,21 +229,23 @@
   =>
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
-  (bind ?successful (pb-field-value ?msg "successful"))
+  (bind ?successfull (pb-field-value ?msg "successfull"))
   
-  ; check task 1 for robot 2
-  (if (and (eq ?robot_id 2) (eq ?task_id 1) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr FALSE)) then 
-    (modify ?tasks_overview (can_retrieve TRUE))
-    (modify ?tasks_overview (task_id (+ ?task_id 1)))
-    (printout green "robot two finished his task " ?task_id crlf)
-  )
-  ; did task 2 for robot 1 finish? 
-  (if (and (eq ?robot_id 1) (eq ?task_id 2) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr TRUE)) then 
-    (modify ?tasks_overview (can_move TRUE))
-    (modify ?tasks_overview (can_retrieve FALSE))
-    (printout green "robot two did something " ?task_id crlf)
-    (modify ?tasks_overview (task_id (+ ?task_id 1)))
-    (printout green ?task_id ?tid crlf)
+  (if (not (eq ?successfull NOT-SET)) then
+    ; check task 1 for robot 2
+    (if (and (eq ?robot_id 2) (eq ?task_id 1) (eq ?successfull TRUE) (eq ?cm FALSE) (eq ?cr FALSE)) then 
+      (modify ?tasks_overview (can_retrieve TRUE))
+      (modify ?tasks_overview (task_id (+ ?task_id 1)))
+      (printout green "robot two finished his task " ?task_id crlf)
+    )
+    ; did task 2 for robot 1 finish? 
+    (if (and (eq ?robot_id 1) (eq ?task_id 2) (eq ?successfull TRUE) (eq ?cm FALSE) (eq ?cr TRUE)) then 
+      (modify ?tasks_overview (can_move TRUE))
+      (modify ?tasks_overview (can_retrieve FALSE))
+      (printout green "robot two did something " ?task_id crlf)
+      (modify ?tasks_overview (task_id (+ ?task_id 1)))
+      (printout green ?task_id ?tid crlf)
+    )
   )
   (retract ?pb-msg)
 )
@@ -249,7 +253,7 @@
 ; Check Machine 
 (defrule check_machine_M-CS1
   (machine (name M-CS1) (state ?s) (type ?t))
-  ?mto <- (machine_task_overview (machine_id M-CS1) (task ?mt))
+  (machine_task_overview (machine_id M-CS1) (task ?mt))
   =>
   (printout red "M-CS1 is in state " ?s " and of type " ?t " and task " ?mt crlf)
 )
@@ -262,8 +266,8 @@
 ;   =>
 ;   (bind ?task_id (pb-field-value ?msg "task_id"))
 ;   (bind ?robot_id (pb-field-value ?msg "robot_id"))
-;   (bind ?successful (pb-field-value ?msg "successful"))
-;   (if (and (eq ?robot_id 2)(eq ?successful TRUE)) then 
+;   (bind ?successfull (pb-field-value ?msg "successfull"))
+;   (if (and (eq ?robot_id 2)(eq ?successfull TRUE)) then 
 ;     (modify ?tasks_overview (can_move FALSE))
 ;     (modify ?tasks_overview (task_id (+ ?task_id 1)))
 ;     (assert(rob_2_checked))
