@@ -86,39 +86,62 @@
   ;retract ?tasks_overview
 )
 
-
-; Check if Robot 1 did what he was intended to do... 
-(defrule check-rob1
-  (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id 1) (ptr ?msg))
-  (robot-one-is-send)
-  ?tasks_overview <- (tasks_overview (robot_id 1) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd))
-  =>
-  (printout green "test" crlf)
-  (printout green ?msg crlf)
-  (bind ?task_id (pb-field-value ?msg "task_id"))
-  (bind ?task_id (pb-field-value ?msg "robot_id"))
-  (bind ?succesfull (pb-field-value ?msg "successful"))
-  (if (eq ?succsefull TRUE) then 
-    (printout green ?tasks_overview crlf)
-    (modify ?tasks_overview (can_move FALSE))
-    (printout green ?tasks_overview crlf)
-    (printout green ?task_id crlf)
-  )
-  (retract ?tasks_overview)
-  ; Todo If Robot id == 1 and task-id == 1 and succesfull allow for next things to happen
-)
-
-
 ; 5. send Robot 2 to cs1 output 
 (defrule send-robot-two-to-mashine
   (game-state (team-color ?team-color))
   (protobuf-peer (name ?n) (peer-id ?peer-id))
+  (not (robot-two-is-send))
   (test (eq ?n ROBOT2))
   =>
   (send_move_to_cmd 2 "M-CS1" "output" ?peer-id)
-
+  (assert (robot-two-is-send))
   (printout red task_id crlf)
 )
+
+; Check if Robot 1 did what he was intended to do... 
+(defrule check-rob1
+  (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id 1) (ptr ?msg))
+  ?tasks_overview <- (tasks_overview (robot_id 1) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd))
+  (robot-one-is-send)
+  (not (rob_1_checked))
+  =>
+  (printout green "test" crlf)
+  (printout green ?msg crlf)
+  (bind ?task_id (pb-field-value ?msg "task_id"))
+  (bind ?robot_id (pb-field-value ?msg "robot_id"))
+  (bind ?succesfull (pb-field-value ?msg "successful"))
+  (if (and (eq ?robot_id 1)(eq ?succsefull TRUE)) then 
+    (printout green ?tasks_overview crlf)
+    (modify ?tasks_overview (can_move FALSE))
+    (assert(rob_1_checked))
+    (printout green ?tasks_overview crlf)
+    (printout green ?task_id crlf)
+  )
+  ; Todo If Robot id == 1 and task-id == 1 and succesfull allow for next things to happen
+)
+
+(defrule check-rob2
+  (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id 2) (ptr ?msg))
+  ?tasks_overview <- (tasks_overview (robot_id 2) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd))
+  (robot-two-is-send)
+  (not (rob_2_checked))
+  =>
+  (printout green "test" crlf)
+  (printout green ?msg crlf)
+  (bind ?task_id (pb-field-value ?msg "task_id"))
+  (bind ?robot_id (pb-field-value ?msg "robot_id"))
+  (bind ?succesfull (pb-field-value ?msg "successful"))
+  (if (and (eq ?robot_id 2)(eq ?succsefull TRUE)) then 
+    (printout green ?tasks_overview crlf)
+    (modify ?tasks_overview (can_move FALSE))
+    (assert(rob_2_checked))
+    (printout green ?tasks_overview crlf)
+    (printout green ?task_id crlf)
+  )
+  ; Todo If Robot id == 1 and task-id == 1 and succesfull allow for next things to happen
+)
+
+
 
 
 ; 2. Retrieve Caps
