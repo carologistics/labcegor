@@ -97,6 +97,7 @@
   (printout green ?msg crlf)
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?task_id (pb-field-value ?msg "robot_id"))
+  (bind ?succesfull (pb-field-value ?msg "successful"))
   (if (eq ?succsefull TRUE) then 
     (printout green ?tasks_overview crlf)
     (modify ?tasks_overview (can_move FALSE))
