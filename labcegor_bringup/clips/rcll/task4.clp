@@ -115,7 +115,6 @@
   =>
   (send_move_to_cmd 1 "M-CS1" "input" ?peer-id ?tid)
   (assert (robot-one-is-send))
-  (modify ?tasks_overview (can_move FALSE))
 )
 
 ; 2. & 3. Get Cap from shelf and place on Machine
