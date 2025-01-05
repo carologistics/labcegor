@@ -116,7 +116,6 @@
   (send_move_to_cmd 1 "M-CS1" "input" ?peer-id ?tid)
   (assert (robot-one-is-send))
   (modify ?tasks_overview (can_move FALSE))
-  ;retract ?tasks_overview
 )
 
 ; 2. & 3. Get Cap from shelf and place on Machine
@@ -129,6 +128,7 @@
   (printout green "BufferStation robot 1 current task id:" ?tid crlf)
   (if (and (eq ?cm FALSE) (eq ?cr TRUE) (not (eq ?tid 1))) then
     (send_robot_to_bufferStation 1 "M-CS1" ?peer-id ?tid)
+    (printout blue "BufferStation should do something" ?tid crlf)
     (assert (robot-one-buffer-cap))
   )
 )
@@ -189,8 +189,6 @@
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
   (bind ?successful (pb-field-value ?msg "successful"))
-  (printout green ?task_id " " ?robot_id " current_id_one:" ?tid_one " current_id_two:" ?tid_two crlf)
-  (printout yellow ?task_id " " ?robot_id ?successful " " ?cm_one " " ?cr_one crlf)
   ; ==========
   ; ROBOT 1
   ; ==========
