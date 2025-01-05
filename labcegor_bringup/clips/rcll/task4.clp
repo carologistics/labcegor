@@ -168,7 +168,7 @@
     (printout green "robot one finished his task" crlf)
     (printout green ?task_id crlf)
   )
-  (if (and (eq ?robot_id 1) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr TRUE))) then 
+  (if (and (eq ?robot_id 1) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr TRUE)) then 
     (modify ?tasks_overview (can_move TRUE))
     (modify ?tasks_overview (can_retrieve FALSE))
     (printout green "robot one finished his task" crlf)
