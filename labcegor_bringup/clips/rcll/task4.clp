@@ -154,8 +154,7 @@
   (printout green ?task_id " " ?robot_id " current_id_one:" ?tid_one " current_id_two:" ?tid_two crlf)
   (printout yellow ?task_id " " ?robot_id ?successful " " ?cm_one " " ?cr_one crlf)
   ; did task 1 finish? 
-  (if (and (eq ?robot_id 1) (eq ?task_id 1) (eq ?successful TRUE) (eq ?cm_one TRUE) (eq ?cr_one FALSE)) then 
-    (modify ?tasks_overview_one (can_move FALSE))
+  (if (and (eq ?robot_id 1) (eq ?task_id 1) (eq ?successful TRUE) then 
     (modify ?tasks_overview_one (can_retrieve TRUE))
     (printout green "robot one finished his task " ?task_id crlf)
     (modify ?tasks_overview_one (task_id (+ ?task_id 1)))
