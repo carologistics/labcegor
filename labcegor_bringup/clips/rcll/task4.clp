@@ -124,7 +124,6 @@
   (test (eq ?n ROBOT1))
   (not (robot-one-buffer-cap))
   => 
-
   (printout blue "task_id BufferStation" crlf)
   (printout blue ?cm crlf)
   (printout blue ?cr crlf)
@@ -158,7 +157,6 @@
   (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id 1) (ptr ?msg))
   ?tasks_overview <- (tasks_overview (robot_id 1) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd))
   (robot-one-is-send)
-  (not (robot_one_checked))
   =>
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
@@ -167,11 +165,14 @@
   (if (and (eq ?robot_id 1) (eq ?successful TRUE) (eq ?task_id 1)) then 
     (modify ?tasks_overview (can_move FALSE))
     (modify ?tasks_overview (can_retrieve TRUE))
-    (assert(robot_one_checked))
     (printout green "robot one finished his task" crlf)
+    (printout green ?task_id crlf)
   )
-  (if (and (eq ?robot_id 1) (eq ?successful TRUE)) then 
-    (printout yellow ?task_id crlf)
+  (if (and (eq ?robot_id 1) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr TRUE))) then 
+    (modify ?tasks_overview (can_move TRUE))
+    (modify ?tasks_overview (can_retrieve FALSE))
+    (printout green "robot one finished his task" crlf)
+    (printout green ?task_id crlf)
   )
   ; Todo If Robot id == 1 and task-id == 1 and successful allow for next things to happen
 )
