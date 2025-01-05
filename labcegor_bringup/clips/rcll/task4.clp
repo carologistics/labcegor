@@ -15,6 +15,12 @@
   (tasks_overview (robot_id 3) (can_move FALSE) (can_retrieve FALSE) (can_deliver FALSE))
 )
 
+
+
+; ==================================================================================
+; FUNCTIONS
+; ==================================================================================
+
 ; Move
 (deffunction send_move_to_cmd (?r_id ?r_target ?m_point ?peer-id)
   (bind ?move_msg (pb-create "llsf_msgs.Move"))
@@ -72,7 +78,13 @@
   ;(modify ?*global_task_id_base* (+ ?*global_task_id_base* 3))
 )
 
-; Move robots 
+
+
+; ==================================================================================
+; MOVE ROBOTS & Do Tasks
+; ==================================================================================
+
+; Move robot 1
 ; 1. send Robot 1 to cs1 input
 (defrule send-robot-one-to-mashine
   (protobuf-peer (name ?n) (peer-id ?peer-id))
@@ -86,6 +98,18 @@
   ;retract ?tasks_overview
 )
 
+; 2. & 3. Get Cap from shelf and place on Machine
+(defrule buffer-cap-robot-one
+  (protobuf-peer (name ?n) (peer-id ?peer-id))
+  ?tasks_overview <- (tasks_overview (robot_id 1) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd))
+  (not (robot-one-buffer-cap))
+  
+  => 
+
+  (assert (robot-one-buffer-cap))
+)
+
+
 ; 5. send Robot 2 to cs1 output 
 (defrule send-robot-two-to-mashine
   (game-state (team-color ?team-color))
@@ -98,6 +122,12 @@
   (printout red task_id crlf)
 )
 
+
+
+; ==================================================================================
+; CHECK STUFF
+; ==================================================================================
+
 ; Check if Robot 1 did what he was intended to do... 
 (defrule check-rob1
   (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id 1) (ptr ?msg))
@@ -105,16 +135,17 @@
   (robot-one-is-send)
   (not (rob_1_checked))
   =>
-  (printout green "test" crlf)
-  (printout green ?msg crlf)
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
   (bind ?successful (pb-field-value ?msg "successful"))
-  (if (and (eq ?robot_id 1)(eq ?successful TRUE)) then 
-    (printout green ?tasks_overview crlf)
+  ; did task 1 finish? 
+  (if (and (eq ?robot_id 1) (eq ?successful TRUE) (eq ?task_id 1)) then 
     (modify ?tasks_overview (can_move FALSE))
+    (modify ?tasks_overview (can_retrieve TRUE))
     (assert(rob_1_checked))
-    (printout green ?tasks_overview crlf)
+    (printout green "robot one finished his task" crlf)
+  )
+  (if (and (eq ?robot_id 1) (eq ?successful TRUE) (not (rob_1_checked))) then 
     (printout green ?task_id crlf)
   )
   ; Todo If Robot id == 1 and task-id == 1 and successful allow for next things to happen
