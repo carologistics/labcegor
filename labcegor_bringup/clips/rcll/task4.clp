@@ -124,6 +124,9 @@
   (test (eq ?n ROBOT1))
   (not (robot-one-buffer-cap))
   => 
+
+  (printout blue "task_id BufferStation" crlf)
+  (printout blue ?cm crlf)
   (if (and (eq ?cm TRUE) (eq ?cr TRUE)) then
     (send_robot_to_bufferStation 1 "M-CS1" ?peer-id)
     (assert (robot-one-buffer-cap))
