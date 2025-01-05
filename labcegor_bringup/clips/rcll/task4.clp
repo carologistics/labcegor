@@ -124,7 +124,7 @@
   (test (eq ?n ROBOT1))
   (not (robot-one-buffer-cap))
   => 
-  (if (and (robot_one_checked) (eq ?cm TRUE) (eq ?cr TRUE)) then
+  (if (and (eq ?cm TRUE) (eq ?cr TRUE)) then
     (send_robot_to_bufferStation 1 "M-CS1" ?peer-id)
     (assert (robot-one-buffer-cap))
   )
