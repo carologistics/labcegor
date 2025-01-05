@@ -31,7 +31,7 @@
   (printout red "task_id move" crlf)
   (printout red ?r_id crlf)
   (printout red (+ ?*global_task_id_base* ?r_id) crlf)
-  (modify ?*global_task_id_base* (+ ?*global_task_id_base* 3))
+  ;(modify ?*global_task_id_base* (+ ?*global_task_id_base* 3))
 )
 
 ; Retrieve
@@ -50,7 +50,7 @@
   (printout green "task_id Retrieve" crlf)
   (printout green ?r_id crlf)
   (printout green (+ ?*global_task_id_base* ?r_id) crlf)
-  (modify ?*global_task_id_base* (+ ?*global_task_id_base* 3))
+  ;(modify ?*global_task_id_base* (+ ?*global_task_id_base* 3))
 )
 
 ; Deliver
@@ -69,7 +69,7 @@
   (printout blue "task_id delivery" crlf)
   (printout blue ?r_id crlf)
   (printout blue (+ ?*global_task_id_base* ?r_id) crlf)
-  (modify ?*global_task_id_base* (+ ?*global_task_id_base* 3))
+  ;(modify ?*global_task_id_base* (+ ?*global_task_id_base* 3))
 )
 
 ; Move robots 
