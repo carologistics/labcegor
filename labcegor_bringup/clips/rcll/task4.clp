@@ -1,5 +1,5 @@
 ; Here is my stuff
-(defglobal ?*global_task_id_base* = 3)
+(defglobal ?*global_task_id_base* = 0)
 
 (deftemplate tasks_overview
   (slot robot_id (type INTEGER))
@@ -37,7 +37,7 @@
   (printout red "task_id move" crlf)
   (printout red ?r_id crlf)
   (printout red (+ ?*global_task_id_base* ?r_id) crlf)
-  ;(modify ?*global_task_id_base* (+ ?*global_task_id_base* 3))
+  (modify ?*global_task_id_base* (+ ?*global_task_id_base* 3))
 )
 
 ; Retrieve
@@ -56,7 +56,7 @@
   (printout green "task_id Retrieve" crlf)
   (printout green ?r_id crlf)
   (printout green (+ ?*global_task_id_base* ?r_id) crlf)
-  ;(modify ?*global_task_id_base* (+ ?*global_task_id_base* 3))
+  (modify ?*global_task_id_base* (+ ?*global_task_id_base* 3))
 )
 
 ; Deliver
@@ -75,7 +75,7 @@
   (printout blue "task_id delivery" crlf)
   (printout blue ?r_id crlf)
   (printout blue (+ ?*global_task_id_base* ?r_id) crlf)
-  ;(modify ?*global_task_id_base* (+ ?*global_task_id_base* 3))
+  (modify ?*global_task_id_base* (+ ?*global_task_id_base* 3))
 )
 
 ; BufferStation
@@ -94,7 +94,7 @@
   (printout blue "task_id BufferStation" crlf)
   (printout blue ?r_id crlf)
   (printout blue (+ ?*global_task_id_base* ?r_id) crlf)
-  ;(modify ?*global_task_id_base* (+ ?*global_task_id_base* 3))
+  (modify ?*global_task_id_base* (+ ?*global_task_id_base* 3))
 )
 
 
@@ -161,19 +161,18 @@
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
   (bind ?successful (pb-field-value ?msg "successful"))
-  (printout green ?task_id ?robot_id crlf)
+  (printout green ?task_id " " ?robot_id crlf)
   ; did task 1 finish? 
-  (if (and (eq ?robot_id 1) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr FALSE)) then 
+  (if (and (eq ?robot_id 1) (eq ?task_id 1) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr FALSE)) then 
     (modify ?tasks_overview (can_move FALSE))
     (modify ?tasks_overview (can_retrieve TRUE))
-    (printout green "robot one finished his task" crlf)
+    (printout green "robot one finished his task " ?task_id crlf)
     (printout green ?task_id crlf)
   )
   (if (and (eq ?robot_id 1) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr TRUE)) then 
     (modify ?tasks_overview (can_move TRUE))
     (modify ?tasks_overview (can_retrieve FALSE))
-    (printout green "robot one finished his task" crlf)
-    (printout green ?task_id crlf)
+    (printout green "robot one finished his task " ?task_id crlf)
   )
   ; Todo If Robot id == 1 and task-id == 1 and successful allow for next things to happen
 )
