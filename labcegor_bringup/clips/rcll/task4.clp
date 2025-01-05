@@ -192,6 +192,9 @@
   ; ROBOT 1
   ; ==========
   ; did task 1 for robot 1 finish? 
+
+  (printout red "Robot: " ?robot_id " Task: " ?task_id " Robot1 : " ?tid_one " " ?cm_one " " ?cr_one " Robot2 : " ?tid_two " " ?cm_two " " ?cr_two crlf)
+
   (if (and (eq ?robot_id 1) (eq ?task_id 1) (eq ?successful TRUE)) then 
     (modify ?tasks_overview_one (can_retrieve TRUE))
     (printout green "robot one finished his task " ?task_id crlf)
