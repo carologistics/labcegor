@@ -221,7 +221,7 @@
   (test (eq ?cd TRUE))
   ; ToDo did previous task finished?
   =>
-  (send_deliver_to_cmd 1 "M-CS2" "input" ?peer-id)
+  (send_deliver_to_cmd 1 "M-CS2" "input" ?peer-id ?tid)
 
   (printout green task_id crlf)
   (assert (robot1_delivered))
