@@ -202,7 +202,7 @@
   ; ToDo did previous if existing finished?
   ; ToDo did 1. finished?
   =>
-  (send_retrieve_from_cmd 1 "M-CS1" "input" ?peer-id)
+  (send_retrieve_from_cmd 1 "M-CS1" "input" ?peer-id ?tid)
   (send_move_to_cmd 1 "M-CS2" "output" ?peer-id)
 
   (printout yellow task_id crlf)
