@@ -113,10 +113,10 @@
   (test (eq ?n ROBOT1))
   (not (robot-one-buffer-cap))
   => 
-  (printout blue "task_id BufferStation" crlf)
+  (printout blue "BufferStation" crlf)
   (printout blue ?cm crlf)
   (printout blue ?cr crlf)
-  (if (and (eq ?cm FALSE) (eq ?cr TRUE)) then
+  (if (and (eq ?cm FALSE) (eq ?cr TRUE) (not (eq ?tid 1))) then
     (send_robot_to_bufferStation 1 "M-CS1" ?peer-id ?tid)
     (assert (robot-one-buffer-cap))
   )
@@ -132,7 +132,6 @@
   =>
   (send_move_to_cmd 2 "M-CS1" "output" ?peer-id ?tid)
   (assert (robot-two-is-send))
-  (printout red task_id crlf)
 )
 
 
