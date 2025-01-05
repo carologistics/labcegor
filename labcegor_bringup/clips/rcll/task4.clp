@@ -35,8 +35,7 @@
   (pb-set-field ?msg "move" ?move_msg)
   (pb-broadcast ?peer-id ?msg)
   (pb-destroy ?msg)
-  (printout red "task_id move" crlf)
-  (printout red ?r_id crlf)
+  (printout blue "Move: robot: " ?r_id " task " ?task_id crlf)
 )
 
 ; Retrieve
@@ -52,8 +51,7 @@
   (pb-set-field ?msg "retrieve" ?move_msg)
   (pb-broadcast ?peer-id ?msg)
   (pb-destroy ?msg)
-  (printout green "task_id Retrieve" crlf)
-  (printout green ?r_id crlf)
+  (printout blue "Retrieve: robot: " ?r_id " task " ?task_id crlf)
 )
 
 ; Deliver
@@ -69,8 +67,7 @@
   (pb-set-field ?msg "deliver" ?move_msg)
   (pb-broadcast ?peer-id ?msg)
   (pb-destroy ?msg)
-  (printout blue "task_id delivery" crlf)
-  (printout blue ?r_id crlf)
+  (printout blue "delivery: robot: " ?r_id " task " ?task_id crlf)
 )
 
 ; BufferStation
@@ -86,8 +83,7 @@
   (pb-set-field ?msg "bufferstation" ?move_msg)
   (pb-broadcast ?peer-id ?msg)
   (pb-destroy ?msg)
-  (printout blue "task_id BufferStation" crlf)
-  (printout blue ?r_id crlf)
+  (printout blue "BufferStation: robot: " ?r_id " task " ?task_id crlf)
 )
 
 
@@ -148,26 +144,28 @@
 ; Check if Robot 1 did what he was intended to do... 
 (defrule check-rob1
   (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id 1) (ptr ?msg))
-  ?tasks_overview <- (tasks_overview (robot_id 1) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd))
+  ?tasks_overview_two <- (tasks_overview (robot_id 2) (task_id ?tid_one) (can_move ?cm_one) (can_retrieve ?cr_two) (can_deliver ?cd))
+  ?tasks_overview_one <- (tasks_overview (robot_id 1) (task_id ?tid_two) (can_move ?cm_one) (can_retrieve ?cr_one) (can_deliver ?cd))
   (robot-one-is-send)
   =>
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
   (bind ?successful (pb-field-value ?msg "successful"))
-  (printout green ?task_id " " ?robot_id crlf)
+  (printout green ?task_id " " ?robot_id " current_id_one:" ?tid_one " current_id_two:" ?tid_two crlf)
+  (printout yellow ?task_id " " ?robot_id ?successful " " ?cm_one " " ?cr_one crlf)
   ; did task 1 finish? 
-  (if (and (eq ?robot_id 1) (eq ?task_id 1) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr FALSE)) then 
-    (modify ?tasks_overview (can_move FALSE))
-    (modify ?tasks_overview (can_retrieve TRUE))
+  (if (and (eq ?robot_id 1) (eq ?task_id 1) (eq ?successful TRUE) (eq ?cm_one TRUE) (eq ?cr_one FALSE)) then 
+    (modify ?tasks_overview_one (can_move FALSE))
+    (modify ?tasks_overview_one (can_retrieve TRUE))
     (printout green "robot one finished his task " ?task_id crlf)
-    (modify ?tasks_overview (task_id (+ ?task_id 1)))
+    (modify ?tasks_overview_one (task_id (+ ?task_id 1)))
     (printout green ?task_id crlf)
   )
-  (if (and (eq ?robot_id 1) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr TRUE)) then 
-    (modify ?tasks_overview (can_move TRUE))
-    (modify ?tasks_overview (can_retrieve FALSE))
+  (if (and (eq ?robot_id 1) (eq ?successful TRUE) (eq ?cm_one FALSE) (eq ?cr_one TRUE)) then 
+    (modify ?tasks_overview_one (can_move TRUE))
+    (modify ?tasks_overview_one (can_retrieve FALSE))
     (printout green "robot one finished his task " ?task_id crlf)
-    (modify ?tasks_overview (task_id (+ ?task_id 1)))
+    (modify ?tasks_overview_one (task_id (+ ?task_id 1)))
   )
   ; Todo If Robot id == 1 and task-id == 1 and successful allow for next things to happen
 )
