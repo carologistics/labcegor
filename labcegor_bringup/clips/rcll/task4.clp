@@ -178,36 +178,50 @@
 ; ==================================================================================
 ; CHECK STUFF
 ; ==================================================================================
-
+; ==========
+; ROBOT 1
+; ==========
 ; Check if Robot 1 did what he was intended to do... 
-(defrule check-robots
+(defrule check-robot_one
   ?pb-msg <- (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id 1) (ptr ?msg))
-  ?tasks_overview_one <- (tasks_overview (robot_id 1) (task_id ?tid_one) (can_move ?cm_one) (can_retrieve ?cr_one) (can_deliver ?cd_one))
-  ?tasks_overview_two <- (tasks_overview (robot_id 2) (task_id ?tid_two) (can_move ?cm_two) (can_retrieve ?cr_two) (can_deliver ?cd_two))
+  ?tasks_overview <- (tasks_overview (robot_id 1) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd))
   =>
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
   (bind ?successful (pb-field-value ?msg "successful"))
-  ; ==========
-  ; ROBOT 1
-  ; ==========
+  
   ; did task 1 for robot 1 finish? 
 
-  (printout red "Robot: " ?robot_id " Task: " ?task_id " Robot1 : " ?tid_one " " ?cm_one " " ?cr_one " Robot2 : " ?tid_two " " ?cm_two " " ?cr_two crlf)
+  (printout red "Robot: " ?robot_id " Task: " ?task_id " Robot" ?robot_id " : " ?tid " " ?cm " " ?cr " crlf)
 
   (if (and (eq ?robot_id 1) (eq ?task_id 1) (eq ?successful TRUE)) then 
-    (modify ?tasks_overview_one (can_retrieve TRUE))
+    (modify ?tasks_overview (can_retrieve TRUE))
     (printout green "robot one finished his task " ?task_id crlf)
-    (modify ?tasks_overview_one (task_id (+ ?task_id 1)))
+    (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (printout green ?task_id crlf)
   )
   ; did task 2 for robot 1 finish? 
-  (if (and (eq ?robot_id 1) (eq ?task_id 2) (eq ?successful TRUE) (eq ?cm_one FALSE) (eq ?cr_one TRUE)) then 
-    (modify ?tasks_overview_one (can_move TRUE))
-    (modify ?tasks_overview_one (can_retrieve TRUE))
+  (if (and (eq ?robot_id 1) (eq ?task_id 2) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr TRUE)) then 
+    (modify ?tasks_overview (can_move TRUE))
+    (modify ?tasks_overview (can_retrieve TRUE))
     (printout green "robot one finished his task " ?task_id crlf)
-    (modify ?tasks_overview_one (task_id (+ ?task_id 1)))
+    (modify ?tasks_overview (task_id (+ ?task_id 1)))
   )
+)
+
+; ==========
+; ROBOT 2
+; ==========
+(defrule check-robot_two
+  ?pb-msg <- (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id 1) (ptr ?msg))
+  ?tasks_overview <- (tasks_overview (robot_id 1) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd))
+  =>
+  (bind ?task_id (pb-field-value ?msg "task_id"))
+  (bind ?robot_id (pb-field-value ?msg "robot_id"))
+  (bind ?successful (pb-field-value ?msg "successful"))
+  
+  (printout red "Robot: " ?robot_id " Task: " ?task_id " Robot" ?robot_id " : " ?tid " " ?cm " " ?cr " crlf)
+
   ; ==========
   ; ROBOT 2
   ; ==========
