@@ -225,7 +225,7 @@
   
   (printout red "Robot two : " ?robot_id " Task: " ?task_id " Robot" ?robot_id " : " ?tid " " ?cm " " ?cr crlf)
   ; check task 1 for robot 2
-  (if (and (eq ?robot_id 2) (eq ?task_id 1) (eq ?successful TRUE) (can_retrieve False)) then 
+  (if (and (eq ?robot_id 2) (eq ?task_id 1) (eq ?successful TRUE) (eq ?cr FALSE)) then 
     (modify ?tasks_overview (can_retrieve TRUE))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (printout green "robot two finished his task " ?task_id crlf)
