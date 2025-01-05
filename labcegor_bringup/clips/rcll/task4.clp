@@ -209,7 +209,6 @@
     (printout green ?task_id ?tid crlf)
   )
   (retract ?pb-msg)
-  (retract ?tasks_overview)
 )
 
 ; ==========
@@ -231,7 +230,6 @@
     (printout green "robot two finished his task " ?task_id crlf)
   )
   (retract ?pb-msg)
-  (retract ?tasks_overview)
 )
 
 ; Check Machine 
