@@ -135,17 +135,17 @@
 
 ; 4. Prepare Machine
 (defrule prepare_machine
-  (protobuf-peer (name ?n) (peer-id ?peer-id))
+  (protobuf-peer (name refbox-private) (peer-id ?peer-id))
   ?tasks_overview_one <- (tasks_overview (robot_id 1) (task_id ?tid_one) (can_move ?cm_one) (can_retrieve ?cr_one) (can_deliver ?cd_one))
   (robot-one-buffer-cap)
   (not (proces_cap_one_CS1))
   =>
-  (printout yellow "prepare_machine : name " ?n " robot_one task_id " ?tid_one crlf)
+  (printout red "prepare_machine : name " ?n " robot_one task_id " ?tid_one crlf)
 
   (if (and (< ?tid_one 1) (eq ?cm_one TRUE) (eq ?cr_one TRUE)) then
     (send_cmd_to_machine "M-CS1" "RETRIEVE_CAP" ?peer-id)
     (assert (proces_cap_one_CS1))
-    (printout green "the machine should do something " ?tid_one crlf)
+    (printout red "the machine should do something " ?tid_one crlf)
   )
 )
 
