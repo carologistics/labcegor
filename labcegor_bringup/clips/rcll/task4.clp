@@ -191,42 +191,42 @@
 
 
 
-; 2. Retrieve Caps
-(defrule retrieve-cap-robot-one
-  ?tasks_overview <- (tasks_overview (robot_id 1) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd))
-  (protobuf-peer (name ?n) (peer-id ?peer-id))
-  (robot_one_moved)
-  (not (robot1_retrieved))
-  (test (eq ?n ROBOT1))
-  (test (eq ?cr TRUE))
-  ; ToDo did previous if existing finished?
-  ; ToDo did 1. finished?
-  =>
-  (send_retrieve_from_cmd 1 "M-CS1" "input" ?peer-id ?tid)
-  (send_move_to_cmd 1 "M-CS2" "output" ?peer-id)
+; ; 2. Retrieve Caps
+; (defrule retrieve-cap-robot-one
+;   ?tasks_overview <- (tasks_overview (robot_id 1) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd))
+;   (protobuf-peer (name ?n) (peer-id ?peer-id))
+;   (robot_one_moved)
+;   (not (robot1_retrieved))
+;   (test (eq ?n ROBOT1))
+;   (test (eq ?cr TRUE))
+;   ; ToDo did previous if existing finished?
+;   ; ToDo did 1. finished?
+;   =>
+;   (send_retrieve_from_cmd 1 "M-CS1" "input" ?peer-id ?tid)
+;   (send_move_to_cmd 1 "M-CS2" "output" ?peer-id?tid)
 
-  (printout yellow task_id crlf)
-  (assert (robot1_retrieved))
-  (retract ?tasks_overview)
-)
+;   (printout yellow task_id crlf)
+;   (assert (robot1_retrieved))
+;   (retract ?tasks_overview)
+; )
 
 
-; Deliver Caps
-(defrule peer-send-agent-task-msg
-  ?tasks_overview <- (tasks_overview (robot_id 1) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd))
-  (protobuf-peer (name ?n) (peer-id ?peer-id))
-  (robot_one_moved)
-  (test (eq ?n ROBOT1))
-  (not (robot1_delivered))
-  (test (eq ?cd TRUE))
-  ; ToDo did previous task finished?
-  =>
-  (send_deliver_to_cmd 1 "M-CS2" "input" ?peer-id ?tid)
+; ; Deliver Caps
+; (defrule peer-send-agent-task-msg
+;   ?tasks_overview <- (tasks_overview (robot_id 1) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd))
+;   (protobuf-peer (name ?n) (peer-id ?peer-id))
+;   (robot_one_moved)
+;   (test (eq ?n ROBOT1))
+;   (not (robot1_delivered))
+;   (test (eq ?cd TRUE))
+;   ; ToDo did previous task finished?
+;   =>
+;   (send_deliver_to_cmd 1 "M-CS2" "input" ?peer-id ?tid)
 
-  (printout green task_id crlf)
-  (assert (robot1_delivered))
-  (retract ?tasks_overview)
-)
+;   (printout green task_id crlf)
+;   (assert (robot1_delivered))
+;   (retract ?tasks_overview)
+; )
 
 ; Make Rule to grab message and if "successful" allow for next step
 ; ToDo: find Shelf and get one disk
