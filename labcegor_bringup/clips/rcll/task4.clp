@@ -72,15 +72,15 @@
 
 ; BufferStation
 (deffunction send_robot_to_bufferStation (?r_id ?r_target ?peer-id ?task_id)
-  (bind ?move_msg (pb-create "llsf_msgs.BufferStation"))
-  (pb-set-field ?move_msg "machine_id" ?r_target)
-  (pb-set-field ?move_msg "shelf_number" 1)
+  (bind ?buffer_msg (pb-create "llsf_msgs.BufferStation"))
+  (pb-set-field ?buffer_msg "machine_id" ?r_target)
+  (pb-set-field ?buffer_msg "shelf_number" 1)
   
   (bind ?msg (pb-create "llsf_msgs.AgentTask"))
   (pb-set-field ?msg "team_color" MAGENTA)
   (pb-set-field ?msg "task_id" ?task_id)
   (pb-set-field ?msg "robot_id" ?r_id)
-  (pb-set-field ?msg "BufferStation" ?move_msg)
+  (pb-set-field ?msg "buffer" ?buffer_msg)
   (pb-broadcast ?peer-id ?msg)
   (pb-destroy ?msg)
   (printout blue "BufferStation: robot: " ?r_id " task " ?task_id crlf)
