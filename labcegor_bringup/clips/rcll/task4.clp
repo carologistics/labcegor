@@ -90,10 +90,10 @@
 ; Check if Robot 1 did what he was intended to do... 
 (defrule check-rob1
   (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id 1) (ptr ?msg))
-  (eq (pb-field-value ?msg "successful") TRUE)
   ?tasks_overview <- (tasks_overview (robot_id 1) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd))
   =>
   (printout green "test" crlf)
+  (printout green ?msg crlf)
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?succsefull (pb-field-value ?msg "successful"))
   (bind ?task_id (pb-field-value ?msg "robot_id"))
