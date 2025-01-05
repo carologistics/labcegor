@@ -78,6 +78,25 @@
   ;(modify ?*global_task_id_base* (+ ?*global_task_id_base* 3))
 )
 
+; BufferStation
+(deffunction send_robot_to_bufferStation (?r_id ?r_target ?peer-id)
+  (bind ?move_msg (pb-create "llsf_msgs.BufferStation"))
+  (pb-set-field ?move_msg "machine_id" ?r_target)
+  (pb-set-field ?move_msg "shelf_number" 1)
+  
+  (bind ?msg (pb-create "llsf_msgs.AgentTask"))
+  (pb-set-field ?msg "team_color" MAGENTA)
+  (pb-set-field ?msg "task_id" (+ ?*global_task_id_base* ?r_id))
+  (pb-set-field ?msg "robot_id" ?r_id)
+  (pb-set-field ?msg "bufferstation" ?move_msg)
+  (pb-broadcast ?peer-id ?msg)
+  (pb-destroy ?msg)
+  (printout blue "task_id BufferStation" crlf)
+  (printout blue ?r_id crlf)
+  (printout blue (+ ?*global_task_id_base* ?r_id) crlf)
+  ;(modify ?*global_task_id_base* (+ ?*global_task_id_base* 3))
+)
+
 
 
 ; ==================================================================================
@@ -102,11 +121,13 @@
 (defrule buffer-cap-robot-one
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   ?tasks_overview <- (tasks_overview (robot_id 1) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd))
+  (test (eq ?n ROBOT1))
   (not (robot-one-buffer-cap))
-  
   => 
-
-  (assert (robot-one-buffer-cap))
+  (if (and (robot_one_checked) (eq ?cm TRUE) (eq ?cr TRUE)) then
+    (send_robot_to_bufferStation 1 "M-CS1" ?peer-id)
+    (assert (robot-one-buffer-cap))
+  )
 )
 
 
