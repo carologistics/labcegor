@@ -1,5 +1,5 @@
 ; Here is my stuff
-(defglobal ?*global_task_id_base* = 0)
+(defglobal ?*global_task_id_base* = 3)
 
 (deftemplate tasks_overview
   (slot robot_id (type INTEGER))
