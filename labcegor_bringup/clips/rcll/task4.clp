@@ -192,7 +192,7 @@
   
   ; did task 1 for robot 1 finish? 
 
-  (printout red "Robot: " ?robot_id " Task: " ?task_id " Robot" ?robot_id " : " ?tid " " ?cm " " ?cr " crlf)
+  (printout red "Robot: " ?robot_id " Task: " ?task_id " Robot" ?robot_id " : " ?tid " " ?cm " " ?cr crlf)
 
   (if (and (eq ?robot_id 1) (eq ?task_id 1) (eq ?successful TRUE)) then 
     (modify ?tasks_overview (can_retrieve TRUE))
@@ -220,11 +220,7 @@
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
   (bind ?successful (pb-field-value ?msg "successful"))
   
-  (printout red "Robot: " ?robot_id " Task: " ?task_id " Robot" ?robot_id " : " ?tid " " ?cm " " ?cr " crlf)
-
-  ; ==========
-  ; ROBOT 2
-  ; ==========
+  (printout red "Robot: " ?robot_id " Task: " ?task_id " Robot" ?robot_id " : " ?tid " " ?cm " " ?cr crlf)
   ; check task 1 for robot 2
   (if (and (eq ?robot_id 2) (eq ?task_id 1) (eq ?successful TRUE)) then 
     (modify ?tasks_overview (can_move FALSE))
