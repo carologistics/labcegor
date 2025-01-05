@@ -127,7 +127,8 @@
 
   (printout blue "task_id BufferStation" crlf)
   (printout blue ?cm crlf)
-  (if (and (eq ?cm TRUE) (eq ?cr TRUE)) then
+  (printout blue ?cr crlf)
+  (if (and (eq ?cm FALSE) (eq ?cr TRUE)) then
     (send_robot_to_bufferStation 1 "M-CS1" ?peer-id)
     (assert (robot-one-buffer-cap))
   )
