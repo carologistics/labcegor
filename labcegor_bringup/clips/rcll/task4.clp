@@ -145,7 +145,7 @@
   (if (and (< ?tid_one 1) (eq ?cm_one TRUE) (eq ?cr_one TRUE)) then
     (send_cmd_to_machine "M-CS1" "RETRIEVE_CAP" ?peer-id)
     (assert (proces_cap_one_CS1))
-    (printout red "the machine should do something " ?tid_one crlf)
+    (printout red "the machine should do something " crlf)
   )
 )
 
