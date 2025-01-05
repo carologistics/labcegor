@@ -86,6 +86,19 @@
   (printout blue "BufferStation: robot: " ?r_id " task " ?task_id crlf)
 )
 
+; Retrieve from Machine
+(deffunction send_cmd_to_machine (?m_id ?operation)
+  (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionCS")) 
+  (pb-set-field ?prep-msg "operation" ?operation) ; "RETRIEVE_CAP")
+
+  (bind ?msg (pb-create "llsf_msgs.PrepareMachine"))
+  (pb-set-field ?msg "team_color" MAGENTA)
+  (pb-set-field ?msg "machine" ?m_id)
+  (pb-set-field ?msg "instruction_cs" ?prep-msg)
+  (pb-broadcast ?peer-id ?msg)
+  (pb-destroy ?msg)
+)
+
 
 
 ; ==================================================================================
@@ -117,6 +130,19 @@
   (if (and (eq ?cm FALSE) (eq ?cr TRUE) (not (eq ?tid 1))) then
     (send_robot_to_bufferStation 1 "M-CS1" ?peer-id ?tid)
     (assert (robot-one-buffer-cap))
+  )
+)
+
+; 4. Prepare Machine
+(defrule prepare_machine
+  (protobuf-peer (name refbox-private) (peer-id ?peer-id))
+  ?tasks_overview_one <- (tasks_overview (robot_id 1) (task_id ?tid_one) (can_move ?cm_one) (can_retrieve ?cr_one) (can_deliver ?cd))
+  (not (proces_cap_one_CS1))
+  (robot-one-buffer-cap)
+  =>
+  (if (and (< tid_one 1) (eq ?cm TRUE) (eq ?cr TRUE)) then
+    (send_cmd_to_machine "M-CS1" "RETRIEVE_CAP")
+    (assert proces_cap_one_CS1)
   )
 )
 
@@ -159,11 +185,10 @@
   )
   (if (and (eq ?robot_id 1) (eq ?task_id 2) (eq ?successful TRUE) (eq ?cm_one FALSE) (eq ?cr_one TRUE)) then 
     (modify ?tasks_overview_one (can_move TRUE))
-    (modify ?tasks_overview_one (can_retrieve FALSE))
+    (modify ?tasks_overview_one (can_retrieve TRUE))
     (printout green "robot one finished his task " ?task_id crlf)
     (modify ?tasks_overview_one (task_id (+ ?task_id 1)))
   )
-  ; Todo If Robot id == 1 and task-id == 1 and successful allow for next things to happen
 )
 
 (defrule check-rob2
