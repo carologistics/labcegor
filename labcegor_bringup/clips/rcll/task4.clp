@@ -145,8 +145,8 @@
     (assert(robot_one_checked))
     (printout green "robot one finished his task" crlf)
   )
-  (if (and (eq ?robot_id 1) (eq ?successful TRUE))) then 
-    (printout green ?task_id crlf)
+  (if (and (eq ?robot_id 1) (eq ?successful TRUE)) then 
+    (printout yellow ?task_id crlf)
   )
   ; Todo If Robot id == 1 and task-id == 1 and successful allow for next things to happen
 )
@@ -157,17 +157,12 @@
   (robot-two-is-send)
   (not (rob_2_checked))
   =>
-  (printout green "test" crlf)
-  (printout green ?msg crlf)
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
   (bind ?successful (pb-field-value ?msg "successful"))
   (if (and (eq ?robot_id 2)(eq ?successful TRUE)) then 
-    (printout green ?tasks_overview crlf)
     (modify ?tasks_overview (can_move FALSE))
     (assert(rob_2_checked))
-    (printout green ?tasks_overview crlf)
-    (printout green ?task_id crlf)
   )
   ; Todo If Robot id == 1 and task-id == 1 and successful allow for next things to happen
 )
