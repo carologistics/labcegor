@@ -145,7 +145,8 @@
     (send_cmd_to_machine "M-CS1" "RETRIEVE_CAP" ?peer-id)
     (assert (proces_cap_one_CS1))
     (printout blue "the machine should do something " crlf)
-  )
+    (printout red "part 2/2" crlf)
+  ) 
 )
 
 ; 5. send Robot 2 to cs1 output 
@@ -156,6 +157,7 @@
   (test (eq ?n ROBOT2))
   =>
   (send_move_to_cmd 2 "M-CS1" "output" ?peer-id ?tid)
+  (printout red "part 1/2" crlf)
   (assert (robot-two-is-send))
 )
 
