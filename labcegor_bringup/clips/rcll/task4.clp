@@ -3,6 +3,7 @@
 
 (deftemplate tasks_overview
   (slot robot_id (type INTEGER))
+  (slot task_id (type INTEGER))
   (slot can_move (type SYMBOL) (allowed-values FALSE TRUE))
   (slot can_retrieve (type SYMBOL) (allowed-values FALSE TRUE))
   (slot can_deliver (type SYMBOL) (allowed-values FALSE TRUE))
