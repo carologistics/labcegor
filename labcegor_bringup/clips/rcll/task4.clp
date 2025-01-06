@@ -148,6 +148,7 @@
   (not (proces_cap_one_CS1))
   =>
   (printout red "prepare_machine robot_one task_id " ?tid_one " " ?cm_one " " ?cr_one " test: " (< ?tid_one 1) " " (> ?tid_one 1) crlf)
+  (printout green (and (eq ?tid_one 3) (eq ?cm_one TRUE) (eq ?cr_one TRUE)) crlf)
   (if (and (eq ?tid_one 3) (eq ?cm_one TRUE) (eq ?cr_one TRUE)) then
     (send_cmd_to_machine ?mot "RETRIEVE_CAP" ?peer-id)
     (assert (proces_cap_one_CS1))
