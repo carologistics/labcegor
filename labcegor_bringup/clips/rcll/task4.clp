@@ -193,7 +193,7 @@
 ; ==========
 ; Check if Robot 1 did what he was intended to do... 
 (defrule check-robot_one
-  ?pb-msg <- (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id 1) (ptr ?msg))
+  (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id 1) (ptr ?msg))
   ?tasks_overview <- (tasks_overview (robot_id 1) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd))
   =>
   (bind ?task_id (pb-field-value ?msg "task_id"))
@@ -215,16 +215,16 @@
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (printout green ?task_id ?tid crlf)
   )
-  
-  (retract ?pb-msg)
 )
 
 ; ==========
 ; ROBOT 2
 ; ==========
-(defrule check-robot_two
-  ?pb-msg <- (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id 2) (ptr ?msg))
+(defrule check-robot_two_first_task
+  (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id 2) (ptr ?msg))
   ?tasks_overview <- (tasks_overview (robot_id 2) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd))
+  (not (robot2_finished_task1))
+  (robot-two-is-send)
   =>
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
@@ -235,17 +235,30 @@
     (modify ?tasks_overview (can_retrieve TRUE))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (printout green "robot two finished his task " ?task_id crlf)
+    (assert (robot2_finished_task1))
   )
+)
+
+
+(defrule check-robot_two_second_task
+  (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id 2) (ptr ?msg))
+  ?tasks_overview <- (tasks_overview (robot_id 2) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd))
+  (not (robot2_finished_task2))
+  (robot-two-is-send)
+  (robot_two_picked_up_disk)
+  =>
+  (bind ?task_id (pb-field-value ?msg "task_id"))
+  (bind ?robot_id (pb-field-value ?msg "robot_id"))
+  (bind ?successfull (pb-field-value ?msg "successfull"))
   ; did task 2 for robot 1 finish? 
-  (if (and (eq ?robot_id 1) (eq ?task_id 2) (eq ?successfull TRUE) (eq ?cm FALSE) (eq ?cr TRUE)) then 
+  (if (and (eq ?robot_id 2) (eq ?task_id 2) (eq ?successfull TRUE) (eq ?cm FALSE) (eq ?cr TRUE)) then 
     (modify ?tasks_overview (can_move TRUE))
     (modify ?tasks_overview (can_retrieve FALSE))
     (printout green "robot two did something " ?task_id crlf)
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (printout green ?task_id ?tid crlf)
+    (assert (robot2_finished_task2))
   )
-  
-  (retract ?pb-msg)
 )
 
 ; Check Machine 
