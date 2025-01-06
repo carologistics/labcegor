@@ -148,7 +148,7 @@
   (not (proces_cap_one_CS1))
   =>
   (printout red "prepare_machine robot_one task_id " ?tid_one " " ?cm_one " " ?cr_one " test: " (< ?tid_one 1) " " (> ?tid_one 1) crlf)
-  (if (and (eq ?tid_one 2) (eq ?cm_one TRUE) (eq ?cr_one TRUE)) then
+  (if (and (eq ?tid_one 3) (eq ?cm_one TRUE) (eq ?cr_one TRUE)) then
     (send_cmd_to_machine "M-CS1" "RETRIEVE_CAP" ?peer-id)
     (assert (proces_cap_one_CS1))
     (printout blue "the machine should do something " crlf)
@@ -200,8 +200,7 @@
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
   (bind ?successful (pb-field-value ?msg "successful"))
-  
-  (printout red ?task_id " " ?robot_id " " ?successful " " ?tid " " ?cm " " ?cr " " ?cd crlf)
+  ;(printout red ?task_id " " ?robot_id " " ?successful " " ?tid " " ?cm " " ?cr " " ?cd crlf)
 
   ; did task 1 for robot 1 finish? 
   (if (and (eq ?robot_id 1) (eq ?task_id 1) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr FALSE)) then 
