@@ -193,7 +193,7 @@
 ; ==========
 ; Check if Robot 1 did what he was intended to do... 
 (defrule check-robot_one
-  ?pb-msg <- (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id 1) (ptr ?msg))
+  (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id 1) (ptr ?msg))
   ?tasks_overview <- (tasks_overview (robot_id 1) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd))
   =>
   (bind ?task_id (pb-field-value ?msg "task_id"))
@@ -217,7 +217,6 @@
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (printout green ?task_id ?tid crlf)
   )
-  (retract ?pb-msg)
 )
 
 ; ==========
