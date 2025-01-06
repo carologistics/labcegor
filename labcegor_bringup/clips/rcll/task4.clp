@@ -199,6 +199,8 @@
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
   (bind ?successfull (pb-field-value ?msg "successfull"))
+  
+  (printout red ?task_id " " ?robot_id " " ?successfull " " ?tid " " ?cm " " ?cr " " ?cd crlf)
 
   ; did task 1 for robot 1 finish? 
   (if (and (eq ?robot_id 1) (eq ?task_id 1) (eq ?successfull TRUE) (eq ?cm FALSE) (eq ?cr FALSE)) then 
