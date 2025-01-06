@@ -257,6 +257,6 @@
   =>
   (printout red "M-CS1 is in state " ?s " and of type " ?t " and task " ?mt " "(eq ?s READY-AT-OUTPUT)crlf)
   (if (eq ?s READY-AT-OUTPUT) then
-    (assert M-CS1_finished_task1)
+    (assert (M-CS1_finished_task1))
   )
 )
