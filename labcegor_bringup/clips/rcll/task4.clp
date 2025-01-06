@@ -218,6 +218,7 @@
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (printout green ?task_id ?tid crlf)
   )
+  (retract ?tasks_overview)
 )
 
 ; ==========
@@ -240,6 +241,7 @@
     (printout green "robot two finished his task " ?task_id crlf)
     (assert (robot2_finished_task1))
   )
+  (retract ?tasks_overview)
 )
 
 
@@ -272,20 +274,3 @@
   =>
   (printout red "M-CS1 is in state " ?s " and of type " ?t " and task " ?mt crlf)
 )
-
-; (defrule check-rob2
-;   (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id 2) (ptr ?msg))
-;   ?tasks_overview <- (tasks_overview (robot_id 2) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd))
-;   (robot-two-is-send)
-;   (not (rob_2_checked))
-;   =>
-;   (bind ?task_id (pb-field-value ?msg "task_id"))
-;   (bind ?robot_id (pb-field-value ?msg "robot_id"))
-;   (bind ?successful (pb-field-value ?msg "successful"))
-;   (if (and (eq ?robot_id 2)(eq ?successful TRUE)) then 
-;     (modify ?tasks_overview (can_move FALSE))
-;     (modify ?tasks_overview (task_id (+ ?task_id 1)))
-;     (assert(rob_2_checked))
-;     (printout green "robot two finished his task " ?task_id crlf)
-;   )
-; )
