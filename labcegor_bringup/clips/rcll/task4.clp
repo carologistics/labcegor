@@ -120,9 +120,10 @@
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   (tasks_overview (robot_id 1) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
   (test (eq ?n ROBOT1))
-  (and (eq ?cm TRUE) (eq ?cr TRUE) (eq ?cc TRUE))
+  (not (robot1_send_to_machine))
   =>
   (send_move_to_cmd 1 ?mot ?mat ?peer-id ?tid)
+  (assert (robot1_send_to_machine))
 )
 
 ; 2. & 3. Get Cap from shelf and place on Machine
@@ -130,12 +131,13 @@
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   (tasks_overview (robot_id 1) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
   (test (eq ?n ROBOT1))
-  (and (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cc TRUE))
+  (not (robot1_buffer_cap))
   => 
   (printout green "BufferStation robot 1 current task id:" ?tid crlf)
   (if (and (eq ?cm FALSE) (eq ?cr TRUE) (not (eq ?tid 1))) then
     (send_robot_to_bufferStation 1 ?mot ?peer-id ?tid)
     (printout blue "BufferStation should do something" ?tid crlf)
+    (assert (robot1_buffer_cap))
   )
 )
 
@@ -159,10 +161,11 @@
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   (tasks_overview (robot_id 2) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
   (test (eq ?n ROBOT2))
-  (and (eq ?cm TRUE) (eq ?cr TRUE) (eq ?cc TRUE))
+  (not (robot2_send_to_machine))
   =>
   (send_move_to_cmd 2 ?mot ?mat ?peer-id ?tid)
   (printout red "part 1/2" crlf)
+  (assert (robot2_send_to_machine))
 )
 
 ; 6. After 4. finish pickup with second robot
