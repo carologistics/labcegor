@@ -265,6 +265,7 @@
 (defrule check_machine_M-CS1
   (machine (name M-CS1) (state ?s) (type ?t))
   (machine_task_overview (machine_id M-CS1) (machine_task ?mt))
+  (not (M-CS1_finished_task1))
   =>
   (printout red "M-CS1 is in state " ?s " and of type " ?t " and task " ?mt crlf)
 )
