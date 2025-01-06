@@ -218,7 +218,6 @@
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (printout green ?task_id ?tid crlf)
   )
-  (retract ?tasks_overview)
 )
 
 ; ==========
@@ -241,7 +240,6 @@
     (printout green "robot two finished his task " ?task_id crlf)
     (assert (robot2_finished_task1))
   )
-  (retract ?tasks_overview)
 )
 
 
