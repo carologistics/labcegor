@@ -174,6 +174,7 @@
   (tasks_overview (robot_id 2) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd))
   (proces_cap_one_CS1)
   (not (robot_two_picked_up_disk))
+  (M-CS1_finished_task1)
   (test (eq ?n ROBOT2))
   => 
   ; if prepare Machine.Successful and robot_two ready then pick-up
@@ -225,7 +226,6 @@
 (defrule check-robot_two_first_task
   (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id 2) (ptr ?msg))
   ?tasks_overview <- (tasks_overview (robot_id 2) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd))
-  (not (robot2_finished_task1))
   (robot-two-is-send)
   =>
   (bind ?task_id (pb-field-value ?msg "task_id"))
@@ -237,21 +237,8 @@
     (modify ?tasks_overview (can_retrieve TRUE))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (printout green "robot two finished his task " ?task_id crlf)
-    (assert (robot2_finished_task1))
   )
-)
 
-
-(defrule check-robot_two_second_task
-  (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id 2) (ptr ?msg))
-  ?tasks_overview <- (tasks_overview (robot_id 2) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd))
-  (not (robot2_finished_task2))
-  (robot-two-is-send)
-  (robot_two_picked_up_disk)
-  =>
-  (bind ?task_id (pb-field-value ?msg "task_id"))
-  (bind ?robot_id (pb-field-value ?msg "robot_id"))
-  (bind ?successful (pb-field-value ?msg "successful"))
   ; did task 2 for robot 1 finish? 
   (if (and (eq ?robot_id 2) (eq ?task_id 2) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr TRUE)) then 
     (modify ?tasks_overview (can_move TRUE))
@@ -259,7 +246,6 @@
     (printout green "robot two did something " ?task_id crlf)
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (printout green ?task_id ?tid crlf)
-    (assert (robot2_finished_task2))
   )
 )
 
@@ -269,5 +255,8 @@
   (machine_task_overview (machine_id M-CS1) (machine_task ?mt))
   (not (M-CS1_finished_task1))
   =>
-  (printout red "M-CS1 is in state " ?s " and of type " ?t " and task " ?mt crlf)
+  (printout red "M-CS1 is in state " ?s " and of type " ?t " and task " ?mt " "(eq ?s READY-AT-OUTPUT)crlf)
+  (if (eq ?s READY-AT-OUTPUT) then
+    (assert M-CS1_finished_task1)
+  )
 )
