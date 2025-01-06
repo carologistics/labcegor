@@ -215,6 +215,7 @@
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (printout green ?task_id ?tid crlf)
   )
+  (retract ?pb-msg)
 )
 
 ; ==========
