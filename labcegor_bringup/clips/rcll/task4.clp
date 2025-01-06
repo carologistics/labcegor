@@ -118,7 +118,7 @@
 ; 1. send Robot 1 to cs1 input
 (defrule send-robot-one-to-mashine
   (protobuf-peer (name ?n) (peer-id ?peer-id))
-  (tasks_overview (robot_id 1) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (?machine_target ?mat))
+  (tasks_overview (robot_id 1) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
   (test (eq ?n ROBOT1))
   (and (eq ?cm TRUE) (eq ?cr TRUE) (eq ?cc TRUE))
   =>
@@ -128,7 +128,7 @@
 ; 2. & 3. Get Cap from shelf and place on Machine
 (defrule buffer-cap-robot-one
   (protobuf-peer (name ?n) (peer-id ?peer-id))
-  (tasks_overview (robot_id 1) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (?machine_target ?mat))
+  (tasks_overview (robot_id 1) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
   (test (eq ?n ROBOT1))
   (and (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cc TRUE))
   => 
@@ -142,7 +142,7 @@
 ; 4. Prepare Machine
 (defrule prepare_machine
   (protobuf-peer (name refbox-private) (peer-id ?peer-id))
-  (tasks_overview (robot_id 1) (task_id ?tid_one) (can_move ?cm_one) (can_retrieve ?cr_one) (can_deliver ?cd_one))
+  (tasks_overview (robot_id 1) (task_id ?tid_one) (can_move ?cm_one) (can_retrieve ?cr_one) (can_deliver ?cd_one) (move_target ?mot) (machine_target ?mat))
   (not (proces_cap_one_CS1))
   =>
   (printout red "prepare_machine robot_one task_id " ?tid_one " " ?cm_one " " ?cr_one " test: " (< ?tid_one 1) " " (> ?tid_one 1) crlf)
@@ -157,7 +157,7 @@
 ; 5. send Robot 2 to cs1 output 
 (defrule send-robot-two-to-mashine
   (protobuf-peer (name ?n) (peer-id ?peer-id))
-  (tasks_overview (robot_id 2) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (?machine_target ?mat))
+  (tasks_overview (robot_id 2) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
   (test (eq ?n ROBOT2))
   (and (eq ?cm TRUE) (eq ?cr TRUE) (eq ?cc TRUE))
   =>
@@ -168,7 +168,7 @@
 ; 6. After 4. finish pickup with second robot
 (defrule robot_two_pickup_disk
   (protobuf-peer (name ?n) (peer-id ?peer-id))
-  (tasks_overview (robot_id 2) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (?machine_target ?mat))
+  (tasks_overview (robot_id 2) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
   (test (eq ?n ROBOT2))
   (and (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cc TRUE))
   (proces_cap_one_CS1)
@@ -193,7 +193,7 @@
 ; Check if Robot 1 did what he was intended to do... 
 (defrule check-robot_one
   (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id 1) (ptr ?msg))
-  ?tasks_overview <- (tasks_overview (robot_id 1) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (?machine_target ?mat))
+  ?tasks_overview <- (tasks_overview (robot_id 1) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
   =>
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
@@ -221,7 +221,7 @@
 ; ==========
 (defrule check-robot_two_first_task
   (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id 2) (ptr ?msg))
-  ?tasks_overview <- (tasks_overview (robot_id 2) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (?machine_target ?mat))
+  ?tasks_overview <- (tasks_overview (robot_id 2) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
   =>
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
