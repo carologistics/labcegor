@@ -9,10 +9,24 @@
     (slot id (type INTEGER))
     (slot l_task_id (type INTEGER))
 )
-(deftemplate move
+;(deftemplate move
+;    (slot id (type INTEGER))
+;    (slot waypoint (type STRING))
+;    (slot io (type STRING))
+;    (slot task_id (type INTEGER))
+;)
+(deftemplate action
+    (slot id (type INTEGER));robo id
+    (slot a_type (type STRING)) ;(m)ove,(r)etrive,(p)ut
+    (slot machine (type STRING)) ;can be movepoint for move
+    (slot io (type STRING)) ;(i)nput,(o)utput, left, center, right
+    (slot color (type STRING) (default "") ) ;identifier or ""
+    (slot task_id (type INTEGER))
+)
+
+(deftemplate do
     (slot id (type INTEGER))
-    (slot waypoint (type STRING))
-    (slot io (type STRING))
+    (slot task (type INTEGER))
 )
 
 (deffacts hiho
@@ -20,6 +34,17 @@
     (last_task (id 2) (l_task_id 2000))
     (last_task (id 3) (l_task_id 3000))
 )
+
+;(deftemplate nexttasks
+;   (slot id (type INTEGER)) ;robo id
+;   (multislot tasks)
+;)
+
+;(deffacts nexttasts_define
+;    (nexttasks (id 1) (tasks))
+ ;   (nexttasks (id 2) (tasks))
+ ;   (nexttasks (id 3) (tasks))
+;)
 
 
 
@@ -40,17 +65,26 @@
                (order_status (id ?oid) (state ?o_state&:(eq ?o_state RC)))
         )
     )
+    (last_task (id 3) (l_task_id ?last_t))
+    ;?nt <- (nexttasks (id 3) (tasks $?tasks))
 =>   
  (printout red ?id_1 crlf)
  (if (eq ?cap_1 CAP_GREY)
  then
-    (assert (move (id 3) (waypoint "M-CS1") (io "i")))
-    ;erstelle fact to watch shoing completion of task ( evtl mit last task ??)
-    ;when complet retrive, and place
- ;then CS-2
+    (assert (action (a_type "m") (id 3) (machine "M-CS1") (io "i") (task_id (+ ?last_t 1)))) ;action unify
+    (assert (action (a_type "r") (id 3) (machine "M-CS1") (io "left") (task_id (+ ?last_t 2)))) ;action unify
+    (assert (action (a_type "p") (id 3) (machine "M-CS1") (io "i") (task_id (+ ?last_t 3))))
+    (assert (action (a_type "m") (id 3) (machine "M-CS1") (io "o") (task_id (+ ?last_t 4))))
+    ; istruct capstatoin
+    ; wait capstaion
+    ; retrive base
+    ;move to ring station
+
+    ;(modify ?nt (tasks ?tasks (move (id 3) (waypoint "M-CS1") (io "i") (task_id (+ ?last_t 1)))))
+    ;erstelle fact to watch showing completion of task ( evtl mit last task ??)
+    ;when complete retrive, and place
  else
-    (assert (move (id 3) (waypoint "M-CS2") (io "i")))
- ;then CS-1
+    (assert (action (a_type "m") (id 3) (machine "M-CS2") (io "i") (task_id (+ ?last_t 1)))) ;action unify
 )
 ;sum costs for rings
 ;robo 1 to base station
@@ -62,6 +96,18 @@
 
 )
 
+(defrule nexttask
+    (not (robo_busy (id ?id)))
+    (not (do (id ?id) (task ?t-id)))
+    (action (id ?id) (task_id ?t-id))
+    (not  (action (id ?id)(task_id ?t-id2&:(< ?t-id2 ?t-id))))
+    ;action mit kleinster t-id
+    =>
+    (assert (do (id ?id) (task ?t-id)))
+)
+
+
+;todo check tasks for finish (s. t4 listen to comunication)
 
 
 (defrule watchmy_stuff
@@ -72,16 +118,19 @@
 
 
 (defrule robo_move
-  (move (id ?id) (waypoint ?wp) (io ?io))
+  (action (a_type "m") (id ?id) (machine ?wp) (io ?io) (task_id ?t-id))
   (protobuf-peer (name ?name) (peer-id ?peer-id))
   (test (eq ?name (sym-cat (str-cat "ROBOT" ?id))))
-  (last_task (id ?id) (l_task_id ?last_t))
-  (not (robo_busy (id ?id)))
+  ?lt <-(last_task (id ?id) (l_task_id ?last_t))
+  ;(not (robo_busy (id ?id)))
+  ?do <- (do (id ?id) (task ?t-id))
   =>
+  (assert (robo_busy (id ?id)))
+  (retract ?do)
   (bind ?msg (pb-create "llsf_msgs.AgentTask"))
   (pb-set-field ?msg "team_color" MAGENTA)
-  (pb-set-field ?msg "task_id" (+ ?last_t 1))
-  ;TODO UPdate fact (maybe in check funktion)
+  (pb-set-field ?msg "task_id" ?t-id)
+  (modify ?lt (l_task_id ?t-id)); UPdate fact (maybe in check funktion)
   (pb-set-field ?msg "robot_id" ?id)
   (bind ?move-msg (pb-create "llsf_msgs.Move")) 
   (pb-set-field ?move-msg "waypoint" ?wp)
@@ -97,5 +146,5 @@
   (pb-set-field ?msg "move" ?move-msg)
   (pb-broadcast ?peer-id ?msg)
   (pb-destroy ?msg)
-  (assert (robo_busy (id ?id)))
 )
+
