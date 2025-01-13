@@ -99,14 +99,32 @@
 (defrule nexttask
     (not (robo_busy (id ?id)))
     (not (do (id ?id) (task ?t-id)))
-    (action (id ?id) (task_id ?t-id))
+    ?a <- (action (id ?id) (task_id ?t-id))
     (not  (action (id ?id)(task_id ?t-id2&:(< ?t-id2 ?t-id))))
     ;action mit kleinster t-id
     =>
     (assert (do (id ?id) (task ?t-id)))
+    ;(retract ?a)
 )
 
-
+(defrule waitforfinish
+    ?a <- (do (id ?id) (task ?t-id))
+    ?b <- (robo_busy (id ?id))
+    (protobuf-msg (type "llsf_msgs.AgentTask") (msg-type ?msg-type)
+    (client-type PEER) (ptr ?msg))
+=>
+    (bind ?robo_id (pb-field-value ?msg "robot_id"))
+    (bind ?task_id (pb-field-value ?msg "task_id"))
+    (bind ?success (pb-field-value ?msg "successful"))
+    (if (and (eq ?robo_id ?id) (eq ?task_id ?t-id) (eq ?success TRUE))
+    then
+        (retract ?d)
+        (retract ?b)
+        (printout green "TASK DONE"  crlf)
+    else
+        ()
+    )
+)
 ;todo check tasks for finish (s. t4 listen to comunication)
 
 
@@ -118,7 +136,7 @@
 
 
 (defrule robo_move
-  (action (a_type "m") (id ?id) (machine ?wp) (io ?io) (task_id ?t-id))
+  ?a <- (action (a_type "m") (id ?id) (machine ?wp) (io ?io) (task_id ?t-id))
   (protobuf-peer (name ?name) (peer-id ?peer-id))
   (test (eq ?name (sym-cat (str-cat "ROBOT" ?id))))
   ?lt <-(last_task (id ?id) (l_task_id ?last_t))
@@ -126,7 +144,8 @@
   ?do <- (do (id ?id) (task ?t-id))
   =>
   (assert (robo_busy (id ?id)))
-  (retract ?do)
+  ;(retract ?do)
+  (retract ?a)
   (bind ?msg (pb-create "llsf_msgs.AgentTask"))
   (pb-set-field ?msg "team_color" MAGENTA)
   (pb-set-field ?msg "task_id" ?t-id)
