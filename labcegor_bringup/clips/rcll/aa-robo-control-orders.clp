@@ -5,6 +5,9 @@
 (deftemplate robo_busy
     (slot id (type INTEGER))
 )
+(deftemplate machine_busy
+    (slot id (type STRING))
+)
 (deftemplate last_task
     (slot id (type INTEGER))
     (slot l_task_id (type INTEGER))
@@ -22,18 +25,41 @@
     (slot io (type STRING)) ;(i)nput,(o)utput, left, center, right
     (slot color (type STRING) (default "") ) ;identifier or ""
     (slot task_id (type INTEGER))
+    (slot wait (type INTEGER) (default 0))
 )
-
+(deftemplate instruct
+    ;(slot a_type (type STRING)) ;(m)ove,(r)etrive,(p)ut
+    (slot machine (type STRING)) ;can be movepoint for move
+    (slot operation (type STRING)) ;(i)nput,(o)utput, left, center, right
+    (slot color (type STRING) (default "") ) ;identifier or ""
+    (slot task_id (type INTEGER))
+    (slot wait (type INTEGER) (default 0))
+)
 (deftemplate do
     (slot id (type INTEGER))
     (slot task (type INTEGER))
 )
+(deftemplate done
+    (slot done_t_id (type INTEGER))
+)
+(deftemplate paymnents
+    (slot station (type INTEGER))
+    (slot total_in (type INTEGER))
+    (slot total_need (type INTEGER))
+    (slot total_blocked (type INTEGER))
+    (slot current_in (type INTEGER))
 
+)
 (deffacts hiho
     (last_task (id 1) (l_task_id 1000))
     (last_task (id 2) (l_task_id 2000))
     (last_task (id 3) (l_task_id 3000))
+    (last_task (id 4) (l_task_id 4000)) ; any maschine
 )
+(deffacts done_zero
+(done (done_t_id 0))
+)
+
 
 ;(deftemplate nexttasks
 ;   (slot id (type INTEGER)) ;robo id
@@ -65,36 +91,43 @@
                (order_status (id ?oid) (state ?o_state&:(eq ?o_state RC)))
         )
     )
-    (last_task (id 3) (l_task_id ?last_t))
+    (last_task (id 3) (l_task_id ?last_1t))
+    (last_task (id 3) (l_task_id ?last_2t))
+    (last_task (id 3) (l_task_id ?last_3t))
+    (last_task (id 4) (l_task_id ?last_mt))
     ;?nt <- (nexttasks (id 3) (tasks $?tasks))
     (not (order_inprocess))
 =>   
  (printout red ?id_1 crlf)
  (if (eq ?cap_1 CAP_GREY)
  then
-    (assert (action (a_type "m") (id 3) (machine "M-CS1") (io "i") (task_id (+ ?last_t 1)))) ;action unify
-    (assert (action (a_type "r") (id 3) (machine "M-CS1") (io "left") (task_id (+ ?last_t 2)))) ;action unify
-    (assert (action (a_type "d") (id 3) (machine "M-CS1") (io "i") (task_id (+ ?last_t 3))))
-    (assert (action (a_type "m") (id 3) (machine "M-CS1") (io "o") (task_id (+ ?last_t 4))))
+    (assert (action (id 3) (a_type "m") (machine "M-CS1") (io "input") (task_id (+ ?last_3t 1)))) ;action unify
+    (assert (action (id 3) (a_type "r") (machine "M-CS1") (io "left") (task_id (+ ?last_3t 2)))) ;action unify
+    (assert (action (id 3) (a_type "d") (machine "M-CS1") (io "input") (task_id (+ ?last_3t 3))))
+    (assert (instruct (machine "M-CS1") (operation "RETRIEVE_CAP") (task_id (+ ?last_mt 1)) (wait (+ ?last_3t 3))))
+    (assert (action (id 3) (a_type "m") (machine "M-CS1") (io "output") (task_id (+ ?last_3t 4))))
+    (assert (action (id 3) (a_type "r") (machine "M-CS1") (io "output") (task_id (+ ?last_3t 5)) (wait (+ ?last_mt 1 ))))
     (assert (order_inprocess))
-    ; istruct capstatoin
-    ; wait capstaion
-    ; retrive base
-    ;move to ring station
 
-    ;(modify ?nt (tasks ?tasks (move (id 3) (waypoint "M-CS1") (io "i") (task_id (+ ?last_t 1)))))
-    ;erstelle fact to watch showing completion of task ( evtl mit last task ??)
-    ;when complete retrive, and place
  else
-    (assert (action (a_type "m") (id 3) (machine "M-CS2") (io "input") (task_id (+ ?last_t 1)))) ;action unify
-    (assert (action (a_type "r") (id 3) (machine "M-CS2") (io "left") (task_id (+ ?last_t 2)))) ;action unify
-    (assert (action (a_type "d") (id 3) (machine "M-CS2") (io "input") (task_id (+ ?last_t 3))))
-    (assert (action (a_type "m") (id 3) (machine "M-CS2") (io "output") (task_id (+ ?last_t 4))))
+    (assert (action (id 3) (a_type "m") (machine "M-CS2") (io "input") (task_id (+ ?last_3t 1)))) ;action unify
+    (assert (action (id 3) (a_type "r") (machine "M-CS2") (io "left") (task_id (+ ?last_3t 2)))) ;action unify
+    (assert (action (id 3) (a_type "d") (machine "M-CS2") (io "input") (task_id (+ ?last_3t 3))))
+    (assert (instruct (machine "M-CS2") (operation "RETRIEVE_CAP") (task_id (+ ?last_mt 1)) (wait (+ ?last_3t 3))))
+    (assert (action (id 3) (a_type "m") (machine "M-CS2") (io "output") (task_id (+ ?last_3t 4))))
+    (assert (action (id 3) (a_type "r") (machine "M-CS2") (io "output") (task_id (+ ?last_3t 5)) (wait (+ ?last_mt 1 ))))
     (assert (order_inprocess))
-)
-;sum costs for rings
-;robo 1 to base station
-;base station instructen on base color
+);;simplify
+    (assert (action (id 1) (a_type "m") (machine "BS") (io "output") (task_id (+ ?last_1t 1))))
+    (assert (instruct (machine "BS") (operation "output") (color ?base_1) (task_id (+ ?last_mt 2)) (wait (+ ?last_1t 1))))
+    (assert (action (id 1) (a_type "r") (machine "BS") (io "output") (task_id (+ ?last_1t 2)) (wait (+ ?last_mt 2 ))))
+    (printout red $?ring-colors_1 crlf)
+
+
+
+;sum costs for rings mit iteration über ring-colors1 je station (blue/yellow, green/orange
+;robo 1 to to in of first ring (if any)
+
 ;robo 2 capcarrier pick up and drop of at base station for first payed ring
 ;robo 3 to out of first ring (and bring cap carrier with you)
 ;robo 1 to out of 2ed ring (and bring one base with you)
@@ -126,6 +159,7 @@
     then
         (retract ?d)
         (retract ?b)
+        (assert (done (done_t_id ?t-id)))
         (printout green "TASK DONE"  crlf)
     else
         (printout green ?robo_id ?task_id ?success  crlf)
@@ -143,7 +177,8 @@
 
 
 (defrule robo_move
-  ?ac <- (action (a_type "m") (id ?id) (machine ?wp) (io ?io) (task_id ?t-id))
+  ?ac <- (action (a_type "m") (id ?id) (machine ?wp) (io ?io) (task_id ?t-id) (wait ?w))
+  (done (done_t_id ?w))
   (protobuf-peer (name ?name) (peer-id ?peer-id))
   (test (eq ?name (sym-cat (str-cat "ROBOT" ?id))))
   ?lt <-(last_task (id ?id) (l_task_id ?last_t))
@@ -167,7 +202,8 @@
 )
 
 (defrule robo_retrive
-  ?ac <- (action (a_type "r") (id ?id) (machine ?wp) (io ?io) (task_id ?t-id))
+  ?ac <- (action (a_type "r") (id ?id) (machine ?wp) (io ?io) (task_id ?t-id)(wait ?w))
+  (done (done_t_id ?w))
   (protobuf-peer (name ?name) (peer-id ?peer-id))
   (test (eq ?name (sym-cat (str-cat "ROBOT" ?id))))
   ?lt <-(last_task (id ?id) (l_task_id ?last_t))
@@ -191,7 +227,8 @@
 
 
 (defrule robo_deliver
-  ?ac <- (action (a_type "d") (id ?id) (machine ?wp) (io ?io) (task_id ?t-id))
+  ?ac <- (action (a_type "d") (id ?id) (machine ?wp) (io ?io) (task_id ?t-id)(wait ?w))
+  (done (done_t_id ?w))
   (protobuf-peer (name ?name) (peer-id ?peer-id))
   (test (eq ?name (sym-cat (str-cat "ROBOT" ?id))))
   ?lt <-(last_task (id ?id) (l_task_id ?last_t))
@@ -212,4 +249,26 @@
   (pb-broadcast ?peer-id ?msg)
   (pb-destroy ?msg)
 )
+
+(defrule cs_retrive
+  (protobuf-peer (name refbox-private) (peer-id ?peer-id))
+  ?inst <- (instruct (machine ?m) (operation ?op) (task_id ?t-id) (wait ?w))
+  (done (done_t_id ?w))
+  (not (machine_busy (id ?m)))
+  ?lt <-(last_task (id 4) (l_task_id ?last_t))
+  =>
+  (assert (machine_busy (id ?m)))
+  (modify ?lt (l_task_id ?t-id))
+  (bind ?msg (pb-create "llsf_msgs.PrepareMachine"))
+  (pb-set-field ?msg "team_color" MAGENTA)
+  (pb-set-field ?msg "machine" ?m)
+  (if (or (eq ?m "M-CS1") (eq ?m "M-CS2"))
+  then
+  (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionCS")) 
+  (pb-set-field ?prep-msg "operation" ?op)
+  (pb-set-field ?msg "instruction_cs" ?prep-msg)
+  )
   
+  (pb-broadcast ?peer-id ?msg)
+  (pb-destroy ?msg)
+)
