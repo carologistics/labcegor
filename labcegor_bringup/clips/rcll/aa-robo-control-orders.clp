@@ -67,14 +67,16 @@
     )
     (last_task (id 3) (l_task_id ?last_t))
     ;?nt <- (nexttasks (id 3) (tasks $?tasks))
+    (not (order_inprocess))
 =>   
  (printout red ?id_1 crlf)
  (if (eq ?cap_1 CAP_GREY)
  then
     (assert (action (a_type "m") (id 3) (machine "M-CS1") (io "i") (task_id (+ ?last_t 1)))) ;action unify
     (assert (action (a_type "r") (id 3) (machine "M-CS1") (io "left") (task_id (+ ?last_t 2)))) ;action unify
-    (assert (action (a_type "p") (id 3) (machine "M-CS1") (io "i") (task_id (+ ?last_t 3))))
+    (assert (action (a_type "d") (id 3) (machine "M-CS1") (io "i") (task_id (+ ?last_t 3))))
     (assert (action (a_type "m") (id 3) (machine "M-CS1") (io "o") (task_id (+ ?last_t 4))))
+    (assert (order_inprocess))
     ; istruct capstatoin
     ; wait capstaion
     ; retrive base
@@ -84,7 +86,11 @@
     ;erstelle fact to watch showing completion of task ( evtl mit last task ??)
     ;when complete retrive, and place
  else
-    (assert (action (a_type "m") (id 3) (machine "M-CS2") (io "i") (task_id (+ ?last_t 1)))) ;action unify
+    (assert (action (a_type "m") (id 3) (machine "M-CS2") (io "input") (task_id (+ ?last_t 1)))) ;action unify
+    (assert (action (a_type "r") (id 3) (machine "M-CS2") (io "left") (task_id (+ ?last_t 2)))) ;action unify
+    (assert (action (a_type "d") (id 3) (machine "M-CS2") (io "input") (task_id (+ ?last_t 3))))
+    (assert (action (a_type "m") (id 3) (machine "M-CS2") (io "output") (task_id (+ ?last_t 4))))
+    (assert (order_inprocess))
 )
 ;sum costs for rings
 ;robo 1 to base station
@@ -108,7 +114,7 @@
 )
 
 (defrule waitforfinish
-    ?a <- (do (id ?id) (task ?t-id))
+    ?d <- (do (id ?id) (task ?t-id))
     ?b <- (robo_busy (id ?id))
     (protobuf-msg (type "llsf_msgs.AgentTask") (msg-type ?msg-type)
     (client-type PEER) (ptr ?msg))
@@ -122,7 +128,8 @@
         (retract ?b)
         (printout green "TASK DONE"  crlf)
     else
-        ()
+        (printout green ?robo_id ?task_id ?success  crlf)
+        (printout green ?id ?t-id  crlf)
     )
 )
 ;todo check tasks for finish (s. t4 listen to comunication)
@@ -136,7 +143,7 @@
 
 
 (defrule robo_move
-  ?a <- (action (a_type "m") (id ?id) (machine ?wp) (io ?io) (task_id ?t-id))
+  ?ac <- (action (a_type "m") (id ?id) (machine ?wp) (io ?io) (task_id ?t-id))
   (protobuf-peer (name ?name) (peer-id ?peer-id))
   (test (eq ?name (sym-cat (str-cat "ROBOT" ?id))))
   ?lt <-(last_task (id ?id) (l_task_id ?last_t))
@@ -145,7 +152,7 @@
   =>
   (assert (robo_busy (id ?id)))
   ;(retract ?do)
-  (retract ?a)
+  (retract ?ac)
   (bind ?msg (pb-create "llsf_msgs.AgentTask"))
   (pb-set-field ?msg "team_color" MAGENTA)
   (pb-set-field ?msg "task_id" ?t-id)
@@ -153,17 +160,56 @@
   (pb-set-field ?msg "robot_id" ?id)
   (bind ?move-msg (pb-create "llsf_msgs.Move")) 
   (pb-set-field ?move-msg "waypoint" ?wp)
-  (if (eq ?io i)
-  then
-    (pb-set-field ?move-msg "machine_point" "input")
-  else
-      (if (eq ?io o)
-        then
-            (pb-set-field ?move-msg "machine_point" "output")
-      )
-  )
+  (pb-set-field ?move-msg "machine_point" ?io)
   (pb-set-field ?msg "move" ?move-msg)
   (pb-broadcast ?peer-id ?msg)
   (pb-destroy ?msg)
 )
 
+(defrule robo_retrive
+  ?ac <- (action (a_type "r") (id ?id) (machine ?wp) (io ?io) (task_id ?t-id))
+  (protobuf-peer (name ?name) (peer-id ?peer-id))
+  (test (eq ?name (sym-cat (str-cat "ROBOT" ?id))))
+  ?lt <-(last_task (id ?id) (l_task_id ?last_t))
+  ;(not (robo_busy (id ?id)))
+  ?do <- (do (id ?id) (task ?t-id))
+  =>
+  (retract ?ac)
+  (assert (robo_busy (id ?id)))
+  (bind ?msg (pb-create "llsf_msgs.AgentTask"))
+  (pb-set-field ?msg "team_color" MAGENTA)
+  (pb-set-field ?msg "task_id" ?t-id)
+  (modify ?lt (l_task_id ?t-id)); UPdate fact (maybe in check funktion)
+  (pb-set-field ?msg "robot_id" ?id)
+  (bind ?retrieve-msg (pb-create "llsf_msgs.Retrieve")) 
+  (pb-set-field ?retrieve-msg "machine_id" ?wp)
+  (pb-set-field ?retrieve-msg "machine_point" ?io)
+  (pb-set-field ?msg "retrieve" ?retrieve-msg)
+  (pb-broadcast ?peer-id ?msg)
+  (pb-destroy ?msg)
+)
+
+
+(defrule robo_deliver
+  ?ac <- (action (a_type "d") (id ?id) (machine ?wp) (io ?io) (task_id ?t-id))
+  (protobuf-peer (name ?name) (peer-id ?peer-id))
+  (test (eq ?name (sym-cat (str-cat "ROBOT" ?id))))
+  ?lt <-(last_task (id ?id) (l_task_id ?last_t))
+  ;(not (robo_busy (id ?id)))
+  ?do <- (do (id ?id) (task ?t-id))
+  =>
+  (retract ?ac)
+  (assert (robo_busy (id ?id)))
+  (bind ?msg (pb-create "llsf_msgs.AgentTask"))
+  (pb-set-field ?msg "team_color" MAGENTA)
+  (pb-set-field ?msg "task_id" ?t-id)
+  (modify ?lt (l_task_id ?t-id)); UPdate fact (maybe in check funktion)
+  (pb-set-field ?msg "robot_id" ?id)
+  (bind ?deliver-msg (pb-create "llsf_msgs.Deliver")) 
+  (pb-set-field ?deliver-msg "machine_id" ?wp)
+  (pb-set-field ?deliver-msg"machine_point" ?io)
+  (pb-set-field ?msg "deliver" ?deliver-msg)
+  (pb-broadcast ?peer-id ?msg)
+  (pb-destroy ?msg)
+)
+  
