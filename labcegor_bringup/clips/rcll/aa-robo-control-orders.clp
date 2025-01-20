@@ -42,7 +42,7 @@
 (deftemplate done
     (slot done_t_id (type INTEGER))
 )
-(deftemplate paymnents
+(deftemplate payments
     (slot station (type INTEGER))
     (slot total_in (type INTEGER))
     (slot total_need (type INTEGER))
@@ -50,11 +50,17 @@
     (slot current_in (type INTEGER))
 
 )
+(deftemplate update_ringstations_payment
+    (multislot rings (type STRING))
+)
 (deffacts hiho
     (last_task (id 1) (l_task_id 1000))
     (last_task (id 2) (l_task_id 2000))
     (last_task (id 3) (l_task_id 3000))
     (last_task (id 4) (l_task_id 4000)) ; any maschine
+    (payments (station 1) (total_in 0) (total_need 0) (total_blocked 0) (current_in 0))
+    (payments (station 2) (total_in 0) (total_need 0) (total_blocked 0) (current_in 0))
+    
 )
 (deffacts done_zero
 (done (done_t_id 0))
@@ -85,7 +91,7 @@
 )
 
 (defrule select_next_order
-    (order (id ?id_1) (complexity ?complexity_1) (base-color ?base_1) (ring-colors $?ring-colors_1) (cap-color ?cap_1) (quantity-delivered ?qd-us_1))
+    (order (id ?id_1) (complexity ?complexity_1) (base-color ?base_1) (ring-colors $?ring_colors_1) (cap-color ?cap_1) (quantity-delivered ?qd-us_1))
     (order_status (id ?id_1) (state RC))
     (not (and  (order (id ?oid&:(< ?oid ?id_1)))
                (order_status (id ?oid) (state ?o_state&:(eq ?o_state RC)))
@@ -99,6 +105,8 @@
     (not (order_inprocess))
 =>   
  (printout red ?id_1 crlf)
+ (assert (update_ringstations_payment (rings $?ring_colors_1)))
+ (assert rings_update);; delibertly without nuber for now
  (if (eq ?cap_1 CAP_GREY)
  then
     (assert (action (id 3) (a_type "m") (machine "M-CS1") (io "input") (task_id (+ ?last_3t 1)))) ;action unify
@@ -121,19 +129,83 @@
     (assert (action (id 1) (a_type "m") (machine "BS") (io "output") (task_id (+ ?last_1t 1))))
     (assert (instruct (machine "BS") (operation "output") (color ?base_1) (task_id (+ ?last_mt 2)) (wait (+ ?last_1t 1))))
     (assert (action (id 1) (a_type "r") (machine "BS") (io "output") (task_id (+ ?last_1t 2)) (wait (+ ?last_mt 2 ))))
-    (printout red $?ring-colors_1 crlf)
+    (printout red $?ring_colors_1 crlf)
+    
+
+    (assert pay_rings_rs1 (wait_for 4000))
+    (assert next_ring)
 
 
 
-;sum costs for rings mit iteration über ring-colors1 je station (blue/yellow, green/orange
+
+;sum costs for rings mit iteration über ring-colors1 je station (blue/yellow, green/orange)
 ;robo 1 to to in of first ring (if any)
 
 ;robo 2 capcarrier pick up and drop of at base station for first payed ring
 ;robo 3 to out of first ring (and bring cap carrier with you)
 ;robo 1 to out of 2ed ring (and bring one base with you)
-;robo 2 to paymnents
+;robo 2 to payments
+)
+
+(defrule pay_for_rings_rs1
+(pay_rings_rs1 (wait_for ?t_id) )
+(done (task_id ?t_id))
+(last_task (id 1)(last_task ?last_1t))
+(last_task (id 4) (last_task ?last_mt))
+?pay <- (payments (station 1) (total_in ?t_in) (total_need ?t_need) (total_blocked ?t_b) (current_in ?c_in) )
+=>
+    (if (and(> (- ?t_need ?t_in) =) (<= ?c_in 3))
+    then
+    (if (eq ?last_1t 1002) 
+        (assert (action (id 1) (a_type "m") (machine "M-RS1") (io "input") (task_id (+ ?last_1t 1))))
+        (assert (action (id 1) (a_type "d") (machine "M-RS1") (io "slide") (task_id (+ ?last_1t 2))))
+        (done (task_id (+ ?t_id 1)))
+        (assert (pay_rings_rs1 (wait_for (+ ?last_mt 1))))
+    )
+
+   (assert (pay_rings_rs2))
+)
+)
+(defrule pay_for_rings_rs2
+(done (task_id 4000))
+(payments (station 1) (total_need ?tn1))
+=>
 
 )
+
+
+(defrule ringstation_new_payments_need
+?update <- (update_ringstations_payment (rings ?ring1 $?rest_rings))
+?p1 <- (payments (station 1) (total_need ?tn1))
+?p2 <- (payments (station 2) (total_need ?tn2))
+(ring-spec (color RING_BLUE) (cost ?cost_b))
+(ring-spec (color RING_YELLOW) (cost ?cost_y))
+(ring-spec (color RING_GREEN) (cost ?cost_g))
+(ring-spec (color RING_ORANGE) (cost ?cost_o))
+(rings_update)
+
+=>
+(if (eq ?ring1 "")
+then
+    (printout green "no more payment update" crlf)
+    (assert (done (done_t_id 4000)))
+
+else
+    (switch ?ring1
+    (case RING_YELLOW then (modify ?p2 (total_need (+ ?tn2 ?cost_y))))
+    (case RING_BLUE then (modify ?p2 (total_need (+ ?tn2 ?cost_b))))
+    (case RING_ORANGE then (modify ?p1 (total_need (+ ?tn1 ?cost_o))))
+    (case RING_GREEN then (modify ?p1 (total_need (+ ?tn1 ?cost_g)))) 
+    (default (printout red "no more payment update - LOOP" crlf))
+    )
+    (printout red "payments updated - LOOP" crlf)
+    (printout green ?tn1 crlf)
+    (printout green ?tn2 crlf)
+    (modify ?update (rings $?rest_rings))
+    (assert (done (done_t_id 4000)))
+)
+)
+
 
 (defrule nexttask
     (not (robo_busy (id ?id)))
