@@ -108,6 +108,20 @@
   (pb-destroy ?msg)
 )
 
+; Prepare Machine
+(deffunction prepare_basestation (?m_id ?side ?color ?peer-id)
+  (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionBS")) 
+  (pb-set-field ?prep-msg "MachineSide" ?side)
+  (pb-set-field ?prep-msg "BaseColor" ?color)
+
+  (bind ?msg (pb-create "llsf_msgs.PrepareMachine"))
+  (pb-set-field ?msg "team_color" MAGENTA)
+  (pb-set-field ?msg "machine" ?m_id)
+  (pb-set-field ?msg "instruction_cs" ?prep-msg)
+  (pb-broadcast ?peer-id ?msg)
+  (pb-destroy ?msg)
+)
+
 
 
 ; ==================================================================================
@@ -197,26 +211,27 @@
   (not (robot3_move_to_pickup))
   =>
   (if (and (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE)) then
+    ;Prepare Basestation PrepareMachine
+    (prepare_basestation ?mot 1 2 ?peer-id)
     (send_move_to_cmd 3 ?mot ?mat ?peer-id ?tid)
     (printout blue "part 1/3" crlf)
     (assert (robot3_move_to_pickup))
   )
 )
 
-; (defrule prepare_machine
-;   (protobuf-peer (name refbox-private) (peer-id ?peer-id))
-;   (tasks_overview (robot_id 3) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
-;   (not (proces_cap_one_CS1))
-;   =>
-;   (printout red "prepare_machine robot_one task_id " ?tid_one " " ?cm_one " " ?cr_one " test: " (< ?tid_one 1) " " (> ?tid_one 1) crlf)
-;   (printout green (and (eq ?tid_one 3) (eq ?cm_one FALSE) (eq ?cr_one FALSE)) crlf)
-;   (if (and (eq ?tid_one 3) (eq ?cm_one FALSE) (eq ?cr_one FALSE)) then
-;     (send_cmd_to_machine ?mot "RETRIEVE_CAP" ?peer-id)
-;     (assert (proces_cap_one_CS1))
-;     (printout blue "the machine should do something " crlf)
-;     (printout red "part 2/2" crlf)
-;   ) 
-; )
+(defrule prepare_machine
+  (protobuf-peer (name refbox-private) (peer-id ?peer-id))
+  (tasks_overview (robot_id 3) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
+  (not (proces_cap_one_CS1))
+  =>
+  (printout red "prepare_machine for robot_three task_id " crlf)
+  (if (and (robot3_move_to_pickup) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE)) then
+    (send_cmd_to_machine ?mot "RETRIEVE_CAP" ?peer-id)
+    (assert (proces_cap_one_CS1))
+    (printout blue "the machine should do something " crlf)
+    (printout red "part 2/2" crlf)
+  ) 
+)
 
 (defrule robot-three-pickup-base
   (protobuf-peer (name ?n) (peer-id ?peer-id))
