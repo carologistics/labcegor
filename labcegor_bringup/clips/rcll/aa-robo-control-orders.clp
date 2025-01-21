@@ -265,7 +265,7 @@
         (assert (action (id 1) (a_type "m") (machine "M-RS2") (io "input") (task_id (+ ?last_1t 1))))
         (assert (action (id 1) (a_type "d") (machine "M-RS2") (io "input") (task_id (+ ?last_1t 2) (wait (+ ?last_1t 1)))))
         (assert (instruct (machine "M-RS2") (operation "XYZ") (task_id (+ ?last_mt 1)) (wait (+ ?last_1t 2))))
-        (assert (action (id 1) (a_type "m") (machine "M-RS2") (io "output") (task_id (+ ?last_1t 3)(wait (+ ?last_mt 2)))))
+        (assert (action (id 1) (a_type "m") (machine "M-RS2") (io "output") (task_id (+ ?last_1t 3)(wait (+ ?last_mt 1)))))
         (assert (action (id 1) (a_type "r") (machine "M-RS2") (io "output") (task_id (+ ?last_1t 4)(wait (+ ?last_1t 3)))))
         (assert (rings_todo $?rings_rest))
     )
@@ -273,15 +273,20 @@
         (assert (action (id 1) (a_type "m") (machine "M-RS1") (io "input") (task_id (+ ?last_1t 1))))
         (assert (action (id 1) (a_type "d") (machine "M-RS1") (io "input") (task_id (+ ?last_1t 2) (wait (+ ?last_1t 1)))))
         (assert (instruct (machine "M-RS1") (operation "XYZ") (task_id (+ ?last_mt 1)) (wait (+ ?last_1t 2))))
-        (assert (action (id 1) (a_type "m") (machine "M-RS1") (io "output") (task_id (+ ?last_1t 3)(wait (+ ?last_mt 2)))))
+        (assert (action (id 1) (a_type "m") (machine "M-RS1") (io "output") (task_id (+ ?last_1t 3)(wait (+ ?last_mt 1)))))
         (assert (action (id 1) (a_type "r") (machine "M-RS1") (io "output") (task_id (+ ?last_1t 4)(wait (+ ?last_1t 3)))))
     )
     (default 
-        ;to cap station
+        (assert (action (id 1) (a_type "m") (machine "M-CS") (io "input") (task_id (+ ?last_1t 1))))
+        (assert (action (id 1) (a_type "d") (machine "M-CS") (io "input") (task_id (+ ?last_1t 2) (wait (+ ?last_1t 1)))))
+        (assert (instruct (machine "M-CS") (operation "XYZ") (task_id (+ ?last_mt 1)) (wait (+ ?last_1t 2))))
+        (assert (action (id 1) (a_type "m") (machine "M-CS") (io "output") (task_id (+ ?last_1t 3)(wait (+ ?last_mt 1)))))
+        (assert (action (id 1) (a_type "r") (machine "M-CS") (io "output") (task_id (+ ?last_1t 4) (wait (+ ?last_1t 3)))))
+        (assert (action (id 1) (a_type "m") (machine "M-DS") (io "input") (task_id (+ ?last_1t 5) (wait (+ ?last_1t 4)))))
+        (assert (action (id 1) (a_type "d") (machine "M-DS") (io "input") (task_id (+ ?last_1t 6) (wait (+ ?last_1t 5)))))
+        (assert (instruct (machine "M-DS") (operation "XYZ") (task_id (+ ?last_mt 2)) (wait (+ ?last_1t 6))))
     )
     )
-    
-
 )
 
 (defrule ringstation_new_payments_need
