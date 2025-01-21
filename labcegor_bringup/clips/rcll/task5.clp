@@ -293,7 +293,7 @@
 ; ==========
 ; ROBOT 3
 ; ==========
-(defrule check-robot_two_first_task
+(defrule check-robot_three
   (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id 3) (ptr ?msg))
   ?tasks_overview <- (tasks_overview (robot_id 3) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
   =>
@@ -306,23 +306,23 @@
     (modify ?tasks_overview (can_move FALSE))
     (modify ?tasks_overview (can_retrieve TRUE))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
-    (printout green "robot two finished his task " ?task_id crlf)
+    (printout green "robot three finished his task " ?task_id crlf)
   )
 
   ; did task 3 for robot 1 finish? 
   (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cr FALSE)) then 
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_deliver TRUE))
-    (printout green "robot two did something " ?task_id crlf)
+    (printout green "robot three did something " ?task_id crlf)
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (printout green ?task_id ?tid crlf)
   )
-  
+
   ; did task 3 for robot 1 finish? 
   (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cr TRUE)) then 
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_move TRUE))
-    (printout green "robot two did something " ?task_id crlf)
+    (printout green "robot three did something " ?task_id crlf)
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (printout green ?task_id ?tid crlf)
   )
