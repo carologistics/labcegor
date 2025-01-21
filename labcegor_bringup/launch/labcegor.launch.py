@@ -44,7 +44,7 @@ def generate_launch_description():
     )
     declare_manager_config = DeclareLaunchArgument(
         "manager_config",
-        default_value="rcll.yaml",
+        default_value="rcll-pddl.yaml",
         description="Name of the CLIPS environment manager configuration",
     )
 
