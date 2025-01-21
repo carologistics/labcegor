@@ -203,6 +203,21 @@
   )
 )
 
+; (defrule prepare_machine
+;   (protobuf-peer (name refbox-private) (peer-id ?peer-id))
+;   (tasks_overview (robot_id 3) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
+;   (not (proces_cap_one_CS1))
+;   =>
+;   (printout red "prepare_machine robot_one task_id " ?tid_one " " ?cm_one " " ?cr_one " test: " (< ?tid_one 1) " " (> ?tid_one 1) crlf)
+;   (printout green (and (eq ?tid_one 3) (eq ?cm_one FALSE) (eq ?cr_one FALSE)) crlf)
+;   (if (and (eq ?tid_one 3) (eq ?cm_one FALSE) (eq ?cr_one FALSE)) then
+;     (send_cmd_to_machine ?mot "RETRIEVE_CAP" ?peer-id)
+;     (assert (proces_cap_one_CS1))
+;     (printout blue "the machine should do something " crlf)
+;     (printout red "part 2/2" crlf)
+;   ) 
+; )
+
 (defrule robot-three-pickup-base
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   (tasks_overview (robot_id 3) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
@@ -226,7 +241,7 @@
   =>
   (if (and (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE)) then
     (send_deliver_to_cmd 3 ?mot ?mat ?peer-id ?tid)
-    (printout blue "part 2/3" crlf)
+    (printout blue "part 3/3" crlf)
     (assert (robot3_delivered_base))
   )
 )
@@ -305,6 +320,8 @@
   (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cr FALSE)) then 
     (modify ?tasks_overview (can_move FALSE))
     (modify ?tasks_overview (can_retrieve TRUE))
+    (modify ?tasks_overview (move_target TRUE))
+    (modify ?tasks_overview (move_target "M-DS"))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (printout green "robot three finished his task " ?task_id crlf)
   )
@@ -322,6 +339,7 @@
   (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cr TRUE)) then 
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_move TRUE))
+    (modify ?tasks_overview (move_target "M-BS"))
     (printout green "robot three did something " ?task_id crlf)
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (printout green ?task_id ?tid crlf)
