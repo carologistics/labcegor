@@ -53,6 +53,12 @@
 (deftemplate update_ringstations_payment
     (multislot rings (type STRING))
 )
+(deftemplate pay_rings_rs1
+    (slot wait_for (type INTEGER))
+)
+(deftemplate pay_rings_rs2
+    (slot wait_for (type INTEGER))
+)
 (deffacts hiho
     (last_task (id 1) (l_task_id 1000))
     (last_task (id 2) (l_task_id 2000))
@@ -106,7 +112,7 @@
 =>   
  (printout red ?id_1 crlf)
  (assert (update_ringstations_payment (rings $?ring_colors_1)))
- (assert rings_update);; delibertly without nuber for now
+ (assert (rings_update));; delibertly without nuber for now
  (if (eq ?cap_1 CAP_GREY)
  then
     (assert (action (id 3) (a_type "m") (machine "M-CS1") (io "input") (task_id (+ ?last_3t 1)))) ;action unify
@@ -132,8 +138,9 @@
     (printout red $?ring_colors_1 crlf)
     
 
-    (assert pay_rings_rs1 (wait_for 4000))
-    (assert next_ring)
+    (assert (pay_rings_rs1 (wait_for (+ ?last_mt 2))))
+    ;(assert pay_rings_rs1 (wait_for 4990))
+    ;(assert next_ring)
 
 
 
@@ -148,30 +155,99 @@
 )
 
 (defrule pay_for_rings_rs1
-(pay_rings_rs1 (wait_for ?t_id) )
-(done (task_id ?t_id))
-(last_task (id 1)(last_task ?last_1t))
-(last_task (id 4) (last_task ?last_mt))
+?init_f <- (pay_rings_rs1 (wait_for ?t_id))
+(done (done_t_id ?t_id))
+(last_task (id 1)(l_task_id ?last_1t))
+(last_task (id 2) (l_task_id ?last_2t))
+(last_task (id 3)(l_task_id ?last_3t))
+(last_task (id 4) (l_task_id ?last_mt))
 ?pay <- (payments (station 1) (total_in ?t_in) (total_need ?t_need) (total_blocked ?t_b) (current_in ?c_in) )
 =>
-    (if (and(> (- ?t_need ?t_in) =) (<= ?c_in 3))
+    (if (and(> (- ?t_need ?t_in) 0) (<= ?c_in 3))
     then
-    (if (eq ?last_1t 1002) 
-        (assert (action (id 1) (a_type "m") (machine "M-RS1") (io "input") (task_id (+ ?last_1t 1))))
-        (assert (action (id 1) (a_type "d") (machine "M-RS1") (io "slide") (task_id (+ ?last_1t 2))))
-        (done (task_id (+ ?t_id 1)))
-        (assert (pay_rings_rs1 (wait_for (+ ?last_mt 1))))
+        (if (eq ?last_1t 1002) 
+        then    
+            (assert (action (id 3) (a_type "m") (machine "M-RS1") (io "input") (task_id (+ ?last_3t 1))))
+            (assert (action (id 3) (a_type "d") (machine "M-RS1") (io "slide") (task_id (+ ?last_3t 2)))) ;;TODO in deliver add update of Payed
+            ;(assert (done (task_id (+ ?t_id 1))))
+            (retract ?init_f)
+            (assert (pay_rings_rs1 (wait_for (+ ?last_mt 1))))
+        else
+            (if (and(> (- ?t_need ?t_in) 0) (<= ?c_in 3))
+            then
+                (if (= (- ?t_need ?t_in) 2)
+                then             
+                    (assert (action (id 2) (a_type "m") (machine "BS") (io "output") (task_id (+ ?last_2t 1))))
+                    (assert (instruct (machine "BS") (operation "output") (color "BLACK") (task_id (+ ?last_mt 2)) (wait (+ ?last_2t 1))))
+                    (assert (action (id 2) (a_type "r") (machine "BS") (io "output") (task_id (+ ?last_2t 2)) (wait (+ ?last_mt 2 ))))
+                    (assert (action (id 2) (a_type "m") (machine "M-RS1") (io "input") (task_id (+ ?last_2t 3))(wait (+ ?last_2t 2))))
+                    (assert (action (id 2) (a_type "d") (machine "M-RS1") (io "slide") (task_id (+ ?last_2t 4)) (wait (+ ?last_2t 3))))
+                else ;noop
+                )
+            else
+                ;robo3 do 2ed payment
+                (assert (action (id 3) (a_type "m") (machine "BS") (io "output") (task_id (+ ?last_3t 1))))
+                (assert (instruct (machine "BS") (operation "output") (color "BLACK") (task_id (+ ?last_mt 3)) (wait (+ ?last_3t 1))))
+                (assert (action (id 3) (a_type "r") (machine "BS") (io "output") (task_id (+ ?last_3t 2)) (wait (+ ?last_mt 3 ))))
+                (assert (action (id 3) (a_type "m") (machine "M-RS1") (io "input") (task_id (+ ?last_3t 3))(wait (+ ?last_3t 2))))
+                (assert (action (id 3) (a_type "d") (machine "M-RS1") (io "slide") (task_id (+ ?last_3t 4)) (wait (+ ?last_3t 3))))
+                (assert (pay_rings_rs2 (wait_for  (+ ?last_3t 3)))
+            )
+            )
+    
+        )
+    else
+        (assert (pay_rings_rs2 (wait_for (+ ?last_3t 2))))
+    )
+   
+)
+
+(defrule pay_for_rings_rs2
+?init_f <- (pay_rings_rs2 (wait_for ?t_id))
+(done (done_t_id ?t_id))
+(last_task (id 1)(l_task_id ?last_1t))
+(last_task (id 2) (l_task_id ?last_2t))
+(last_task (id 3)(l_task_id ?last_3t))
+(last_task (id 4) (l_task_id ?last_mt))
+?pay <- (payments (station 2) (total_in ?t_in) (total_need ?t_need) (total_blocked ?t_b) (current_in ?c_in) )
+=>
+    (if (and(> (- ?t_need ?t_in) 0) (<= ?c_in 3))
+    then
+        (if (eq ?last_1t 1002) 
+        then    
+            (assert (action (id 3) (a_type "m") (machine "M-RS2") (io "input") (task_id (+ ?last_3t 1))))
+            (assert (action (id 3) (a_type "d") (machine "M-RS2") (io "slide") (task_id (+ ?last_3t 2)))) ;;TODO in deliver add update of Payed
+            ;(assert (done (task_id (+ ?t_id 1))))
+            (retract ?init_f)
+            (assert (pay_rings_rs2 (wait_for (+ ?last_mt 1))))
+        else
+            (if (and(> (- ?t_need ?t_in) 0) (<= ?c_in 3))
+            then
+                (if (= (- ?t_need ?t_in) 2)
+                then             
+                    (assert (action (id 2) (a_type "m") (machine "BS") (io "output") (task_id (+ ?last_2t 1))))
+                    (assert (instruct (machine "BS") (operation "output") (color "BLACK") (task_id (+ ?last_mt 2)) (wait (+ ?last_2t 1))))
+                    (assert (action (id 2) (a_type "r") (machine "BS") (io "output") (task_id (+ ?last_2t 2)) (wait (+ ?last_mt 2 ))))
+                    (assert (action (id 2) (a_type "m") (machine "M-RS2") (io "input") (task_id (+ ?last_2t 3))(wait (+ ?last_2t 2))))
+                    (assert (action (id 2) (a_type "d") (machine "M-RS2") (io "slide") (task_id (+ ?last_2t 4)) (wait (+ ?last_2t 3))))
+                else ;noop
+                )
+            else
+                ;robo3 do 2ed payment
+                (assert (action (id 3) (a_type "m") (machine "BS") (io "output") (task_id (+ ?last_3t 1))))
+                (assert (instruct (machine "BS") (operation "output") (color "BLACK") (task_id (+ ?last_mt 3)) (wait (+ ?last_3t 1))))
+                (assert (action (id 3) (a_type "r") (machine "BS") (io "output") (task_id (+ ?last_3t 2)) (wait (+ ?last_mt 3 ))))
+                (assert (action (id 3) (a_type "m") (machine "M-RS2") (io "input") (task_id (+ ?last_3t 3))(wait (+ ?last_3t 2))))
+                (assert (action (id 3) (a_type "d") (machine "M-RS2") (io "slide") (task_id (+ ?last_3t 4)) (wait (+ ?last_3t 3))))
+                (assert (pick_rings))
+            )
+            )
+    
+        )
+    else
+        (assert (pick_rings))
     )
 
-   (assert (pay_rings_rs2))
-)
-)
-(defrule pay_for_rings_rs2
-(done (task_id 4000))
-(payments (station 1) (total_need ?tn1))
-=>
-
-)
 
 
 (defrule ringstation_new_payments_need
@@ -303,6 +379,8 @@ else
   (done (done_t_id ?w))
   (protobuf-peer (name ?name) (peer-id ?peer-id))
   (test (eq ?name (sym-cat (str-cat "ROBOT" ?id))))
+  ?pay_rs1 <- (payments (station 1) (total_in ?t_in1) (current_in ?c_in1))
+  ?pay_rs2 <- (payments (station 2) (total_in ?t_in2) (current_in ?c_in2))
   ?lt <-(last_task (id ?id) (l_task_id ?last_t))
   ;(not (robo_busy (id ?id)))
   ?do <- (do (id ?id) (task ?t-id))
@@ -317,6 +395,18 @@ else
   (bind ?deliver-msg (pb-create "llsf_msgs.Deliver")) 
   (pb-set-field ?deliver-msg "machine_id" ?wp)
   (pb-set-field ?deliver-msg"machine_point" ?io)
+  (if (eq ?io "slide")
+    then
+        (if (eq ?wp "M-RS1")
+        then
+            (modify ?pay_rs1 (total_in (+ ?t_in1 1)) (current_in (+ ?c_in1 1)))
+        )
+    else
+    (if (eq ?wp "M-RS2")
+    then
+     (modify ?pay_rs2 (total_in (+ ?t_in2 1)) (current_in (+ ?c_in2 1)))
+    )
+  )
   (pb-set-field ?msg "deliver" ?deliver-msg)
   (pb-broadcast ?peer-id ?msg)
   (pb-destroy ?msg)
