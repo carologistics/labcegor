@@ -5,6 +5,8 @@ from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, SetEnvironmentVariable
 from launch.actions import OpaqueFunction
+from launch.actions import IncludeLaunchDescription
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 from rclpy.logging import get_logger
@@ -17,6 +19,8 @@ def launch_with_context(context, *args, **kwargs):
     if not os.path.isfile(manager_config_file):
         logger = get_logger("labcegor_bringup")
         logger.warning(f"Parameter file path is not a file: {manager_config_file}")
+    pddl_manager_dir = get_package_share_directory('pddl_manager')
+    launch_pddl_manager = os.path.join(pddl_manager_dir, 'launch', 'pddl_manager.launch.py')
 
     cx_node = Node(
         package='cx_bringup',
@@ -28,7 +32,9 @@ def launch_with_context(context, *args, **kwargs):
         ],
         arguments=['--ros-args', '--log-level', log_level]
     )
-    return [cx_node]
+    return [cx_node, IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(launch_pddl_manager)
+        ),]
 
 def generate_launch_description():
     declare_log_level_ = DeclareLaunchArgument(
