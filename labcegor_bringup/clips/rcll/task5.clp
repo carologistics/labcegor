@@ -208,7 +208,7 @@
   (tasks_overview (robot_id 3) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
   (test (eq ?n ROBOT3))
   (robot3_move_to_pickup)
-  not(robot3_did_pickup)
+  (not(robot3_did_pickup))
   =>
   (if (and (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cd FALSE)) then
     (send_retrieve_from_cmd 3 ?mot ?mat ?peer-id ?tid)
@@ -222,7 +222,7 @@
   (tasks_overview (robot_id 3) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
   (test (eq ?n ROBOT3))
   (robot3_did_pickup)
-  not(robot3_delivered_base)
+  (not(robot3_delivered_base))
   =>
   (if (and (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE)) then
     (send_deliver_to_cmd 3 ?mot ?mat ?peer-id ?tid)
