@@ -31,7 +31,7 @@ def launch_with_context(context, *args, **kwargs):
         lifecycle_node_matcher=lambda node: node == pddl_manager_node,
         transition_id=Transition.TRANSITION_CONFIGURE,
     ))]),
-    TimerAction(period=2.0, actions=[EmitEvent(event=ChangeState(
+    TimerAction(period=3.0, actions=[EmitEvent(event=ChangeState(
         lifecycle_node_matcher=lambda node: node == pddl_manager_node,
         transition_id=Transition.TRANSITION_ACTIVATE,
     ))]),
