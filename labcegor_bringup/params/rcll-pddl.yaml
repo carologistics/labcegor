@@ -1,0 +1,60 @@
+clips_manager:
+  ros__parameters:
+    environments: ["cx_rcll"]
+    cx_rcll:
+      redirect_stdout_to_debug: false
+      log_clips_to_file: true
+      watch: ["facts", "rules"]
+      plugins: ["executive",
+                "ament_index",
+                "config",
+                "protobuf",
+                "ros_msgs",
+                "plan_temporal_action",
+                "timed_plan_action_msg",
+                "files"]
+
+    ament_index:
+      plugin: "cx::AmentIndexPlugin"
+    config:
+      plugin: "cx::ConfigPlugin"
+    executive:
+      plugin: "cx::ExecutivePlugin"
+      publish_on_refresh: false
+      assert_time: true
+      refresh_rate: 10
+    files:
+      plugin: "cx::FileLoadPlugin"
+      pkg_share_dirs: ["labcegor_bringup"]
+      batch: [
+        "clips/labcegor_bringup/rcll/deftemplates.clp",
+        "clips/labcegor_bringup/rcll/init.clp",
+        "clips/labcegor_bringup/rcll/refbox-comm-init.clp",
+        "clips/labcegor_bringup/rcll/sim-comm-init.clp",
+        "clips/labcegor_bringup/rcll/refbox-recv.clp",
+        "clips/labcegor_bringup/pddl_manager/saliences.clp",
+        "clips/labcegor_bringup/pddl_manager/deftemplates.clp",
+        "clips/labcegor_bringup/pddl_manager/init-pddl.clp",
+        "clips/labcegor_bringup/pddl_manager/set-goals.clp",
+        "clips/labcegor_bringup/pddl_manager/clear-goals.clp",
+        "clips/labcegor_bringup/pddl_manager/objects.clp",
+        "clips/labcegor_bringup/pddl_manager/fluents.clp",
+        "clips/labcegor_bringup/pddl_manager/instances.clp",
+        "clips/labcegor_bringup/pddl_manager/get-action-names.clp",
+        "clips/labcegor_bringup/pddl_manager/get-fluents.clp",
+        "clips/labcegor_bringup/pddl_manager/numeric-fluents.clp",
+        "clips/labcegor_bringup/pddl_manager/plan.clp",
+        "clips/labcegor_bringup/pddl_manager/action-effect-apply.clp",
+        "clips/labcegor_bringup/pddl_manager/action-precond-check.clp",
+        "clips/labcegor_bringup/rcll/pddl-example.clp",
+       ]
+    ros_msgs:
+      plugin: "cx::RosMsgsPlugin"
+    plan_temporal_action:
+      plugin: "cx::CXExpertinoMsgsPlanTemporalPlugin"
+    timed_plan_action_msg:
+      plugin: "cx::CXExpertinoMsgsTimedPlanActionPlugin"
+    protobuf:
+      plugin: "cx::ProtobufPlugin"
+      pkg_share_dirs: ["rcll_protobuf_msgs"]
+      proto_paths: ["rcll-protobuf-msgs"]

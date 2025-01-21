@@ -7,6 +7,9 @@
   <maintainer email="todo@rwth-aachen.de">TODO</maintainer>
   <license>GPLv2+</license>
 
+  <depend>expertino_msgs</depend>
+  <exec_depend>pddl_manager</exec_depend>
+  <exec_depend>up_nextflap</exec_depend>
   <exec_depend>cx_bringup</exec_depend>
   <exec_depend>rcll_protobuf_msgs</exec_depend>
 

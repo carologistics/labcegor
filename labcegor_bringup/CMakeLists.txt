@@ -7,6 +7,8 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(cx_ros_comm_gen REQUIRED)
+find_package(cx_plugin REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
@@ -23,7 +25,11 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-install(DIRECTORY launch params DESTINATION share/${PROJECT_NAME})
+# plugins for pddl planner action client and nested message of it
+cx_generate_msg_bindings("expertino_msgs" "TimedPlanAction")
+cx_generate_action_bindings("expertino_msgs" "PlanTemporal")
+
+install(DIRECTORY launch params pddl DESTINATION share/${PROJECT_NAME})
 install(DIRECTORY clips/ DESTINATION share/${PROJECT_NAME}/clips/${PROJECT_NAME}/)
 
 ament_package()
