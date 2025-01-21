@@ -53,6 +53,9 @@
 (deftemplate update_ringstations_payment
     (multislot rings (type STRING))
 )
+(deftemplate rings_todo
+    (multislot rings (type STRING))
+)
 (deftemplate pay_rings_rs1
     (slot wait_for (type INTEGER))
 )
@@ -139,6 +142,8 @@
     
 
     (assert (pay_rings_rs1 (wait_for (+ ?last_mt 2))))
+    (assert (rings_todo (rings $?ring_colors_1)))
+
     ;(assert pay_rings_rs1 (wait_for 4990))
     ;(assert next_ring)
 
@@ -187,7 +192,7 @@
             else
                 ;robo3 do 2ed payment
                 (assert (action (id 3) (a_type "m") (machine "BS") (io "output") (task_id (+ ?last_3t 1))))
-                (assert (instruct (machine "BS") (operation "output") (color "BLACK") (task_id (+ ?last_mt 3)) (wait (+ ?last_3t 1))))
+                (assert (instruct (machine "BS") (operation "output") (color "RED") (task_id (+ ?last_mt 3)) (wait (+ ?last_3t 1))))
                 (assert (action (id 3) (a_type "r") (machine "BS") (io "output") (task_id (+ ?last_3t 2)) (wait (+ ?last_mt 3 ))))
                 (assert (action (id 3) (a_type "m") (machine "M-RS1") (io "input") (task_id (+ ?last_3t 3))(wait (+ ?last_3t 2))))
                 (assert (action (id 3) (a_type "d") (machine "M-RS1") (io "slide") (task_id (+ ?last_3t 4)) (wait (+ ?last_3t 3))))
@@ -248,7 +253,36 @@
         (assert (pick_rings))
     )
 
+(defrule pickup_rings
+(pick-rings)
+(last_task (id 1)(l_task_id ?last_1t))
+(last_task (id 4)(l_task_id ?last_mt))
+(done (done_t_id ?t_id))
+(rings_todo (rings ?ring1 $?rings_rest))
+=>
+    (switch ?ring1
+    (case (or RING_YELLOW RING_BLUE) then 
+        (assert (action (id 1) (a_type "m") (machine "M-RS2") (io "input") (task_id (+ ?last_1t 1))))
+        (assert (action (id 1) (a_type "d") (machine "M-RS2") (io "input") (task_id (+ ?last_1t 2) (wait (+ ?last_1t 1)))))
+        (assert (instruct (machine "M-RS2") (operation "XYZ") (task_id (+ ?last_mt 1)) (wait (+ ?last_1t 2))))
+        (assert (action (id 1) (a_type "m") (machine "M-RS2") (io "output") (task_id (+ ?last_1t 3)(wait (+ ?last_mt 2)))))
+        (assert (action (id 1) (a_type "r") (machine "M-RS2") (io "output") (task_id (+ ?last_1t 4)(wait (+ ?last_1t 3)))))
+        (assert (rings_todo $?rings_rest))
+    )
+    (case (or RING_ORANGE RING_GREEN) then 
+        (assert (action (id 1) (a_type "m") (machine "M-RS1") (io "input") (task_id (+ ?last_1t 1))))
+        (assert (action (id 1) (a_type "d") (machine "M-RS1") (io "input") (task_id (+ ?last_1t 2) (wait (+ ?last_1t 1)))))
+        (assert (instruct (machine "M-RS1") (operation "XYZ") (task_id (+ ?last_mt 1)) (wait (+ ?last_1t 2))))
+        (assert (action (id 1) (a_type "m") (machine "M-RS1") (io "output") (task_id (+ ?last_1t 3)(wait (+ ?last_mt 2)))))
+        (assert (action (id 1) (a_type "r") (machine "M-RS1") (io "output") (task_id (+ ?last_1t 4)(wait (+ ?last_1t 3)))))
+    )
+    (default 
+        ;to cap station
+    )
+    )
+    
 
+)
 
 (defrule ringstation_new_payments_need
 ?update <- (update_ringstations_payment (rings ?ring1 $?rest_rings))
