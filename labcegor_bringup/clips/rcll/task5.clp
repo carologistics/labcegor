@@ -29,6 +29,7 @@
 
 (deffacts machine_facts
   (machine_task_overview (machine_id M-CS1) (machine_task NOT-SET))
+  (machine_task_overview (machine_id M-BS) (machine_task NOT-SET))
   (machine_payment_info (machine_id M-RS1) (money 0))
   (machine_payment_info (machine_id M-RS2) (money 0))
 )
@@ -242,7 +243,10 @@
 (defrule robot-three-pickup-base
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   (tasks_overview (robot_id 3) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
+  (machine (name "M-BS") (state ?s)
+)
   (test (eq ?n ROBOT3))
+  (eq ?s READY-AT-OUTPUT)
   (robot3_move_to_pickup)
   (not(robot3_did_pickup))
   =>
@@ -371,11 +375,12 @@
 
 ; Check Machine 
 (defrule check_machine_M-CS1
-  (machine (name M-CS1) (state ?s) (type ?t))
+  ;(machine (name M-CS1) (state ?s) (type ?t))
+  (machine (name M-BS) (state ?s) (type ?t))
   (machine_task_overview (machine_id M-CS1) (machine_task ?mt))
   (not (M-CS1_finished_task1))
   =>
-  (printout red "M-CS1 is in state " ?s " and of type " ?t " and task " ?mt " "(eq ?s READY-AT-OUTPUT)crlf)
+  (printout red "M-BS is in state " ?s " and of type " ?t " and task " ?mt " "(eq ?s READY-AT-OUTPUT)crlf)
   (if (eq ?s READY-AT-OUTPUT) then
     (assert (M-CS1_finished_task1))
   )
