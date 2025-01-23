@@ -251,7 +251,7 @@
   (send_move_to_cmd 3 ?mot ?mat ?peer-id ?tid)
   (printout red "part 1/3 " ?n crlf)
   (modify ?check_robot (did_something TRUE))
-  (printout blue "move" ?name " " ?number " " ?robot_state " " ?is-busy crlf)
+  (printout blue "move" ?number " " ?robot_state " " ?is-busy crlf)
 )
 
 (defrule robot-three-pickup-base
@@ -268,7 +268,7 @@
     ;(printout blue "part 2/3" crlf)
     (modify ?check_robot (did_something TRUE))
   )
-  (printout blue "retrieve" ?name " " ?number " " ?robot_state " " ?is-busy crlf)
+  (printout blue "retrieve" ?number " " ?robot_state " " ?is-busy crlf)
 )
 
 
@@ -282,7 +282,7 @@
   (send_deliver_to_cmd 3 ?mot ?mat ?peer-id ?tid)
   ;(printout blue "part 3/3" crlf)
   (modify ?check_robot (did_something TRUE))
-  (printout blue "deliver" ?name " " ?number " " ?robot_state " " ?is-busy crlf)
+  (printout blue "deliver" ?number " " ?robot_state " " ?is-busy crlf)
 )
 
 ; ==================================================================================
