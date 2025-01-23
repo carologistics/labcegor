@@ -239,7 +239,7 @@
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   (protobuf-peer (name refbox-private) (peer-id ?refbox-id))
   (machine (name M-BS) (state ?s))
-  (tasks_overview (robot_id 3) (task_id ?tid) (can_move TRUE) (can_retrieve FALSE) (can_deliver ?cd) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
+  ?tasks_overview <- (tasks_overview (robot_id 3) (task_id ?tid) (can_move TRUE) (can_retrieve FALSE) (can_deliver ?cd) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id 3) (did_something FALSE))
   (test (eq ?n ROBOT3))
   =>
@@ -250,17 +250,19 @@
   (if (eq ?robot_state IDLE) then 
     (send_move_to_cmd 3 ?mot ?mat ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
+    (modify ?tasks_overview (state MOVING))
   )
   (if (eq ?robot_state HOLDING) then 
     (send_move_to_cmd 3 ?mot ?mat ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
+    (modify ?tasks_overview (state CARRY))
   )
   (printout red "CARRY " ?n " " robot_state crlf)
 )
 
 (defrule robot-three-pickup-base
   (protobuf-peer (name ?n) (peer-id ?peer-id))
-  (tasks_overview (robot_id 3) (task_id ?tid) (can_move FALSE) (can_retrieve TRUE) (can_deliver FALSE) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
+  ?tasks_overview <- (tasks_overview (robot_id 3) (task_id ?tid) (can_move FALSE) (can_retrieve TRUE) (can_deliver FALSE) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id 3) (did_something FALSE))
   (machine (name M-BS) (state ?s))
   (test (eq ?n ROBOT3))
@@ -270,18 +272,20 @@
     (send_retrieve_from_cmd 3 ?mot ?mat ?peer-id ?tid)
     (printout blue "part 2/3 " robot_state crlf)
     (modify ?check_robot (did_something TRUE))
+    (modify ?tasks_overview (state HOLDING))
   )
 )
 
 (defrule robot-three-deliver-base
   (protobuf-peer (name ?n) (peer-id ?peer-id))
-  (tasks_overview (robot_id 3) (task_id ?tid) (can_move FALSE) (can_retrieve FALSE) (can_deliver TRUE) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
+  ?tasks_overview <- (tasks_overview (robot_id 3) (task_id ?tid) (can_move FALSE) (can_retrieve FALSE) (can_deliver TRUE) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id 3) (did_something FALSE))
   (test (eq ?n ROBOT3))
   =>
   (send_deliver_to_cmd 3 ?mot ?mat ?peer-id ?tid)
   (printout blue "part 3/3 " robot_state crlf)
   (modify ?check_robot (did_something TRUE))
+  (modify ?tasks_overview (state IDLE))
 )
 
 ; ==================================================================================
@@ -357,7 +361,8 @@
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
   (bind ?successful (pb-field-value ?msg "successful"))
   (bind ?target (check_payment ?m_one ?m_two))
-  
+
+  (printout green "robot three did something " ?task_id " " ?tid " " ?cm  " " ?cr  " " ?cd  " " ?mot  " " ?mat  " " ?robot_state " " ?target crlf)
   ; It has moved
   (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE)) then 
     (modify ?tasks_overview (can_move FALSE))
