@@ -24,7 +24,7 @@
 (deffacts robottasks
   (tasks_overview (robot_id 1) (task_id 1) (can_move TRUE) (can_retrieve TRUE) (can_deliver TRUE) (move_target "M-CS1") (machine_target "input" ))
   (tasks_overview (robot_id 2) (task_id 1) (can_move TRUE) (can_retrieve TRUE) (can_deliver TRUE) (move_target "M-CS1") (machine_target "output" ))
-  (tasks_overview (robot_id 3) (task_id 1) (can_move TRUE) (can_retrieve FALSE) (can_deliver FALSE) (move_target "M-BS") (machine_target "input" ))
+  (tasks_overview (robot_id 3) (task_id 1) (can_move TRUE) (can_retrieve FALSE) (can_deliver FALSE) (move_target "M-BS") (machine_target "output" ))
 )
 
 (deffacts machine_facts
@@ -232,25 +232,11 @@
   =>
   (if (and (eq ?cm TRUE) (eq ?cr FALSE)) then
     ;Prepare Basestation PrepareMachine
-    (prepare_basestation ?mot 1 2 ?peer-id)
+    (prepare_basestation ?mot OUTPUT BASE_BLACK ?peer-id)
     (send_move_to_cmd 3 ?mot ?mat ?peer-id ?tid)
     (printout blue "part 1/3" crlf)
     (assert (robot3_move_to_pickup))
   )
-)
-
-(defrule prepare_machine
-  (protobuf-peer (name refbox-private) (peer-id ?peer-id))
-  (tasks_overview (robot_id 3) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
-  (not (proces_cap_one_CS1))
-  =>
-  (printout red "prepare_machine for robot_three task_id " crlf)
-  (if (and (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE)) then
-    (send_cmd_to_machine ?mot "RETRIEVE_CAP" ?peer-id)
-    (assert (proces_cap_one_CS1))
-    (printout blue "the machine should do something " crlf)
-    (printout red "part 2/2" crlf)
-  ) 
 )
 
 (defrule robot-three-pickup-base
@@ -354,8 +340,8 @@
   (bind ?successful (pb-field-value ?msg "successful"))
   (bind ?target (check_payment ?m_one ?m_two))
   
-  (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cr FALSE)) then 
-    (printout green "robot three finished his task " ?task_id crlf)
+  (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE)) then 
+    (printout green "robot three finished his task " ?task_id " " ?target crlf)
     ; TODO check ?target == "NONE" and do something else if thats the case
     (if (not (eq ?target "NONE")) then
       (modify ?tasks_overview (can_move FALSE))
@@ -365,7 +351,7 @@
     )
   )
 
-  (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cr FALSE)) then 
+  (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cd FALSE)) then 
     (modify ?tasks_overview (can_move TRUE))
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_deliver TRUE))
@@ -374,7 +360,7 @@
     (printout green ?task_id ?tid crlf)
   )
 
-  (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cr TRUE)) then 
+  (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE)) then 
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_move TRUE))
     (modify ?tasks_overview (move_target "M-BS"))
