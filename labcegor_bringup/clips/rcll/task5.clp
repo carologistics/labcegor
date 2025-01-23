@@ -243,7 +243,7 @@
 (defrule robot-three-pickup-base
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   (tasks_overview (robot_id 3) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
-  (machine (name "M-BS") (state ?s)
+  (machine (name M-BS) (state ?s)
 )
   (test (eq ?n ROBOT3))
   (eq ?s READY-AT-OUTPUT)
@@ -346,13 +346,13 @@
   
   (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE)) then 
     (printout green "robot three finished his task " ?task_id  crlf)
-    ; TODO check ?target == "NONE" and do something else if thats the case
     (modify ?tasks_overview (can_move FALSE))
     (modify ?tasks_overview (can_retrieve TRUE))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
   )
 
   (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cd FALSE)) then 
+    ; TODO check ?target == "NONE" and do something else if thats the case
     (modify ?tasks_overview (can_move TRUE))
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_deliver TRUE))
