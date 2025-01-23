@@ -341,28 +341,27 @@
   (bind ?target (check_payment ?m_one ?m_two))
   
   (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE)) then 
-    (printout green "robot three finished his task " ?task_id " " ?target crlf)
+    (printout green "robot three finished his task " ?task_id  crlf)
     ; TODO check ?target == "NONE" and do something else if thats the case
-    (if (not (eq ?target "NONE")) then
-      (modify ?tasks_overview (can_move FALSE))
-      (modify ?tasks_overview (can_retrieve TRUE))
-      (modify ?tasks_overview (move_target "M-BS"))
-      (modify ?tasks_overview (task_id (+ ?task_id 1)))
-    )
+    (modify ?tasks_overview (can_move FALSE))
+    (modify ?tasks_overview (can_retrieve TRUE))
+    (modify ?tasks_overview (task_id (+ ?task_id 1)))
   )
 
   (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cd FALSE)) then 
     (modify ?tasks_overview (can_move TRUE))
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_deliver TRUE))
-    (printout green "robot three did something " ?task_id crlf)
+    (modify ?tasks_overview (move_target ?target))
+    (printout green "robot three did something " ?task_id " " ?target crlf)
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (printout green ?task_id ?tid crlf)
   )
 
   (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE)) then 
-    (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_move TRUE))
+    (modify ?tasks_overview (can_retrieve FALSE))
+    (modify ?tasks_overview (can_deliver FALSE))
     (modify ?tasks_overview (move_target "M-BS"))
     (printout green "robot three did something " ?task_id crlf)
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
