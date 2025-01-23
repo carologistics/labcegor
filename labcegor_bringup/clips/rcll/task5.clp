@@ -267,7 +267,7 @@
   (machine (name M-BS) (state ?s))
   (test (eq ?n ROBOT3))
   =>
-  (printout red "Basestation is in state " ?scrlf)
+  (printout red "Basestation is in state " ?s crlf)
   (if (eq ?s READY-AT-OUTPUT) then
     (send_retrieve_from_cmd 3 ?mot ?mat ?peer-id ?tid)
     (printout blue "part 2/3 " robot_state crlf)
