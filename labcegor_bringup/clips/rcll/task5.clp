@@ -233,7 +233,7 @@
   =>
   (if (and (eq ?cm TRUE) (eq ?cr FALSE)) then
     ;Prepare Basestation PrepareMachine
-    (prepare_basestation ?mot OUTPUT BASE_BLACK ?peer-id)
+    (prepare_basestation "M-BS" OUTPUT BASE_BLACK ?peer-id)
     (send_move_to_cmd 3 ?mot ?mat ?peer-id ?tid)
     (printout blue "part 1/3" crlf)
     (assert (robot3_move_to_pickup))
