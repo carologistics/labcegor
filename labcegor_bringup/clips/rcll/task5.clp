@@ -243,10 +243,9 @@
   (protobuf-peer (name refbox-private) (peer-id ?peer-id))
   (tasks_overview (robot_id 3) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
   (not (proces_cap_one_CS1))
-  (robot3_move_to_pickup)
   =>
   (printout red "prepare_machine for robot_three task_id " crlf)
-  (if (and (robot3_move_to_pickup) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE)) then
+  (if (and (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE)) then
     (send_cmd_to_machine ?mot "RETRIEVE_CAP" ?peer-id)
     (assert (proces_cap_one_CS1))
     (printout blue "the machine should do something " crlf)
