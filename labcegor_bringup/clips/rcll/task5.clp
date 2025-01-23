@@ -129,6 +129,7 @@
   (pb-set-field ?msg "instruction_bs" ?prep-msg)
   (pb-broadcast ?peer-id ?msg)
   (pb-destroy ?msg)
+  (printout red ?m_id " " ?side " " ?color " " ?peer-id crlf)
 )
 
 ; Which Machine to bribe?
@@ -228,6 +229,7 @@
 (defrule send-robot-three-to-pickup
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   (tasks_overview (robot_id 3) (task_id ?tid) (can_move TRUE) (can_retrieve ?FALSE) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
+  (machine (name M-BS) (state ?s)
   (test (eq ?n ROBOT3))
   =>
   ;Prepare Basestation PrepareMachine
