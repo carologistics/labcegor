@@ -360,7 +360,7 @@
   
   ; It has moved
   (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE)) then 
-    ;(printout green "robot three finished his task " ?task_id  crlf)
+    (printout green "robot three finished his task " ?task_id  crlf)
     (modify ?tasks_overview (can_move FALSE))
     (modify ?tasks_overview (can_retrieve TRUE))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
@@ -369,7 +369,7 @@
   
   ; It has moved
   (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd TRUE)) then 
-    ;(printout green "robot three finished his task " ?task_id  crlf)
+    (printout green "robot three finished his task " ?task_id " " ?target crlf)
     (modify ?tasks_overview (can_move FALSE))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (modify ?check_robot (did_something FALSE))
@@ -377,24 +377,22 @@
 
   (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cd FALSE)) then 
     ; TODO check ?target == "NONE" and do something else if thats the case
+    (printout green "robot three did something " ?task_id " " ?target crlf)
     (modify ?tasks_overview (can_move TRUE))
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_deliver TRUE))
     (modify ?tasks_overview (move_target ?target))
-    ;(printout green "robot three did something " ?task_id " " ?target crlf)
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
-    ;(printout green ?task_id ?tid crlf)
     (modify ?check_robot (did_something FALSE))
   )
 
   (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE)) then 
+    (printout green "robot three did something " ?task_id " " ?target crlf)
     (modify ?tasks_overview (can_move TRUE))
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_deliver FALSE))
     (modify ?tasks_overview (move_target "M-BS"))
-    ;(printout green "robot three did something " ?task_id crlf)
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
-    ;(printout green ?task_id ?tid crlf)
     (modify ?check_robot (did_something FALSE))
   )
 )
@@ -406,7 +404,7 @@
   (machine_task_overview (machine_id M-CS1) (machine_task ?mt))
   (not (M-CS1_finished_task1))
   =>
-  ;(printout red "M-BS is in state " ?s " and of type " ?t " and task " ?mt " "(eq ?s READY-AT-OUTPUT)crlf)
+  (printout red "M-BS is in state " ?s " and of type " ?t " and task " ?mt " "(eq ?s READY-AT-OUTPUT)crlf)
   (if (eq ?s READY-AT-OUTPUT) then
     (assert (M-CS1_finished_task1))
   )
