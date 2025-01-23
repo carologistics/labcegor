@@ -33,9 +33,19 @@
             ;robo_oder = machine_order
         )
         (assert (request_task (id ?id) (last_task ?task) (order ?order)))
+        ;(assert (done (done_t_id ?task))) still needed?
         ;(printout green "TASK DONE"  crlf)
     else
         (printout green ?robo_id ?task_id ?success  crlf)
         (printout green ?id ?t-id  crlf)
     )
+)
+
+
+(defrule ringstation_update
+(update_rs)
+?rs1 <- (machine_status (name "M-RS1") (slide_shelf ?pay_rs1))
+?rs2 <- (machine_status (name "M-RS2") (slide_shelf ?pay_rs2))
+=>
+;do update
 )

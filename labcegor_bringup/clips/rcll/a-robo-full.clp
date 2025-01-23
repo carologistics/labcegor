@@ -15,11 +15,11 @@
   (slot des (type SYMBOL)); destination waypoint
   (slot des_at_waypoint (type SYMBOL));if any
 )
-(deftemplate machine-status
+(deftemplate machine_status
   (slot name (type SYMBOL))
-  (slot task (type INTEGER)) ;0/1 ?
-  (slot order (type INTEGER)) ; order id 0= emty, 20 full unassigend
-  (slot pos (type SYMBOL)(allowed-values input inside output)) ; for CS especialy wp not cap
+  (slot task (type INTEGER) (default 0)) ;0/1 ?
+  (slot order (type INTEGER) (default 0)) ; order id 0= emty, 20 full unassigend
+  (slot pos (type SYMBOL)(allowed-values input inside output empty) (default empty)) ; for CS especialy wp not cap
   (slot slide_shelf (type INTEGER)) ; 0,1,2,3 (pay in for RS) (0,1,2 - pickup point fo CS) 
 )
 (deftemplate request_task
@@ -42,4 +42,6 @@
 (deffacts
   (team (name MAGENTA)(prefix M))
   (init_moves)
+  (machine_status (name "M-RS1") (slide_shelf 0))
+  (machine_status (name "M-RS2") (slide_shelf 0))
 )
