@@ -260,7 +260,7 @@
 
 (defrule robot-three-pickup-base
   (protobuf-peer (name ?n) (peer-id ?peer-id))
-  ?tasks_overview <- (tasks_overview (robot_id 3) (task_id ?tid) (can_move FALSE) (can_retrieve TRUE) (can_deliver FALSE) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
+  (tasks_overview (robot_id 3) (task_id ?tid) (can_move FALSE) (can_retrieve TRUE) (can_deliver FALSE) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id 3) (did_something FALSE))
   (machine (name M-BS) (state ?s))
   (test (eq ?n ROBOT3))
@@ -275,7 +275,7 @@
 
 (defrule robot-three-deliver-base
   (protobuf-peer (name ?n) (peer-id ?peer-id))
-  ?tasks_overview <- (tasks_overview (robot_id 3) (task_id ?tid) (can_move FALSE) (can_retrieve FALSE) (can_deliver TRUE) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
+  (tasks_overview (robot_id 3) (task_id ?tid) (can_move FALSE) (can_retrieve FALSE) (can_deliver TRUE) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id 3) (did_something FALSE))
   (test (eq ?n ROBOT3))
   =>
