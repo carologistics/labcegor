@@ -68,7 +68,7 @@
   (pb-set-field ?msg "retrieve" ?move_msg)
   (pb-broadcast ?peer-id ?msg)
   (pb-destroy ?msg)
-  (printout blue "Retrieve: robot: " ?r_id " task " ?task_id crlf)
+  (printout blue "Retrieve: robot: " ?r_id " task " ?r_id " " ?r_target " " ?m_point " " ?peer-id " " ?task_id " " ?task_id crlf)
 )
 
 ; Deliver
