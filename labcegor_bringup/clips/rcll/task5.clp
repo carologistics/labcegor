@@ -133,7 +133,7 @@
 
 ; Which Machine to bribe?
 (deffunction check_payment (?m_one ?m_two)
-  (printout green "The Ring-stations should have " ?m_one " and " ?m_two crlf)
+  ;(printout green "The Ring-stations should have " ?m_one " and " ?m_two crlf)
   (if(<= ?m_one 3)then
     (return "M-RS1")
   )
@@ -234,7 +234,7 @@
   ;Prepare Basestation PrepareMachine
   (prepare_basestation "M-BS" OUTPUT BASE_BLACK ?peer-id)
   (send_move_to_cmd 3 ?mot ?mat ?peer-id ?tid)
-  (printout blue "part 1/3" crlf)
+;  (printout blue "part 1/3" crlf)
 )
 
 (defrule robot-three-pickup-base
@@ -245,10 +245,10 @@
   (test (eq ?n ROBOT3))
   (and (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cd FALSE))
   =>
-  (printout red "Basestation is in state " ?s crlf)
+  ;(printout red "Basestation is in state " ?s crlf)
   (if (eq ?s READY-AT-OUTPUT) then
     (send_retrieve_from_cmd 3 ?mot ?mat ?peer-id ?tid)
-    (printout blue "part 2/3" crlf)
+    ;(printout blue "part 2/3" crlf)
   )
 )
 
@@ -259,7 +259,7 @@
   (and (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE))
   =>
   (send_deliver_to_cmd 3 ?mot ?mat ?peer-id ?tid)
-  (printout blue "part 3/3" crlf)
+  ;(printout blue "part 3/3" crlf)
 )
 
 ; ==================================================================================
@@ -356,9 +356,9 @@
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_deliver TRUE))
     (modify ?tasks_overview (move_target ?target))
-    (printout green "robot three did something " ?task_id " " ?target crlf)
+    ;(printout green "robot three did something " ?task_id " " ?target crlf)
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
-    (printout green ?task_id ?tid crlf)
+    ;(printout green ?task_id ?tid crlf)
   )
 
   (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE)) then 
@@ -366,9 +366,9 @@
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_deliver FALSE))
     (modify ?tasks_overview (move_target "M-BS"))
-    (printout green "robot three did something " ?task_id crlf)
+    ;(printout green "robot three did something " ?task_id crlf)
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
-    (printout green ?task_id ?tid crlf)
+    ;(printout green ?task_id ?tid crlf)
   )
 )
 
@@ -379,7 +379,7 @@
   (machine_task_overview (machine_id M-CS1) (machine_task ?mt))
   (not (M-CS1_finished_task1))
   =>
-  (printout red "M-BS is in state " ?s " and of type " ?t " and task " ?mt " "(eq ?s READY-AT-OUTPUT)crlf)
+  ;(printout red "M-BS is in state " ?s " and of type " ?t " and task " ?mt " "(eq ?s READY-AT-OUTPUT)crlf)
   (if (eq ?s READY-AT-OUTPUT) then
     (assert (M-CS1_finished_task1))
   )
