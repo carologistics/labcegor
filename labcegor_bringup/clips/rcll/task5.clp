@@ -245,7 +245,7 @@
   ;Prepare Basestation PrepareMachine
   (prepare_basestation "M-BS" "OUTPUT" "BASE_BLACK" ?peer-id)
   (send_move_to_cmd 3 ?mot ?mat ?peer-id ?tid)
-  ;  (printout blue "part 1/3" crlf)
+  (printout red "part 1/3 " ?n crlf)
   (modify ?check_robot (did_something TRUE))
 )
 
