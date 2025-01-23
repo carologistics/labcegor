@@ -7,6 +7,7 @@
   (slot can_move (type SYMBOL) (allowed-values FALSE TRUE))
   (slot can_retrieve (type SYMBOL) (allowed-values FALSE TRUE))
   (slot can_deliver (type SYMBOL) (allowed-values FALSE TRUE))
+  (slot state (type SYMBOL) (allowed-values IDLE MOVING CARRY HOLDING SOMETHING))
   (slot move_target (type STRING))
   (slot machine_target (type STRING))
 )
@@ -27,9 +28,9 @@
 )
 ; facts
 (deffacts robottasks
-  (tasks_overview (robot_id 1) (task_id 1) (can_move TRUE) (can_retrieve TRUE) (can_deliver TRUE) (move_target "M-CS1") (machine_target "input" ))
-  (tasks_overview (robot_id 2) (task_id 1) (can_move TRUE) (can_retrieve TRUE) (can_deliver TRUE) (move_target "M-CS1") (machine_target "output" ))
-  (tasks_overview (robot_id 3) (task_id 1) (can_move TRUE) (can_retrieve FALSE) (can_deliver FALSE) (move_target "M-BS") (machine_target "output" ))
+  (tasks_overview (robot_id 1) (task_id 1) (can_move TRUE) (can_retrieve TRUE) (can_deliver TRUE) (state IDLE) (move_target "M-CS1") (machine_target "input" ))
+  (tasks_overview (robot_id 2) (task_id 1) (can_move TRUE) (can_retrieve TRUE) (can_deliver TRUE) (state IDLE) (move_target "M-CS1") (machine_target "output" ))
+  (tasks_overview (robot_id 3) (task_id 1) (can_move TRUE) (can_retrieve FALSE) (can_deliver FALSE) (state IDLE) (move_target "M-BS") (machine_target "output" ))
   (check_robot (robot_id 1) (did_something FALSE))
   (check_robot (robot_id 2) (did_something FALSE))
   (check_robot (robot_id 3) (did_something FALSE))
@@ -41,7 +42,6 @@
   (machine_payment_info (machine_id M-RS1) (money 0))
   (machine_payment_info (machine_id M-RS2) (money 0))
 )
-
 
 
 ; ==================================================================================
@@ -238,9 +238,8 @@
 (defrule send-robot-three-to-pickup
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   (protobuf-peer (name refbox-private) (peer-id ?refbox-id))
-  (robot (name CARO3) (number ?number) (state ?robot_state) (is-busy ?is-busy))
-  (tasks_overview (robot_id 3) (task_id ?tid) (can_move TRUE) (can_retrieve FALSE) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
   (machine (name M-BS) (state ?s))
+  ?tasks_overview <- (tasks_overview (robot_id 3) (task_id ?tid) (can_move TRUE) (can_retrieve FALSE) (can_deliver ?cd) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id 3) (did_something FALSE))
   (test (eq ?n ROBOT3))
   =>
@@ -248,41 +247,44 @@
   (if (eq ?s IDLE) then
     (prepare_basestation "M-BS" "OUTPUT" "BASE_BLACK" ?refbox-id)
   )
-  (send_move_to_cmd 3 ?mot ?mat ?peer-id ?tid)
-  (printout red "part 1/3 " ?n crlf)
-  (modify ?check_robot (did_something TRUE))
-  (printout blue "move" ?number " " ?robot_state " " ?is-busy crlf)
+  (if (eq ?robot_state IDLE) then 
+    (send_move_to_cmd 3 ?mot ?mat ?peer-id ?tid)
+    (modify ?check_robot (did_something TRUE))
+    (modify ?tasks_overview (state MOVING))
+  )
+  (if (eq ?robot_state HOLDING) then 
+    (send_move_to_cmd 3 ?mot ?mat ?peer-id ?tid)
+    (modify ?check_robot (did_something TRUE))
+    (modify ?tasks_overview (state CARRY))
+  )
+  (printout red "CARRY " ?n " " robot_state crlf)
 )
 
 (defrule robot-three-pickup-base
   (protobuf-peer (name ?n) (peer-id ?peer-id))
-  (tasks_overview (robot_id 3) (task_id ?tid) (can_move FALSE) (can_retrieve TRUE) (can_deliver FALSE) (move_target ?mot) (machine_target ?mat))
+  ?tasks_overview <- (tasks_overview (robot_id 3) (task_id ?tid) (can_move FALSE) (can_retrieve TRUE) (can_deliver FALSE) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id 3) (did_something FALSE))
   (machine (name M-BS) (state ?s))
-  (robot (name ROBOT3) (number ?number) (state ?robot_state) (is-busy ?is-busy))
   (test (eq ?n ROBOT3))
   =>
-  (printout red "Basestation is in state " ?s crlf)
+  (printout red "Basestation is in state " ?scrlf)
   (if (eq ?s READY-AT-OUTPUT) then
     (send_retrieve_from_cmd 3 ?mot ?mat ?peer-id ?tid)
-    ;(printout blue "part 2/3" crlf)
+    (printout blue "part 2/3 " robot_state crlf)
     (modify ?check_robot (did_something TRUE))
   )
-  (printout blue "retrieve" ?number " " ?robot_state " " ?is-busy crlf)
 )
 
 
 (defrule robot-three-deliver-base
   (protobuf-peer (name ?n) (peer-id ?peer-id))
-  (tasks_overview (robot_id 3) (task_id ?tid) (can_move FALSE) (can_retrieve FALSE) (can_deliver TRUE) (move_target ?mot) (machine_target ?mat))
+  ?tasks_overview <- (tasks_overview (robot_id 3) (task_id ?tid) (can_move FALSE) (can_retrieve FALSE) (can_deliver TRUE) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id 3) (did_something FALSE))
-  (robot (name ROBOT3) (number ?number) (state ?robot_state) (is-busy ?is-busy))
   (test (eq ?n ROBOT3))
   =>
   (send_deliver_to_cmd 3 ?mot ?mat ?peer-id ?tid)
-  ;(printout blue "part 3/3" crlf)
+  (printout blue "part 3/3 " robot_state crlf)
   (modify ?check_robot (did_something TRUE))
-  (printout blue "deliver" ?number " " ?robot_state " " ?is-busy crlf)
 )
 
 ; ==================================================================================
@@ -349,7 +351,7 @@
 ; ==========
 (defrule check-robot_three
   (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id 3) (ptr ?msg))
-  ?tasks_overview <- (tasks_overview (robot_id 3) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
+  ?tasks_overview <- (tasks_overview (robot_id 3) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   (machine_payment_info (machine_id M-RS1) (money ?m_one))
   (machine_payment_info (machine_id M-RS2) (money ?m_two))
   ?check_robot <- (check_robot (robot_id 3) (did_something TRUE))
@@ -366,6 +368,7 @@
     (modify ?tasks_overview (can_retrieve TRUE))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (modify ?check_robot (did_something FALSE))
+    (modify ?tasks_overview (state IDLE))
   )
   
   ; It has moved
@@ -374,6 +377,7 @@
     (modify ?tasks_overview (can_move FALSE))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (modify ?check_robot (did_something FALSE))
+    (modify ?tasks_overview (state HOLDING))
   )
 
   (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cd FALSE)) then 
@@ -384,6 +388,7 @@
     (modify ?tasks_overview (can_deliver TRUE))
     (modify ?tasks_overview (move_target ?target))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
+    (modify ?tasks_overview (state HOLDING))
     (modify ?check_robot (did_something FALSE))
   )
 
@@ -395,6 +400,7 @@
     (modify ?tasks_overview (move_target "M-BS"))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (modify ?check_robot (did_something FALSE))
+    (modify ?tasks_overview (state IDLE))
   )
 )
 
