@@ -238,7 +238,7 @@
 (defrule send-robot-three-to-pickup
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   (protobuf-peer (name refbox-private) (peer-id ?refbox-id))
-  (robot (name ROBOT3) (number ?number) (state ?robot_state) (is-busy ?is-busy))
+  (robot (name Caro3) (number ?number) (state ?robot_state) (is-busy ?is-busy))
   (tasks_overview (robot_id 3) (task_id ?tid) (can_move TRUE) (can_retrieve FALSE) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
   (machine (name M-BS) (state ?s))
   ?check_robot <- (check_robot (robot_id 3) (did_something FALSE))
