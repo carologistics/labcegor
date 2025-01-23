@@ -238,10 +238,10 @@
 (defrule send-robot-three-to-pickup
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   (protobuf-peer (name refbox-private) (peer-id ?refbox-id))
+  (robot (name ROBOT3) (number ?number) (state ?robot_state) (is-busy ?is-busy))
   (tasks_overview (robot_id 3) (task_id ?tid) (can_move TRUE) (can_retrieve FALSE) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
-  ?check_robot <- (check_robot (robot_id 3) (did_something FALSE))
   (machine (name M-BS) (state ?s))
-  (robot (name ?name) (number ?number) (state ?robot_state) (is-busy ?is-busy))
+  ?check_robot <- (check_robot (robot_id 3) (did_something FALSE))
   (test (eq ?n ROBOT3))
   =>
   ;Prepare Basestation PrepareMachine
@@ -259,7 +259,7 @@
   (tasks_overview (robot_id 3) (task_id ?tid) (can_move FALSE) (can_retrieve TRUE) (can_deliver FALSE) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id 3) (did_something FALSE))
   (machine (name M-BS) (state ?s))
-  (robot (name ?name) (number ?number) (state ?robot_state) (is-busy ?is-busy))
+  (robot (name ROBOT3) (number ?number) (state ?robot_state) (is-busy ?is-busy))
   (test (eq ?n ROBOT3))
   =>
   (printout red "Basestation is in state " ?s crlf)
@@ -276,7 +276,7 @@
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   (tasks_overview (robot_id 3) (task_id ?tid) (can_move FALSE) (can_retrieve FALSE) (can_deliver TRUE) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id 3) (did_something FALSE))
-  (robot (name ?name) (number ?number) (state ?robot_state) (is-busy ?is-busy))
+  (robot (name ROBOT3) (number ?number) (state ?robot_state) (is-busy ?is-busy))
   (test (eq ?n ROBOT3))
   =>
   (send_deliver_to_cmd 3 ?mot ?mat ?peer-id ?tid)
