@@ -229,7 +229,7 @@
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   (tasks_overview (robot_id 3) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
   (test (eq ?n ROBOT3))
-  (test(and (eq ?cm TRUE) (eq ?cr FALSE)))
+  (test (and (eq ?cm TRUE) (eq ?cr FALSE)))
   =>
   ;Prepare Basestation PrepareMachine
   (prepare_basestation "M-BS" "OUTPUT" "BASE_BLACK" ?peer-id)
@@ -256,7 +256,7 @@
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   (tasks_overview (robot_id 3) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
   (test (eq ?n ROBOT3))
-  (test(and (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE)))
+  (test (and (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE)))
   =>
   (send_deliver_to_cmd 3 ?mot ?mat ?peer-id ?tid)
   ;(printout blue "part 3/3" crlf)
