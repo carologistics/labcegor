@@ -15,6 +15,11 @@
   (slot machine_id (type SYMBOL))
   (slot machine_task (type SYMBOL))
 )
+
+(deftemplate machine_payment_info
+  (slot machine_id (type SYMBOL))
+  (slot money (type INTEGER))
+)
 ; facts
 (deffacts robottasks
   (tasks_overview (robot_id 1) (task_id 1) (can_move TRUE) (can_retrieve TRUE) (can_deliver TRUE) (move_target "M-CS1") (machine_target "input" ))
@@ -24,7 +29,10 @@
 
 (deffacts machine_facts
   (machine_task_overview (machine_id M-CS1) (machine_task NOT-SET))
+  (machine_payment_info (machine_id M-RS1) (money 0))
+  (machine_payment_info (machine_id M-RS2) (money 0))
 )
+
 
 
 ; ==================================================================================
@@ -124,82 +132,99 @@
 
 
 
+; Which Machine to bribe?
+(deffunction check_payment
+  (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionBS")) 
+  (machine_payment_info (machine_id M-RS1) (money ?m_one))
+  (machine_payment_info (machine_id M-RS2) (money ?m_two))
+  (printout green "The Ring-stations should have " ?m_one " and " ?m_two ?tid crlf)
+  if((<= ?m_one 3) then
+    return "M-RS1"
+  )
+  if((<= ?m_two 3) then
+    return "M-RS2"
+  )
+  return("NONE")
+)
+
+
+
 ; ==================================================================================
 ; MOVE ROBOTS & Do Tasks
 ; ==================================================================================
 
-; Move robot 1
-; 1. send Robot 1 to cs1 input
-(defrule send-robot-one-to-mashine
-  (protobuf-peer (name ?n) (peer-id ?peer-id))
-  (tasks_overview (robot_id 1) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
-  (test (eq ?n ROBOT1))
-  (not (robot1_send_to_machine))
-  =>
-  (send_move_to_cmd 1 ?mot ?mat ?peer-id ?tid)
-  (assert (robot1_send_to_machine))
-)
+; ; Move robot 1
+; ; 1. send Robot 1 to cs1 input
+; (defrule send-robot-one-to-mashine
+;   (protobuf-peer (name ?n) (peer-id ?peer-id))
+;   (tasks_overview (robot_id 1) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
+;   (test (eq ?n ROBOT1))
+;   (not (robot1_send_to_machine))
+;   =>
+;   (send_move_to_cmd 1 ?mot ?mat ?peer-id ?tid)
+;   (assert (robot1_send_to_machine))
+; )
 
-; 2. & 3. Get Cap from shelf and place on Machine
-(defrule buffer-cap-robot-one
-  (protobuf-peer (name ?n) (peer-id ?peer-id))
-  (tasks_overview (robot_id 1) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
-  (test (eq ?n ROBOT1))
-  (not (robot1_buffer_cap))
-  => 
-  (printout green "BufferStation robot 1 current task id:" ?tid crlf)
-  (if (and (eq ?cm FALSE) (eq ?cr TRUE) (not (eq ?tid 1))) then
-    (send_robot_to_bufferStation 1 ?mot ?peer-id ?tid)
-    (printout blue "BufferStation should do something" ?tid crlf)
-    (assert (robot1_buffer_cap))
-  )
-)
+; ; 2. & 3. Get Cap from shelf and place on Machine
+; (defrule buffer-cap-robot-one
+;   (protobuf-peer (name ?n) (peer-id ?peer-id))
+;   (tasks_overview (robot_id 1) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
+;   (test (eq ?n ROBOT1))
+;   (not (robot1_buffer_cap))
+;   => 
+;   (printout green "BufferStation robot 1 current task id:" ?tid crlf)
+;   (if (and (eq ?cm FALSE) (eq ?cr TRUE) (not (eq ?tid 1))) then
+;     (send_robot_to_bufferStation 1 ?mot ?peer-id ?tid)
+;     (printout blue "BufferStation should do something" ?tid crlf)
+;     (assert (robot1_buffer_cap))
+;   )
+; )
 
-; 4. Prepare Machine
-(defrule prepare_machine
-  (protobuf-peer (name refbox-private) (peer-id ?peer-id))
-  (tasks_overview (robot_id 1) (task_id ?tid_one) (can_move ?cm_one) (can_retrieve ?cr_one) (can_deliver ?cd_one) (move_target ?mot) (machine_target ?mat))
-  (not (proces_cap_one_CS1))
-  =>
-  (printout red "prepare_machine robot_one task_id " ?tid_one " " ?cm_one " " ?cr_one " test: " (< ?tid_one 1) " " (> ?tid_one 1) crlf)
-  (printout green (and (eq ?tid_one 3) (eq ?cm_one FALSE) (eq ?cr_one FALSE)) crlf)
-  (if (and (eq ?tid_one 3) (eq ?cm_one FALSE) (eq ?cr_one FALSE)) then
-    (send_cmd_to_machine ?mot "RETRIEVE_CAP" ?peer-id)
-    (assert (proces_cap_one_CS1))
-    (printout blue "the machine should do something " crlf)
-    (printout red "part 2/2" crlf)
-  ) 
-)
+; ; 4. Prepare Machine
+; (defrule prepare_machine
+;   (protobuf-peer (name refbox-private) (peer-id ?peer-id))
+;   (tasks_overview (robot_id 1) (task_id ?tid_one) (can_move ?cm_one) (can_retrieve ?cr_one) (can_deliver ?cd_one) (move_target ?mot) (machine_target ?mat))
+;   (not (proces_cap_one_CS1))
+;   =>
+;   (printout red "prepare_machine robot_one task_id " ?tid_one " " ?cm_one " " ?cr_one " test: " (< ?tid_one 1) " " (> ?tid_one 1) crlf)
+;   (printout green (and (eq ?tid_one 3) (eq ?cm_one FALSE) (eq ?cr_one FALSE)) crlf)
+;   (if (and (eq ?tid_one 3) (eq ?cm_one FALSE) (eq ?cr_one FALSE)) then
+;     (send_cmd_to_machine ?mot "RETRIEVE_CAP" ?peer-id)
+;     (assert (proces_cap_one_CS1))
+;     (printout blue "the machine should do something " crlf)
+;     (printout red "part 2/2" crlf)
+;   ) 
+; )
 
-; 5. send Robot 2 to cs1 output 
-(defrule send-robot-two-to-mashine
-  (protobuf-peer (name ?n) (peer-id ?peer-id))
-  (tasks_overview (robot_id 2) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
-  (test (eq ?n ROBOT2))
-  (not (robot2_send_to_machine))
-  =>
-  (send_move_to_cmd 2 ?mot ?mat ?peer-id ?tid)
-  (printout red "part 1/2" crlf)
-  (assert (robot2_send_to_machine))
-)
+; ; 5. send Robot 2 to cs1 output 
+; (defrule send-robot-two-to-mashine
+;   (protobuf-peer (name ?n) (peer-id ?peer-id))
+;   (tasks_overview (robot_id 2) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
+;   (test (eq ?n ROBOT2))
+;   (not (robot2_send_to_machine))
+;   =>
+;   (send_move_to_cmd 2 ?mot ?mat ?peer-id ?tid)
+;   (printout red "part 1/2" crlf)
+;   (assert (robot2_send_to_machine))
+; )
 
-; 6. After 4. finish pickup with second robot
-(defrule robot_two_pickup_disk
-  (protobuf-peer (name ?n) (peer-id ?peer-id))
-  (tasks_overview (robot_id 2) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
-  (test (eq ?n ROBOT2))
-  (and (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cc TRUE))
-  (proces_cap_one_CS1)
-  (M-CS1_finished_task1)
-  (not (robot_two_picked_up_disk))
-  => 
-  ; if prepare Machine.Successful and robot_two ready then pick-up
-  (if (and (eq ?tid 2) (eq ?cm TRUE) (eq ?cr FALSE)) then
-    (send_retrieve_from_cmd 2 ?mot ?mat ?peer-id ?tid)
-    (assert (robot_two_picked_up_disk))
-    (printout blue "Robot 2 tried something " crlf)
-  )
-)
+; ; 6. After 4. finish pickup with second robot
+; (defrule robot_two_pickup_disk
+;   (protobuf-peer (name ?n) (peer-id ?peer-id))
+;   (tasks_overview (robot_id 2) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
+;   (test (eq ?n ROBOT2))
+;   (and (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cc TRUE))
+;   (proces_cap_one_CS1)
+;   (M-CS1_finished_task1)
+;   (not (robot_two_picked_up_disk))
+;   => 
+;   ; if prepare Machine.Successful and robot_two ready then pick-up
+;   (if (and (eq ?tid 2) (eq ?cm TRUE) (eq ?cr FALSE)) then
+;     (send_retrieve_from_cmd 2 ?mot ?mat ?peer-id ?tid)
+;     (assert (robot_two_picked_up_disk))
+;     (printout blue "Robot 2 tried something " crlf)
+;   )
+; )
 
 ; ==================================================================================
 ; Manage ROBOTS 3
@@ -330,15 +355,18 @@
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
   (bind ?successful (pb-field-value ?msg "successful"))
-  
+  (bind ?target (check_payment))
   ; check task 1 for robot 3
   (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cr FALSE)) then 
-    (modify ?tasks_overview (can_move FALSE))
-    (modify ?tasks_overview (can_retrieve TRUE))
-    (modify ?tasks_overview (move_target TRUE))
-    (modify ?tasks_overview (move_target "M-DS"))
-    (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (printout green "robot three finished his task " ?task_id crlf)
+    ; TODO check ?target == "NONE" and do something else if thats the case
+    (if (not (eq ?target "NONE")) then
+      (modify ?tasks_overview (can_move FALSE))
+      (modify ?tasks_overview (can_retrieve TRUE))
+      (modify ?tasks_overview (move_target TRUE))
+      (modify ?tasks_overview (move_target ?target))
+      (modify ?tasks_overview (task_id (+ ?task_id 1)))
+    )
   )
 
   ; did task 3 for robot 1 finish? 
