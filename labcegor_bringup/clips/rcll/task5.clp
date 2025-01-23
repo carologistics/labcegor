@@ -133,9 +133,7 @@
 
 
 ; Which Machine to bribe?
-(deffunction check_payment
-  (machine_payment_info (machine_id M-RS1) (money ?m_one))
-  (machine_payment_info (machine_id M-RS2) (money ?m_two))
+(deffunction check_payment (?m_one ?m_two)
   (printout green "The Ring-stations should have " ?m_one " and " ?m_two ?tid crlf)
   (if(<= ?m_one 3)then
     return "M-RS1"
@@ -350,11 +348,13 @@
 (defrule check-robot_three
   (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id 3) (ptr ?msg))
   ?tasks_overview <- (tasks_overview (robot_id 3) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
+  (machine_payment_info (machine_id M-RS1) (money ?m_one))
+  (machine_payment_info (machine_id M-RS2) (money ?m_two))
   =>
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
   (bind ?successful (pb-field-value ?msg "successful"))
-  (bind ?target (check_payment))
+  (bind ?target (check_payment ?m_one ?m_two))
   ; check task 1 for robot 3
   (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cr FALSE)) then 
     (printout green "robot three finished his task " ?task_id crlf)
