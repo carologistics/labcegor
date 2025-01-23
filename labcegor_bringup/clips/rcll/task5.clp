@@ -238,6 +238,7 @@
   (send_move_to_cmd 3 ?mot ?mat ?peer-id ?tid)
   ;  (printout blue "part 1/3" crlf)
   (assert (robot3_move_to_pickup))
+  (assert (robot3_did_something))
 )
 
 (defrule robot-three-pickup-base
@@ -253,6 +254,7 @@
     (send_retrieve_from_cmd 3 ?mot ?mat ?peer-id ?tid)
     ;(printout blue "part 2/3" crlf)
     (assert (robot3_did_pickup))
+    (assert (robot3_did_something))
   )
 )
 
@@ -267,6 +269,7 @@
   (send_deliver_to_cmd 3 ?mot ?mat ?peer-id ?tid)
   ;(printout blue "part 3/3" crlf)
   (assert (robot3_delivered_base))
+  (assert (robot3_did_something))
 )
 
 ; ==================================================================================
@@ -336,6 +339,7 @@
   ?tasks_overview <- (tasks_overview (robot_id 3) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
   (machine_payment_info (machine_id M-RS1) (money ?m_one))
   (machine_payment_info (machine_id M-RS2) (money ?m_two))
+  (robot3_did_something)
   =>
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
@@ -348,6 +352,7 @@
     (modify ?tasks_overview (can_move FALSE))
     (modify ?tasks_overview (can_retrieve TRUE))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
+    (retract (robot3_did_something))
   )
   
   ; It has moved
@@ -355,6 +360,7 @@
     ;(printout green "robot three finished his task " ?task_id  crlf)
     (modify ?tasks_overview (can_move FALSE))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
+    (retract (robot3_did_something))
   )
 
   (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cd FALSE)) then 
@@ -366,6 +372,7 @@
     ;(printout green "robot three did something " ?task_id " " ?target crlf)
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     ;(printout green ?task_id ?tid crlf)
+    (retract (robot3_did_something))
   )
 
   (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE)) then 
@@ -376,6 +383,7 @@
     ;(printout green "robot three did something " ?task_id crlf)
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     ;(printout green ?task_id ?tid crlf)
+    (retract (robot3_did_something))
   )
 )
 
