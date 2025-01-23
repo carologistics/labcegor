@@ -134,7 +134,6 @@
 
 ; Which Machine to bribe?
 (deffunction check_payment
-  (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionBS")) 
   (machine_payment_info (machine_id M-RS1) (money ?m_one))
   (machine_payment_info (machine_id M-RS2) (money ?m_two))
   (printout green "The Ring-stations should have " ?m_one " and " ?m_two ?tid crlf)
