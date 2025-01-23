@@ -352,7 +352,7 @@
     (modify ?tasks_overview (can_move FALSE))
     (modify ?tasks_overview (can_retrieve TRUE))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
-    (retract (robot3_did_something))
+    (retract robot3_did_something)
   )
   
   ; It has moved
@@ -360,7 +360,7 @@
     ;(printout green "robot three finished his task " ?task_id  crlf)
     (modify ?tasks_overview (can_move FALSE))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
-    (retract (robot3_did_something))
+    (retract robot3_did_something)
   )
 
   (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cd FALSE)) then 
@@ -372,7 +372,7 @@
     ;(printout green "robot three did something " ?task_id " " ?target crlf)
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     ;(printout green ?task_id ?tid crlf)
-    (retract (robot3_did_something))
+    (retract robot3_did_something)
   )
 
   (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE)) then 
@@ -383,7 +383,7 @@
     ;(printout green "robot three did something " ?task_id crlf)
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     ;(printout green ?task_id ?tid crlf)
-    (retract (robot3_did_something))
+    (retract robot3_did_something)
   )
 )
 
