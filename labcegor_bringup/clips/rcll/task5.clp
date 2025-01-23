@@ -242,6 +242,7 @@
   ?tasks_overview <- (tasks_overview (robot_id 3) (task_id ?tid) (can_move TRUE) (can_retrieve FALSE) (can_deliver ?cd) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id 3) (did_something FALSE))
   (test (eq ?n ROBOT3))
+  (test (or (eq ?robot_state IDLE) (eq ?robot_state HOLDING)))
   =>
   ;Prepare Basestation PrepareMachine
   (if (eq ?s IDLE) then
@@ -364,7 +365,7 @@
 
   (printout green "robot three did something " ?task_id " " ?tid " " ?cm  " " ?cr  " " ?cd  " " ?mot  " " ?mat  " " ?robot_state " " ?target crlf)
   ; It has moved
-  (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE)) then 
+  (if (and (eq ?robot_id 3) (eq ?task_id ?tid) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE)) then 
     (modify ?tasks_overview (can_move FALSE))
     (modify ?tasks_overview (can_retrieve TRUE))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
@@ -373,14 +374,14 @@
   )
   
   ; It has moved
-  (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd TRUE)) then 
+  (if (and (eq ?robot_id 3) (eq ?task_id ?tid) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd TRUE)) then 
     (modify ?tasks_overview (can_move FALSE))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (modify ?check_robot (did_something FALSE))
     (modify ?tasks_overview (state HOLDING))
   )
 
-  (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cd FALSE)) then 
+  (if (and (eq ?robot_id 3) (eq ?task_id ?tid) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cd FALSE)) then 
     ; TODO check ?target == "NONE" and do something else if thats the case
     (modify ?tasks_overview (can_move TRUE))
     (modify ?tasks_overview (can_retrieve FALSE))
@@ -391,7 +392,7 @@
     (modify ?check_robot (did_something FALSE))
   )
 
-  (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE)) then 
+  (if (and (eq ?robot_id 3) (eq ?task_id ?tid) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE)) then 
     (modify ?tasks_overview (can_move TRUE))
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_deliver FALSE))
