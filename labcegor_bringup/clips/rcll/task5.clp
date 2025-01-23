@@ -68,7 +68,7 @@
   (pb-set-field ?msg "retrieve" ?move_msg)
   (pb-broadcast ?peer-id ?msg)
   (pb-destroy ?msg)
-  (printout blue "Retrieve: robot: " ?r_id " task " ?r_id " " ?r_target " " ?m_point " " ?peer-id " " ?task_id " " ?task_id crlf)
+  (printout blue "Retrieve: robot: " ?r_id " task " ?task_id " " ?r_target " " ?m_point " " ?peer-id crlf)
 )
 
 ; Deliver
@@ -119,7 +119,7 @@
 ; Prepare Machine
 (deffunction prepare_basestation (?m_id ?side ?color ?peer-id)
   (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionBS")) 
-  (pb-set-field ?prep-msg "MachineSide" ?side)
+  (pb-set-field ?prep-msg "MachineSide" "input")
   (pb-set-field ?prep-msg "BaseColor" ?color)
 
   (bind ?msg (pb-create "llsf_msgs.PrepareMachine"))
