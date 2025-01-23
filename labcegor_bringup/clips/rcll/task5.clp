@@ -246,11 +246,12 @@
   (machine (name M-BS) (state ?s)
 )
   (test (eq ?n ROBOT3))
-  (eq ?s READY-AT-OUTPUT)
   (robot3_move_to_pickup)
   (not(robot3_did_pickup))
   =>
-  (if (and (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cd FALSE)) then
+
+  (printout red "Basestation is in state " ?s crlf)
+  (if (and (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cd FALSE) (eq ?s READY-AT-OUTPUT)) then
     (send_retrieve_from_cmd 3 ?mot ?mat ?peer-id ?tid)
     (printout blue "part 2/3" crlf)
     (assert (robot3_did_pickup))
