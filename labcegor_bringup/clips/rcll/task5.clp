@@ -20,11 +20,19 @@
   (slot machine_id (type SYMBOL))
   (slot money (type INTEGER))
 )
+
+(deftemplate check_robot
+  (slot robot_id (type INTEGER))
+  (slot did_something (type SYMBOL) (allowed-values FALSE TRUE))
+)
 ; facts
 (deffacts robottasks
   (tasks_overview (robot_id 1) (task_id 1) (can_move TRUE) (can_retrieve TRUE) (can_deliver TRUE) (move_target "M-CS1") (machine_target "input" ))
   (tasks_overview (robot_id 2) (task_id 1) (can_move TRUE) (can_retrieve TRUE) (can_deliver TRUE) (move_target "M-CS1") (machine_target "output" ))
   (tasks_overview (robot_id 3) (task_id 1) (can_move TRUE) (can_retrieve FALSE) (can_deliver FALSE) (move_target "M-BS") (machine_target "output" ))
+  (check_robot (robot_id 1) (did_something FALSE))
+  (check_robot (robot_id 2) (did_something FALSE))
+  (check_robot (robot_id 3) (did_something FALSE))
 )
 
 (deffacts machine_facts
@@ -229,6 +237,7 @@
 (defrule send-robot-three-to-pickup
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   (tasks_overview (robot_id 3) (task_id ?tid) (can_move TRUE) (can_retrieve ?FALSE) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
+  ?check_robot <- (check_robot (robot_id 3) (did_something FALSE))
   (machine (name M-BS) (state ?s))
   (test (eq ?n ROBOT3))
   (not (robot3_move_to_pickup))
@@ -238,12 +247,13 @@
   (send_move_to_cmd 3 ?mot ?mat ?peer-id ?tid)
   ;  (printout blue "part 1/3" crlf)
   (assert (robot3_move_to_pickup))
-  (assert (robot3_did_something))
+  (modify ?check_robot (did_something TRUE))
 )
 
 (defrule robot-three-pickup-base
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   (tasks_overview (robot_id 3) (task_id ?tid) (can_move FALSE) (can_retrieve TRUE) (can_deliver FALSE) (move_target ?mot) (machine_target ?mat))
+  ?check_robot <- (check_robot (robot_id 3) (did_something FALSE))
   (machine (name M-BS) (state ?s))
   (test (eq ?n ROBOT3))
   (robot3_move_to_pickup)
@@ -254,7 +264,7 @@
     (send_retrieve_from_cmd 3 ?mot ?mat ?peer-id ?tid)
     ;(printout blue "part 2/3" crlf)
     (assert (robot3_did_pickup))
-    (assert (robot3_did_something))
+    (modify ?check_robot (did_something TRUE))
   )
 )
 
@@ -262,6 +272,7 @@
 (defrule robot-three-deliver-base
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   (tasks_overview (robot_id 3) (task_id ?tid) (can_move FALSE) (can_retrieve FALSE) (can_deliver TRUE) (move_target ?mot) (machine_target ?mat))
+  ?check_robot <- (check_robot (robot_id 3) (did_something FALSE))
   (test (eq ?n ROBOT3))
   (robot3_did_pickup)
   (not(robot3_delivered_base))
@@ -269,7 +280,7 @@
   (send_deliver_to_cmd 3 ?mot ?mat ?peer-id ?tid)
   ;(printout blue "part 3/3" crlf)
   (assert (robot3_delivered_base))
-  (assert (robot3_did_something))
+  (modify ?check_robot (did_something TRUE))
 )
 
 ; ==================================================================================
@@ -339,7 +350,7 @@
   ?tasks_overview <- (tasks_overview (robot_id 3) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
   (machine_payment_info (machine_id M-RS1) (money ?m_one))
   (machine_payment_info (machine_id M-RS2) (money ?m_two))
-  (robot3_did_something)
+  ?check_robot <- (check_robot (robot_id 3) (did_something TRUE))
   =>
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
@@ -352,7 +363,7 @@
     (modify ?tasks_overview (can_move FALSE))
     (modify ?tasks_overview (can_retrieve TRUE))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
-    (retract robot3_did_something)
+    (modify ?check_robot (did_something FALSE))
   )
   
   ; It has moved
@@ -360,7 +371,7 @@
     ;(printout green "robot three finished his task " ?task_id  crlf)
     (modify ?tasks_overview (can_move FALSE))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
-    (retract robot3_did_something)
+    (modify ?check_robot (did_something FALSE))
   )
 
   (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cd FALSE)) then 
@@ -372,7 +383,7 @@
     ;(printout green "robot three did something " ?task_id " " ?target crlf)
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     ;(printout green ?task_id ?tid crlf)
-    (retract robot3_did_something)
+    (modify ?check_robot (did_something FALSE))
   )
 
   (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE)) then 
@@ -383,7 +394,7 @@
     ;(printout green "robot three did something " ?task_id crlf)
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     ;(printout green ?task_id ?tid crlf)
-    (retract robot3_did_something)
+    (modify ?check_robot (did_something FALSE))
   )
 )
 
