@@ -130,11 +130,9 @@
   (pb-destroy ?msg)
 )
 
-
-
 ; Which Machine to bribe?
 (deffunction check_payment (?m_one ?m_two)
-  (printout green "The Ring-stations should have " ?m_one " and " ?m_two ?tid crlf)
+  (printout green "The Ring-stations should have " ?m_one " and " ?m_two crlf)
   (if(<= ?m_one 3)then
     return "M-RS1"
   )
