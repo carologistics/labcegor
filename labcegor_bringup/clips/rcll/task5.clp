@@ -229,15 +229,12 @@
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   (tasks_overview (robot_id 3) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
   (test (eq ?n ROBOT3))
-  (not (robot3_move_to_pickup))
+  (and (eq ?cm TRUE) (eq ?cr FALSE))
   =>
-  (if (and (eq ?cm TRUE) (eq ?cr FALSE)) then
-    ;Prepare Basestation PrepareMachine
-    (prepare_basestation "M-BS" OUTPUT BASE_BLACK ?peer-id)
-    (send_move_to_cmd 3 ?mot ?mat ?peer-id ?tid)
-    (printout blue "part 1/3" crlf)
-    (assert (robot3_move_to_pickup))
-  )
+  ;Prepare Basestation PrepareMachine
+  (prepare_basestation "M-BS" OUTPUT BASE_BLACK ?peer-id)
+  (send_move_to_cmd 3 ?mot ?mat ?peer-id ?tid)
+  (printout blue "part 1/3" crlf)
 )
 
 (defrule robot-three-pickup-base
@@ -246,14 +243,12 @@
   (machine (name M-BS) (state ?s)
 )
   (test (eq ?n ROBOT3))
-  (robot3_move_to_pickup)
-  (not(robot3_did_pickup))
+  (and (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cd FALSE))
   =>
   (printout red "Basestation is in state " ?s crlf)
-  (if (and (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cd FALSE) (eq ?s READY-AT-OUTPUT)) then
+  (if (eq ?s READY-AT-OUTPUT) then
     (send_retrieve_from_cmd 3 ?mot ?mat ?peer-id ?tid)
     (printout blue "part 2/3" crlf)
-    (assert (robot3_did_pickup))
   )
 )
 
@@ -261,14 +256,10 @@
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   (tasks_overview (robot_id 3) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
   (test (eq ?n ROBOT3))
-  (robot3_did_pickup)
-  (not(robot3_deliver_base))
+  (and (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE))
   =>
-  (if (and (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE)) then
-    (send_deliver_to_cmd 3 ?mot ?mat ?peer-id ?tid)
-    (printout blue "part 3/3" crlf)
-    (assert (robot3_deliver_base))
-  )
+  (send_deliver_to_cmd 3 ?mot ?mat ?peer-id ?tid)
+  (printout blue "part 3/3" crlf)
 )
 
 ; ==================================================================================
@@ -350,7 +341,6 @@
     (modify ?tasks_overview (can_move FALSE))
     (modify ?tasks_overview (can_retrieve TRUE))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
-    (if (robot3_did_pickup) then (retract robot3_did_pickup))
   )
   
   ; It has moved
@@ -358,7 +348,6 @@
     (printout green "robot three finished his task " ?task_id  crlf)
     (modify ?tasks_overview (can_move FALSE))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
-    (if (robot3_deliver_base) then (retract robot3_deliver_base))
   )
 
   (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cd FALSE)) then 
@@ -367,7 +356,6 @@
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_deliver TRUE))
     (modify ?tasks_overview (move_target ?target))
-    (if (robot3_move_to_pickup) then (retract robot3_move_to_pickup))
     (printout green "robot three did something " ?task_id " " ?target crlf)
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (printout green ?task_id ?tid crlf)
@@ -378,7 +366,6 @@
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_deliver FALSE))
     (modify ?tasks_overview (move_target "M-BS"))
-    (if (robot3_move_to_pickup) then (retract robot3_move_to_pickup))
     (printout green "robot three did something " ?task_id crlf)
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (printout green ?task_id ?tid crlf)
