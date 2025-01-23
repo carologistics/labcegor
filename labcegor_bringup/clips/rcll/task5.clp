@@ -128,8 +128,8 @@
 ; Prepare Machine
 (deffunction prepare_basestation (?m_id ?side ?color ?peer-id)
   (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionBS")) 
-  (pb-set-field ?prep-msg "MachineSide" ?side)
-  (pb-set-field ?prep-msg "BaseColor" ?color)
+  (pb-set-field ?prep-msg "MachineSide" "OUTPUT")
+  (pb-set-field ?prep-msg "BaseColor" "BASE_BLACK")
 
   (bind ?msg (pb-create "llsf_msgs.PrepareMachine"))
   (pb-set-field ?msg "team_color" MAGENTA)
