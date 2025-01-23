@@ -230,7 +230,7 @@
   (test (eq ?n ROBOT3))
   (not (robot3_move_to_pickup))
   =>
-  (if (and (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE)) then
+  (if (and (eq ?cm TRUE) (eq ?cr FALSE)) then
     ;Prepare Basestation PrepareMachine
     (prepare_basestation ?mot 1 2 ?peer-id)
     (send_move_to_cmd 3 ?mot ?mat ?peer-id ?tid)
@@ -353,7 +353,7 @@
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
   (bind ?successful (pb-field-value ?msg "successful"))
   (bind ?target (check_payment ?m_one ?m_two))
-  ; check task 1 for robot 3
+  
   (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cr FALSE)) then 
     (printout green "robot three finished his task " ?task_id crlf)
     ; TODO check ?target == "NONE" and do something else if thats the case
@@ -365,8 +365,8 @@
     )
   )
 
-  ; did task 3 for robot 1 finish? 
   (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cr FALSE)) then 
+    (modify ?tasks_overview (can_move TRUE))
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_deliver TRUE))
     (printout green "robot three did something " ?task_id crlf)
@@ -374,7 +374,6 @@
     (printout green ?task_id ?tid crlf)
   )
 
-  ; did task 3 for robot 1 finish? 
   (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cr TRUE)) then 
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_move TRUE))
