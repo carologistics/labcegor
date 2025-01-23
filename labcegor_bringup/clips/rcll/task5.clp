@@ -241,13 +241,11 @@
   ?check_robot <- (check_robot (robot_id 3) (did_something FALSE))
   (machine (name M-BS) (state ?s))
   (test (eq ?n ROBOT3))
-  (not (robot3_move_to_pickup))
   =>
   ;Prepare Basestation PrepareMachine
   (prepare_basestation "M-BS" "OUTPUT" "BASE_BLACK" ?peer-id)
   (send_move_to_cmd 3 ?mot ?mat ?peer-id ?tid)
   ;  (printout blue "part 1/3" crlf)
-  (assert (robot3_move_to_pickup))
   (modify ?check_robot (did_something TRUE))
 )
 
@@ -257,14 +255,11 @@
   ?check_robot <- (check_robot (robot_id 3) (did_something FALSE))
   (machine (name M-BS) (state ?s))
   (test (eq ?n ROBOT3))
-  (robot3_move_to_pickup)
-  (not(robot3_did_pickup))
   =>
   (printout red "Basestation is in state " ?s crlf)
   (if (eq ?s READY-AT-OUTPUT) then
     (send_retrieve_from_cmd 3 ?mot ?mat ?peer-id ?tid)
     ;(printout blue "part 2/3" crlf)
-    (assert (robot3_did_pickup))
     (modify ?check_robot (did_something TRUE))
   )
 )
@@ -275,12 +270,9 @@
   (tasks_overview (robot_id 3) (task_id ?tid) (can_move FALSE) (can_retrieve FALSE) (can_deliver TRUE) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id 3) (did_something FALSE))
   (test (eq ?n ROBOT3))
-  (robot3_did_pickup)
-  (not(robot3_delivered_base))
   =>
   (send_deliver_to_cmd 3 ?mot ?mat ?peer-id ?tid)
   ;(printout blue "part 3/3" crlf)
-  (assert (robot3_delivered_base))
   (modify ?check_robot (did_something TRUE))
 )
 
