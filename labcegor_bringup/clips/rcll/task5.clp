@@ -260,7 +260,7 @@
   (robot3_move_to_pickup)
   (not(robot3_did_pickup))
   =>
-  ;(printout red "Basestation is in state " ?s crlf)
+  (printout red "Basestation is in state " ?s crlf)
   (if (eq ?s READY-AT-OUTPUT) then
     (send_retrieve_from_cmd 3 ?mot ?mat ?peer-id ?tid)
     ;(printout blue "part 2/3" crlf)
