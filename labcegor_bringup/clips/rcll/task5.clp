@@ -238,13 +238,15 @@
 (defrule send-robot-three-to-pickup
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   (protobuf-peer (name refbox-private) (peer-id ?refbox-id))
-  (tasks_overview (robot_id 3) (task_id ?tid) (can_move TRUE) (can_retrieve ?FALSE) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
+  (tasks_overview (robot_id 3) (task_id ?tid) (can_move TRUE) (can_retrieve FALSE) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id 3) (did_something FALSE))
   (machine (name M-BS) (state ?s))
   (test (eq ?n ROBOT3))
   =>
   ;Prepare Basestation PrepareMachine
-  (prepare_basestation "M-BS" "OUTPUT" "BASE_BLACK" ?refbox-id)
+  (if (eq ?s IDLE) then
+    (prepare_basestation "M-BS" "OUTPUT" "BASE_BLACK" ?refbox-id)
+  )
   (send_move_to_cmd 3 ?mot ?mat ?peer-id ?tid)
   (printout red "part 1/3 " ?n crlf)
   (modify ?check_robot (did_something TRUE))
