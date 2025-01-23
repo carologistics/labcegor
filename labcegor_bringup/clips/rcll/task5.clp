@@ -138,10 +138,10 @@
   (machine_payment_info (machine_id M-RS1) (money ?m_one))
   (machine_payment_info (machine_id M-RS2) (money ?m_two))
   (printout green "The Ring-stations should have " ?m_one " and " ?m_two ?tid crlf)
-  if((<= ?m_one 3) then
+  (if(<= ?m_one 3)then
     return "M-RS1"
   )
-  if((<= ?m_two 3) then
+  (if(<= ?m_two 3) then
     return "M-RS2"
   )
   return("NONE")
