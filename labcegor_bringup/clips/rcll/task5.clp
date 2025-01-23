@@ -346,7 +346,7 @@
     (if (not (eq ?target "NONE")) then
       (modify ?tasks_overview (can_move FALSE))
       (modify ?tasks_overview (can_retrieve TRUE))
-      (modify ?tasks_overview (move_target ?target))
+      (modify ?tasks_overview (move_target "M-BS"))
       (modify ?tasks_overview (task_id (+ ?task_id 1)))
     )
   )
