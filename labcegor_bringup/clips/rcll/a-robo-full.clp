@@ -11,9 +11,9 @@
   (slot task (type INTEGER)) ;current task-id 0 = free
   (slot order (type INTEGER)) ;odrder id of workpice in Hand 0=empty, 20 = hands full unassigned, 2X assigend to slide fo RSX
   (slot pos (type SYMBOL)); waypoint
-  (slot pos_at_wp (type SYMBOL));if any
+  (slot pos_at_waypoint (type SYMBOL));if any
   (slot des (type SYMBOL)); destination waypoint
-  (slot des (type SYMBOL));if any
+  (slot des_at_waypoint (type SYMBOL));if any
 )
 (deftemplate machine-status
   (slot name (type SYMBOL))
@@ -28,6 +28,10 @@
   (slot order (type INTEGER));id of last order 0 if delivered as last task
 )
 
+(deftemplate update_rs
+  (slot id (type INTEGER))
+  (slot payment (type INTEGER) (allowed-values 1 0 -1 -2)) ;1 for ring is added -1, -2 für payment for ring 0 as optional
+)
 
 
 (deftemplate team
@@ -37,4 +41,5 @@
 
 (deffacts
   (team (name MAGENTA)(prefix M))
+  (init_moves)
 )
