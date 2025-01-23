@@ -229,7 +229,7 @@
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   (tasks_overview (robot_id 3) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
   (test (eq ?n ROBOT3))
-  (and (eq ?cm TRUE) (eq ?cr FALSE))
+  (test(and (eq ?cm TRUE) (eq ?cr FALSE)))
   =>
   ;Prepare Basestation PrepareMachine
   (prepare_basestation "M-BS" OUTPUT BASE_BLACK ?peer-id)
@@ -243,7 +243,7 @@
   (machine (name M-BS) (state ?s)
 )
   (test (eq ?n ROBOT3))
-  (and (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cd FALSE))
+  (test (and (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cd FALSE)))
   =>
   ;(printout red "Basestation is in state " ?s crlf)
   (if (eq ?s READY-AT-OUTPUT) then
@@ -256,7 +256,7 @@
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   (tasks_overview (robot_id 3) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
   (test (eq ?n ROBOT3))
-  (and (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE))
+  (test(and (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE)))
   =>
   (send_deliver_to_cmd 3 ?mot ?mat ?peer-id ?tid)
   ;(printout blue "part 3/3" crlf)
@@ -309,15 +309,15 @@
   (if (and (eq ?robot_id 2) (eq ?task_id 1) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr TRUE)) then 
     (modify ?tasks_overview (can_move FALSE))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
-    (printout green "robot two finished his task " ?task_id crlf)
+    ; (printout green "robot two finished his task " ?task_id crlf)
   )
 
   ; did task 2 for robot 1 finish? 
   (if (and (eq ?robot_id 2) (eq ?task_id 2) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr FALSE)) then 
     (modify ?tasks_overview (can_retrieve FALSE))
-    (printout green "robot two did something " ?task_id crlf)
+    ; (printout green "robot two did something " ?task_id crlf)
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
-    (printout green ?task_id ?tid crlf)
+    ; (printout green ?task_id ?tid crlf)
   )
 )
 
@@ -337,7 +337,7 @@
   
   ; It has moved
   (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE)) then 
-    (printout green "robot three finished his task " ?task_id  crlf)
+    ;(printout green "robot three finished his task " ?task_id  crlf)
     (modify ?tasks_overview (can_move FALSE))
     (modify ?tasks_overview (can_retrieve TRUE))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
@@ -345,7 +345,7 @@
   
   ; It has moved
   (if (and (eq ?robot_id 3) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd TRUE)) then 
-    (printout green "robot three finished his task " ?task_id  crlf)
+    ;(printout green "robot three finished his task " ?task_id  crlf)
     (modify ?tasks_overview (can_move FALSE))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
   )
