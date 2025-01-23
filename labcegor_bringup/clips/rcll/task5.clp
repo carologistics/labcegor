@@ -243,7 +243,7 @@
   (test (eq ?n ROBOT3))
   =>
   ;Prepare Basestation PrepareMachine
-  (prepare_basestation "M-BS" "OUTPUT" "BASE_BLACK" ?peer-id)
+  (prepare_basestation "M-BS" "OUTPUT" "BASE_BLACK" refbox-private)
   (send_move_to_cmd 3 ?mot ?mat ?peer-id ?tid)
   (printout red "part 1/3 " ?n crlf)
   (modify ?check_robot (did_something TRUE))
