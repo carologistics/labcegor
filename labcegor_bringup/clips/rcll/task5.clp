@@ -129,8 +129,8 @@
 (deffunction prepare_basestation (?m_id ?side ?color ?peer-id)
   (printout red "first message in prepare_basestation" ?m_id " " ?side " " ?color " " ?peer-id crlf)
   (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionBS")) 
-  (pb-set-field ?prep-msg "MachineSide" "OUTPUT")
-  (pb-set-field ?prep-msg "BaseColor" "BASE_BLACK")
+  (pb-set-field ?prep-msg "side" "OUTPUT")
+  (pb-set-field ?prep-msg "color" "BASE_BLACK")
 
   (bind ?msg (pb-create "llsf_msgs.PrepareMachine"))
   (pb-set-field ?msg "team_color" MAGENTA)
