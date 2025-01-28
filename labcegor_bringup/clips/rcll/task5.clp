@@ -169,7 +169,7 @@
   =>
   (modify ?check_robot (is_assigned TRUE))
   (modify ?check_robot (assigned_order ?oid))
-  (printout blue "Robot" ?n " peer-id" ?peer-id " robot-id" ?id " " crlf)
+  (printout blue "Robot" "robot-id" ?id " " crlf)
 )
 
 ; ==================================================================================
