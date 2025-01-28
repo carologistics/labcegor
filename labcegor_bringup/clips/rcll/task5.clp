@@ -186,7 +186,7 @@
   ?check_robot <- (check_robot (robot_id ?cid) (did_something FALSE) (is_assigned TRUE) (assigned_order ?ao))
   (test (and (eq ?id ?cid) (eq ?peer-id ?id)))
   =>
-  (printout blue "Robot" ?n " peer-id" ?peer-id " robot-id" ?id " assigned: " ?aocrlf)
+  (printout blue "Robot" ?n " peer-id" ?peer-id " robot-id" ?id " assigned: " ?ao crlf)
 )
 
 
