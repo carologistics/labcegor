@@ -391,6 +391,7 @@
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (modify ?tasks_overview (state HOLDING))
     (modify ?check_robot (did_something FALSE))
+    (printout green "where should it go now? " ?target " " ?m_one " " ?m_two " soooo?: " (check_payment ?m_one ?m_two) crlf)
   )
 
   (if (and (eq ?robot_id 3) (eq ?task_id ?tid) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE)) then 
