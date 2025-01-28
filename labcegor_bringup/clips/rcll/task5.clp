@@ -258,7 +258,7 @@
     (modify ?check_robot (did_something TRUE))
     (modify ?tasks_overview (state CARRY))
   )
-  (printout red "CARRY " ?n " " robot_state crlf)
+  (printout red "CARRY " ?n " " ?robot_state " " ?mot " " ?mat " " ?peer-idcrlf)
 )
 
 (defrule robot-three-pickup-base
