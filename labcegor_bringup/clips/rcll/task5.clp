@@ -188,7 +188,7 @@
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   (protobuf-peer (name refbox-private) (peer-id ?refbox-id))
   =>
-  (printout blue "Robot " ?n " peer-id " ?rid " robot-id " ?id " assigned:"  crlf)
+  (printout blue "Robot " ?n " peer-id " ?peer-id " robot-id " ?rid " assigned:"  crlf)
 )
 
 
