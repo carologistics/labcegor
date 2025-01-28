@@ -144,10 +144,10 @@
 ; Which Machine to bribe?
 (deffunction check_payment (?m_one ?m_two)
   ;(printout green "The Ring-stations should have " ?m_one " and " ?m_two crlf)
-  (if(<= ?m_one 3)then
+  (if(< ?m_one 3)then
     (return "M-RS1")
   )
-  (if(<= ?m_two 3) then
+  (if(< ?m_two 3) then
     (return "M-RS2")
   )
   (return "NONE")
