@@ -271,7 +271,7 @@
   (printout red "Basestation is in state " ?s crlf)
   (if (eq ?s READY-AT-OUTPUT) then
     (send_retrieve_from_cmd 3 ?mot ?mat ?peer-id ?tid)
-    (printout blue "part 2/3 " robot_state crlf)
+    ; (printout blue "part 2/3 " robot_state crlf)
     (modify ?check_robot (did_something TRUE))
     (modify ?tasks_overview (state HOLDING))
   )
@@ -284,7 +284,7 @@
   (test (eq ?n ROBOT3))
   =>
   (send_deliver_to_cmd 3 ?mot ?mat ?peer-id ?tid)
-  (printout blue "part 3/3 " robot_state crlf)
+  ; (printout blue "part 3/3 " robot_state crlf)
   (modify ?check_robot (did_something TRUE))
   (modify ?tasks_overview (state IDLE))
 )
@@ -308,16 +308,16 @@
   ; did task 1 for robot 1 finish? 
   (if (and (eq ?robot_id 1) (eq ?task_id 1) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr TRUE)) then 
     (modify ?tasks_overview (can_move FALSE))
-    (printout green "robot one finished his task " ?task_id crlf)
+    ; (printout green "robot one finished his task " ?task_id crlf)
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
-    (printout green ?task_id ?tid crlf)
+    ; (printout green ?task_id ?tid crlf)
   )
   ; did task 2 for robot 1 finish? 
   (if (and (eq ?robot_id 1) (eq ?task_id 2) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr TRUE)) then 
     (modify ?tasks_overview (can_retrieve FALSE))
-    (printout green "robot one finished his task " ?task_id crlf)
+    ; (printout green "robot one finished his task " ?task_id crlf)
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
-    (printout green ?task_id ?tid crlf)
+    ; (printout green ?task_id ?tid crlf)
   )
 )
 
@@ -363,7 +363,7 @@
   (bind ?successful (pb-field-value ?msg "successful"))
   (bind ?target (check_payment ?m_one ?m_two))
 
-  (printout green "robot three did something " ?task_id " " ?tid " " ?cm  " " ?cr  " " ?cd  " " ?mot  " " ?mat  " " ?robot_state " " ?target crlf)
+  ;(printout green "robot three did something " ?task_id " " ?tid " " ?cm  " " ?cr  " " ?cd  " " ?mot  " " ?mat  " " ?robot_state " " ?target crlf)
   ; It has moved
   (if (and (eq ?robot_id 3) (eq ?task_id ?tid) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE)) then 
     (modify ?tasks_overview (can_move FALSE))
