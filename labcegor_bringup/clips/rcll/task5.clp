@@ -189,7 +189,7 @@
   (protobuf-peer (name refbox-private) (peer-id ?refbox-id))
   (machine (name M-BS) (state ?s))
   =>
-  (printout blue "Robot " ?n " robot-id " ?rid crlf)
+  (printout blue "Robot " ?peer-name " robot-id " ?rid crlf)
   ; Todo send robot
   ; todo check if robot is 
   ;Get Order
