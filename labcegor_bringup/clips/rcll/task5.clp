@@ -255,8 +255,8 @@
   ; (if (eq ?s IDLE) then
   ;   (prepare_basestation "M-BS" "OUTPUT" "BASE_BLACK" ?refbox-id)
   ; )
-  (assert base_order_from_machine (order_id 0) (robot_id 3) (color "BASE_BLACK") (position "OUTPUT"))
-  
+  (assert (base_order_from_machine (order_id 0) (robot_id 3) (color "BASE_BLACK") (position "OUTPUT")))
+
   (if (eq ?robot_state IDLE) then 
     (send_move_to_cmd 3 ?mot ?mat ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
