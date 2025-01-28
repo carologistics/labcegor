@@ -25,6 +25,7 @@
 (defrule robo_retrive
   ?ac <- (action (a_type "r") (id ?id) (machine ?wp) (io ?io) (task_id ?t-id)(wait ?w))
   ;(done (done_t_id ?w))
+  (robo_status (id ?id) (pos ?wp) (pos_at_waypoint ?io))
   (protobuf-peer (name ?name) (peer-id ?peer-id))
   (test (eq ?name (sym-cat (str-cat "ROBOT" ?id))))
   ;old;?lt <-(last_task (id ?id) (l_task_id ?last_t))
@@ -49,6 +50,7 @@
 (defrule robo_deliver
   ?ac <- (action (a_type "d") (id ?id) (machine ?wp) (io ?io) (task_id ?t-id)(wait ?w))
   ;(done (done_t_id ?w))
+  (robo_status (id ?id) (pos ?wp) (pos_at_waypoint ?io))
   (protobuf-peer (name ?name) (peer-id ?peer-id))
   (test (eq ?name (sym-cat (str-cat "ROBOT" ?id))))
   ;old;?pay_rs1 <- (payments (station 1) (total_in ?t_in1) (current_in ?c_in1))
@@ -77,9 +79,9 @@
 (defrule machine-instruct
   (protobuf-peer (name refbox-private) (peer-id ?peer-id))
   ?inst <- (instruct (machine ?m) (operation ?op) (task_id ?t-id) (wait ?w))
-  (done (done_t_id ?w))
-  (not (machine_busy (id ?m)))
-  ?lt <-(last_task (id 4) (l_task_id ?last_t))
+  ;(done (done_t_id ?w))
+  ;(not (machine_busy (id ?m)))
+  ;?lt <-(last_task (id 4) (l_task_id ?last_t))
   =>
   (assert (machine_busy (id ?m)))
   (modify ?lt (l_task_id ?t-id))
@@ -87,10 +89,10 @@
   (pb-set-field ?msg "team_color" MAGENTA)
   (pb-set-field ?msg "machine" ?m)
   (if (or (eq ?m "M-CS1") (eq ?m "M-CS2"))
-  then
-  (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionCS")) 
-  (pb-set-field ?prep-msg "operation" ?op)
-  (pb-set-field ?msg "instruction_cs" ?prep-msg)
+    then
+      (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionCS")) 
+      (pb-set-field ?prep-msg "operation" ?op)
+      (pb-set-field ?msg "instruction_cs" ?prep-msg)
   )
   
   (pb-broadcast ?peer-id ?msg)
