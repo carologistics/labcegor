@@ -199,9 +199,7 @@
   ; todo check if robot is 
   ;Get Order
   ;Prepare Basestation PrepareMachine
-  (if (eq ?s IDLE) then
-    (assert (base_order_from_machine (order_id ?oid) (robot_id ?rid) (color ?color) (position "INPUT")))
-  )
+  (assert (base_order_from_machine (order_id ?oid) (robot_id ?rid) (color ?color) (position "INPUT")))
   (if (eq ?robot_state IDLE) then 
     (send_move_to_cmd ?rid "M-BS" "input" ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
