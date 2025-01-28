@@ -166,7 +166,7 @@
   ?tasks_overview <- (tasks_overview (robot_id ?id) (robot_type PRODUCTION) (task_id ?tid) (can_move TRUE) (can_retrieve ?cr) (can_deliver ?cd) (state IDLE) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id ?cid) (did_something FALSE) (is_assigned FALSE) (assigned_order ?ao))
   (test (eq ?id ?cid))
-  ->
+  =>
   (modify ?check_robot (is_assigned TRUE))
   (modify ?check_robot (assigned_order ?oid))
 )
@@ -181,7 +181,7 @@
   ?tasks_overview <- (tasks_overview (robot_id ?id) (robot_type PRODUCTION) (task_id ?tid) (can_move TRUE) (can_retrieve ?cr) (can_deliver ?cd) (state IDLE) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id ?cid) (did_something FALSE) (is_assigned TRUE) (assigned_order ?ao))
   (test (eq ?id ?cid))
-  ->
+  =>
   (printout blue "Robot" ?n " peer-id" ?peer-id " robot-id" ?id " " crlf)
 )
 
