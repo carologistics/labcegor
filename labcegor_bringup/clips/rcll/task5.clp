@@ -273,6 +273,7 @@
   =>
   (if (eq ?s IDLE) then
     (prepare_basestation "M-BS" ?pos ?color ?refbox-id)
+    (printout blue "prepare for order: " ?oid " color: " ?color " at: " ?pos " for robot: " ?rid crlf)
     (retract ?machine_order)
   )
 )
