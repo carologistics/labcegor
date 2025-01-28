@@ -165,11 +165,11 @@
   ?order <- (order (id ?oid) (name ?name) (workpiece ?workpiece) (complexity ?complexity) (base-color ?base-color) (ring-colors ?ring-colors) (cap-color ?cap-color) (quantity-requested ?requested) (quantity-delivered ?delivered) (quantity-delivered-other ?other) (delivery-begin ?begin) (delivery-end ?end) (competitive ?competitive))
   ?tasks_overview <- (tasks_overview (robot_id ?id) (robot_type PRODUCTION) (task_id ?tid) (can_move TRUE) (can_retrieve ?cr) (can_deliver ?cd) (state IDLE) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id ?cid) (did_something FALSE) (is_assigned FALSE) (assigned_order ?ao))
-  (test (eq ?id ?cid))
+
   =>
-  (modify ?check_robot (is_assigned TRUE))
-  (modify ?check_robot (assigned_order ?oid))
-  (printout blue "Robot" "robot-id" ?id " " crlf)
+  ; (modify ?check_robot (is_assigned TRUE))
+  ; (modify ?check_robot (assigned_order ?oid))
+  (printout blue "Robot" "robot-id" ?id " " ?cid " " ?oid crlf)
 )
 
 ; ==================================================================================
