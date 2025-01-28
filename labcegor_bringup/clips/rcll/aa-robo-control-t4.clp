@@ -143,13 +143,6 @@
   (printout red ?m-state crlf)
   (if (eq ?m-state READY-AT-OUTPUT)
   then
-    (printout blue "CAP Retrieved - BASE at out" crlf)
-    (assert(check_complete_CS1))
-  else
-    (printout yellow "still Retrieving - CS1" crlf)
-  )
-)
-
 (defrule r2_move
   (protobuf-peer (name ROBOT2) (peer-id ?peer-id))
   (not (move_is_sentR2))

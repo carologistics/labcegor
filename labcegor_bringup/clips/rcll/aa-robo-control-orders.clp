@@ -153,12 +153,6 @@
 ;sum costs for rings mit iteration über ring-colors1 je station (blue/yellow, green/orange)
 ;robo 1 to to in of first ring (if any)
 
-;robo 2 capcarrier pick up and drop of at base station for first payed ring
-;robo 3 to out of first ring (and bring cap carrier with you)
-;robo 1 to out of 2ed ring (and bring one base with you)
-;robo 2 to payments
-)
-
 (defrule pay_for_rings_rs1
 ?init_f <- (pay_rings_rs1 (wait_for ?t_id))
 (done (done_t_id ?t_id))

@@ -1,14 +1,13 @@
 ;----WARNING --- WIP------
 (defrule robo_move
   ?ac <- (action (a_type "m") (id ?id) (machine ?wp) (io ?io) (task_id ?t-id) (wait ?w))
-  (done (done_t_id ?w))
+  ;(done (done_t_id ?w))
   (protobuf-peer (name ?name) (peer-id ?peer-id))
   (test (eq ?name (sym-cat (str-cat "ROBOT" ?id))))
   ;old;?lt <-(last_task (id ?id) (l_task_id ?last_t))
   ;old;?do <- (do (id ?id) (task ?t-id))
   =>
   ;TODO renew ;(assert (robo_busy (id ?id)))
-  ;(retract ?do)
   (retract ?ac)
   (bind ?msg (pb-create "llsf_msgs.AgentTask"))
   (pb-set-field ?msg "team_color" MAGENTA)
@@ -25,7 +24,7 @@
 
 (defrule robo_retrive
   ?ac <- (action (a_type "r") (id ?id) (machine ?wp) (io ?io) (task_id ?t-id)(wait ?w))
-  (done (done_t_id ?w))
+  ;(done (done_t_id ?w))
   (protobuf-peer (name ?name) (peer-id ?peer-id))
   (test (eq ?name (sym-cat (str-cat "ROBOT" ?id))))
   ;old;?lt <-(last_task (id ?id) (l_task_id ?last_t))
@@ -49,7 +48,7 @@
 
 (defrule robo_deliver
   ?ac <- (action (a_type "d") (id ?id) (machine ?wp) (io ?io) (task_id ?t-id)(wait ?w))
-  (done (done_t_id ?w))
+  ;(done (done_t_id ?w))
   (protobuf-peer (name ?name) (peer-id ?peer-id))
   (test (eq ?name (sym-cat (str-cat "ROBOT" ?id))))
   ;old;?pay_rs1 <- (payments (station 1) (total_in ?t_in1) (current_in ?c_in1))
