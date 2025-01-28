@@ -35,9 +35,9 @@
   (tasks_overview (robot_id 1) (robot_type PRODUCTION) (task_id 1) (can_move TRUE) (can_retrieve FALSE) (can_deliver FALSE) (state IDLE) (move_target "M-BS") (machine_target "input" ))
   (tasks_overview (robot_id 2) (robot_type PRODUCTION) (task_id 1) (can_move TRUE) (can_retrieve FALSE) (can_deliver FALSE) (state IDLE) (move_target "M-BS") (machine_target "output" ))
   (tasks_overview (robot_id 3) (robot_type PAYMENT) (task_id 1) (can_move TRUE) (can_retrieve FALSE) (can_deliver FALSE) (state IDLE) (move_target "M-BS") (machine_target "output" ))
-  (check_robot (robot_id 1) (did_something FALSE) (is_assigned FALSE) (assigned_order NOT-SET))
-  (check_robot (robot_id 2) (did_something FALSE) (is_assigned FALSE) (assigned_order NOT-SET))
-  (check_robot (robot_id 3) (did_something FALSE) (is_assigned FALSE) (assigned_order NOT-SET))
+  (check_robot (robot_id 1) (did_something FALSE) (is_assigned FALSE) (assigned_order -1))
+  (check_robot (robot_id 2) (did_something FALSE) (is_assigned FALSE) (assigned_order -1))
+  (check_robot (robot_id 3) (did_something FALSE) (is_assigned FALSE) (assigned_order -1))
 )
 
 (deffacts machine_facts
