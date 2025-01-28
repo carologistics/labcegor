@@ -171,8 +171,8 @@
   ?tasks_overview <- (tasks_overview (robot_id ?id) (robot_type PRODUCTION) (task_id ?tid) (can_move TRUE) (can_retrieve ?cr) (can_deliver ?cd) (state IDLE) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id ?cid) (did_something FALSE) (is_assigned FALSE) (assigned_order ?ao))
   (check_robot (robot_id ?other-id) (assigned_order ?other-ao))
-  (assigned_order (order_id ?ao_id) (robot_id ?r_id))
-  (test (and (eq ?id ?cid) (eq ?id ?other-id) (not (eq ?order-name assigned)) (not (eq (?ao_id ?oid))) ))
+  (not (assigned_order (order_id ?oid)))
+  (test (and (eq ?id ?cid) (eq ?id ?other-id) (not (eq ?order-name assigned))))
   =>
   (modify ?check_robot (is_assigned TRUE))
   (modify ?check_robot (assigned_order ?oid))
