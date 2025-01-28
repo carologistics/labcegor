@@ -202,7 +202,7 @@
   ;Get Order
   ;Prepare Basestation PrepareMachine
   (if (eq ?s IDLE) then
-    (prepare_basestation "M-BS" "INPUT" ?base-color ?refbox-id)
+    ; (prepare_basestation "M-BS" "INPUT" ?base-color ?refbox-id)
   )
   (if (eq ?robot_state IDLE) then 
     (send_move_to_cmd ?rid "M-BS" "input" ?peer-id ?tid)
