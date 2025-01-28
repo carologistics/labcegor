@@ -267,7 +267,7 @@
 ; Manage Machines
 ; ==================================================================================
 (defrule manage_ordered_bases
-  ?machine_order <= (base_order_from_machine (order_id ?oid) (robot_id ?rid) (color ?color) (position ?pos))
+  ?machine_order <- (base_order_from_machine (order_id ?oid) (robot_id ?rid) (color ?color) (position ?pos))
   (protobuf-peer (name refbox-private) (peer-id ?refbox-id))
   (machine (name M-BS) (state ?s))
   =>
