@@ -174,7 +174,7 @@
   =>
   (modify ?check_robot (is_assigned TRUE))
   (modify ?check_robot (assigned_order ?oid))
-  (assert (assigned_order (order_id ?oid) (robot_id ?id)))
+  (assert (assigned_order (order_id ?oid) (robot_id ?rid)))
   (printout blue "Robot " "robot-id " ?rid " " ?oid " " ?order-name crlf)
 )
 
