@@ -185,10 +185,10 @@
   ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE) (is_assigned TRUE))
   (assigned_order (order_id ?oid) (robot_id ?rid))
   ?order <- (order (id ?oid) (name ?order-name)); (workpiece ?workpiece) (complexity ?complexity) (base-color ?base-color) (ring-colors $?ring-colors) (cap-color ?cap-color) (quantity-requested ?requested) (quantity-delivered ?delivered) (quantity-delivered-other ?other) (delivery-begin ?begin) (delivery-end ?end) (competitive ?competitive))
-  (protobuf-peer (name ?n) (peer-id ?peer-id))
+  (protobuf-peer (name ?n) (peer-id ?rid))
   (protobuf-peer (name refbox-private) (peer-id ?refbox-id))
   =>
-  (printout blue "Robot " ?n " peer-id " ?peer-id " robot-id " ?rid " assigned:"  crlf)
+  (printout blue "Robot " ?n " robot-id " ?rid " assigned:"  crlf)
 )
 
 
