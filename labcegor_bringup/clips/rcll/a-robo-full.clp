@@ -1,6 +1,6 @@
 (deftemplate order_status
   (slot id (type INTEGER))
-  (slot state (type SYMBOL) (allowed-values RC BS RS1 RS2 CS1 CS2 DE))
+  (slot state (type SYMBOL)); (allowed-values RC BS RS1 RS2 CS1 CS2 DE))
   (slot next_step (type SYMBOL) (allowed-values Base Ring_1 Ring_2 Ring_3 Cap Deliver None))
   (slot start_d_time (type INTEGER))
   (slot last_d_time (type INTEGER))
@@ -25,11 +25,12 @@
 (deftemplate request_task
   (slot id (type INTEGER));robo id
   (slot last_task (type INTEGER));taskid of last completet task
-  (slot order (type INTEGER));id of last order 0 if delivered as last task
+  (slot robo_order (type INTEGER));id of last order 0 if delivered as last task
+  (slot machine_order (type INTEGER) (default 0))
 )
 
 (deftemplate update_rs
-  (slot id (type INTEGER))
+  (slot id (type INTEGER)) ;; rs1/RS2
   (slot payment (type INTEGER) (allowed-values 1 0 -1 -2)) ;1 for ring is added -1, -2 für payment for ring 0 as optional
 )
 
