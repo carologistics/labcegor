@@ -168,30 +168,27 @@
 
 (defrule random-order-assignment
   ?order <- (order (id ?oid) (name ?order-name) (workpiece ?workpiece) (complexity ?complexity) (base-color ?base-color) (ring-colors ?ring-colors) (cap-color ?cap-color) (quantity-requested ?requested) (quantity-delivered ?delivered) (quantity-delivered-other ?other) (delivery-begin ?begin) (delivery-end ?end) (competitive ?competitive))
-  ?tasks_overview <- (tasks_overview (robot_id ?id) (robot_type PRODUCTION) (task_id ?tid) (can_move TRUE) (can_retrieve ?cr) (can_deliver ?cd) (state IDLE) (move_target ?mot) (machine_target ?mat))
-  ?check_robot <- (check_robot (robot_id ?cid) (did_something FALSE) (is_assigned FALSE) (assigned_order ?ao))
-  (check_robot (robot_id ?other-id) (assigned_order ?other-ao))
+  ?tasks_overview <- (tasks_overview (robot_id ?rid) (robot_type PRODUCTION) (task_id ?tid) (can_move TRUE) (can_retrieve ?cr) (can_deliver ?cd) (state IDLE) (move_target ?mot) (machine_target ?mat))
+  ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE) (is_assigned FALSE) (assigned_order ?ao))
   (not (assigned_order (order_id ?oid)))
-  (test (and (eq ?id ?cid) (eq ?id ?other-id) (not (eq ?order-name assigned))))
   =>
   (modify ?check_robot (is_assigned TRUE))
   (modify ?check_robot (assigned_order ?oid))
   (assert (assigned_order (order_id ?oid) (robot_id ?id)))
-  (printout blue "Robot" "robot-id" ?id " " ?cid " " ?oid " " ?oid " " ?order-name crlf)
+  (printout blue "Robot" "robot-id" ?id " " ?oid " " ?oid " " ?order-name crlf)
 )
 
 ; ==================================================================================
 ; Manage ROBOT1 for Production
 ; ==================================================================================
 (defrule move_robot_order_based
-  (protobuf-peer (name ?n) (peer-id ?peer-id))
-  (protobuf-peer (name refbox-private) (peer-id ?refbox-id))
   ?order <- (order (id ?oid) (name ?order-name) (workpiece ?workpiece) (complexity ?complexity) (base-color ?base-color) (ring-colors ?ring-colors) (cap-color ?cap-color) (quantity-requested ?requested) (quantity-delivered ?delivered) (quantity-delivered-other ?other) (delivery-begin ?begin) (delivery-end ?end) (competitive ?competitive))
-  ?tasks_overview <- (tasks_overview (robot_id ?id) (robot_type PRODUCTION) (task_id ?tid) (can_move TRUE) (can_retrieve ?cr) (can_deliver ?cd) (state IDLE) (move_target ?mot) (machine_target ?mat))
-  ?check_robot <- (check_robot (robot_id ?cid) (did_something FALSE) (is_assigned TRUE) (assigned_order ?ao))
-  (test (and (eq ?id ?cid) (eq ?peer-id ?id)))
+  ?tasks_overview <- (tasks_overview (robot_id ?rid) (robot_type PRODUCTION) (task_id ?tid) (can_move TRUE) (can_retrieve ?cr) (can_deliver ?cd) (state IDLE) (move_target ?mot) (machine_target ?mat))
+  ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE) (is_assigned TRUE) (assigned_order ?ao))
+  (protobuf-peer (name ?n) (peer-id ?rid))
+  (protobuf-peer (name refbox-private) (peer-id ?refbox-id))
   =>
-  (printout blue "Robot" ?n " peer-id" ?peer-id " robot-id" ?id " assigned: " ?ao crlf)
+  (printout blue "Robot " ?n " peer-id " ?rid " " robot-id" ?id " assigned: " ?ao crlf)
 )
 
 
