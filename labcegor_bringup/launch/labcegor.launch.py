@@ -33,9 +33,7 @@ def launch_with_context(context, *args, **kwargs):
         ],
         arguments=['--ros-args', '--log-level', log_level]
     )
-    return [cx_node, IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(launch_pddl_manager)
-        ),]
+    return [cx_node,]
 
 def generate_launch_description():
     declare_log_level_ = DeclareLaunchArgument(
