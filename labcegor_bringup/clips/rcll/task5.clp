@@ -387,7 +387,7 @@
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_deliver TRUE))
     (modify ?tasks_overview (move_target ?target))
-    (modify ?tasks_overview (move_target "slide"))
+    (modify ?tasks_overview (machine_target "slide"))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (modify ?tasks_overview (state HOLDING))
     (modify ?check_robot (did_something FALSE))
