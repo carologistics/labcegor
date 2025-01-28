@@ -184,11 +184,24 @@
   ?tasks_overview <- (tasks_overview (robot_id ?rid) (robot_type PRODUCTION) (task_id ?tid) (state IDLE))
   ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE) (is_assigned TRUE))
   (assigned_order (order_id ?oid) (robot_id ?rid))
-  ?order <- (order (id ?oid) (name ?order-name)); (workpiece ?workpiece) (complexity ?complexity) (base-color ?base-color) (ring-colors $?ring-colors) (cap-color ?cap-color) (quantity-requested ?requested) (quantity-delivered ?delivered) (quantity-delivered-other ?other) (delivery-begin ?begin) (delivery-end ?end) (competitive ?competitive))
-  (protobuf-peer (name ?n) (peer-id ?rid))
+  ?order <- (order (id ?oid) (name ?order-name) (base-color ?base-color)); (workpiece ?workpiece) (complexity ?complexity) (ring-colors $?ring-colors) (cap-color ?cap-color) (quantity-requested ?requested) (quantity-delivered ?delivered) (quantity-delivered-other ?other) (delivery-begin ?begin) (delivery-end ?end) (competitive ?competitive))
+  (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
   (protobuf-peer (name refbox-private) (peer-id ?refbox-id))
+  (machine (name M-BS) (state ?s))
   =>
-  (printout blue "Robot " ?n " robot-id " ?rid " assigned:"  crlf)
+  (printout blue "Robot " ?n " robot-id " ?rid crlf)
+  ; Todo send robot
+  ; todo check if robot is 
+  ;Get Order
+  ;Prepare Basestation PrepareMachine
+  (if (eq ?s IDLE) then
+    (prepare_basestation "M-BS" "INPUT" ?base-color ?refbox-id)
+  )
+  (if (eq ?robot_state IDLE) then 
+    (send_move_to_cmd ?rid "M-BS" "input" ?peer-id ?tid)
+    (modify ?check_robot (did_something TRUE))
+    (modify ?tasks_overview (state MOVING))
+  )
 )
 
 
