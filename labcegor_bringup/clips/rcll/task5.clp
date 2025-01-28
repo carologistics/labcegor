@@ -188,13 +188,11 @@
 ; Manage ROBOT1 for Production
 ; ==================================================================================
 (defrule move_robot_order_based
-  ?tasks_overview <- (tasks_overview (robot_id ?rid) (robot_type PRODUCTION) (task_id ?tid) (state ?robot_state))
+  ?tasks_overview <- (tasks_overview (robot_id ?rid) (robot_type PRODUCTION) (state ?robot_state))
   ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE) (is_assigned TRUE))
   (assigned_order (order_id ?oid) (robot_id ?rid))
-  ?order <- (order (id ?oid) (name ?order-name) (base-color ?base-color)); (workpiece ?workpiece) (complexity ?complexity) (ring-colors $?ring-colors) (cap-color ?cap-color) (quantity-requested ?requested) (quantity-delivered ?delivered) (quantity-delivered-other ?other) (delivery-begin ?begin) (delivery-end ?end) (competitive ?competitive))
+  ?order <- (order (id ?oid) (name ?order-name) (base-color ?base-color)); 
   (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
-  (protobuf-peer (name refbox-private) (peer-id ?refbox-id))
-  (machine (name M-BS) (state ?s))
   =>
   (printout blue "Robot " ?peer-name " robot-id " ?rid crlf)
   ; Todo send robot
@@ -202,7 +200,7 @@
   ;Get Order
   ;Prepare Basestation PrepareMachine
   (if (eq ?s IDLE) then
-    ; (prepare_basestation "M-BS" "INPUT" ?base-color ?refbox-id)
+    (assert (base_order_from_machine (order_id ?oid) (robot_id ?rid) (color ?color) (position "INPUT")))
   )
   (if (eq ?robot_state IDLE) then 
     (send_move_to_cmd ?rid "M-BS" "input" ?peer-id ?tid)
@@ -211,50 +209,18 @@
   )
 )
 
-
-; (defrule send-robot-one-to-pickup
-;   (protobuf-peer (name ?n) (peer-id ?peer-id))
-;   (protobuf-peer (name refbox-private) (peer-id ?refbox-id))
-;   (machine (name M-BS) (state ?s))
-;   ?tasks_overview <- (tasks_overview (robot_id 1) (robot_type PRODUCTION) (task_id ?tid) (can_move TRUE) (can_retrieve FALSE) (can_deliver ?cd) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
-;   ?check_robot <- (check_robot (robot_id 1) (did_something FALSE))
-;   (test (eq ?n ROBOT1))
-;   (test (or (eq ?robot_state IDLE) (eq ?robot_state HOLDING)))
-;   =>
-;   ;Get Order
-;   ;Prepare Basestation PrepareMachine
-;   (if (eq ?s IDLE) then
-;     (prepare_basestation "M-BS" "OUTPUT" "BASE_BLACK" ?refbox-id)
-;   )
-;   (if (eq ?robot_state IDLE) then 
-;     (send_move_to_cmd 1 ?mot ?mat ?peer-id ?tid)
-;     (modify ?check_robot (did_something TRUE))
-;     (modify ?tasks_overview (state MOVING))
-;   )
-;   (if (eq ?robot_state HOLDING) then 
-;     (send_move_to_cmd 1 ?mot ?mat ?peer-id ?tid)
-;     (modify ?check_robot (did_something TRUE))
-;     (modify ?tasks_overview (state CARRY))
-;   )
-;   (printout red "CARRY " ?n " " ?robot_state " " ?mot " " ?mat " " ?peer-id crlf)
-; )
-
 ; ==================================================================================
 ; Manage ROBOTS 3 for Payment
 ; ==================================================================================
 (defrule send-robot-three-to-pickup
   (protobuf-peer (name ?n) (peer-id ?peer-id))
-  (protobuf-peer (name refbox-private) (peer-id ?refbox-id))
-  (machine (name M-BS) (state ?s))
   ?tasks_overview <- (tasks_overview (robot_id 3) (robot_type PAYMENT) (task_id ?tid) (can_move TRUE) (can_retrieve FALSE) (can_deliver ?cd) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id 3) (did_something FALSE))
   (test (eq ?n ROBOT3))
   (test (or (eq ?robot_state IDLE) (eq ?robot_state HOLDING)))
   =>
+
   ;Prepare Basestation PrepareMachine
-  ; (if (eq ?s IDLE) then
-  ;   (prepare_basestation "M-BS" "OUTPUT" "BASE_BLACK" ?refbox-id)
-  ; )
   (assert (base_order_from_machine (order_id 0) (robot_id 3) (color "BASE_BLACK") (position "OUTPUT")))
 
   (if (eq ?robot_state IDLE) then 
@@ -303,12 +269,13 @@
 ; Manage Machines
 ; ==================================================================================
 (defrule manage_ordered_bases
-  (base_order_from_machine (order_id ?oid) (robot_id ?rid) (color ?color) (position ?pos))
+  ?machine_order <= (base_order_from_machine (order_id ?oid) (robot_id ?rid) (color ?color) (position ?pos))
   (protobuf-peer (name refbox-private) (peer-id ?refbox-id))
   (machine (name M-BS) (state ?s))
   =>
   (if (eq ?s IDLE) then
     (prepare_basestation "M-BS" ?pos ?color ?refbox-id)
+    (retract ?machine_order)
   )
 )
 
@@ -317,60 +284,28 @@
 ; CHECK STUFF
 ; ==================================================================================
 ; ==========
-; ROBOT 1
+; ROBOTS orderbased
 ; ==========
-; Check if Robot 1 did what he was intended to do... 
-(defrule check-robot_one
-  (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id 1) (ptr ?msg))
-  ?tasks_overview <- (tasks_overview (robot_id 1) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
+(defrule check_progress_off_robot_with_order
+  ?tasks_overview <- (tasks_overview (robot_id ?rid) (robot_type PRODUCTION) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
+  ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE) (is_assigned TRUE))
+  (assigned_order (order_id ?oid) (robot_id ?rid))
+  ?order <- (order (id ?oid) (name ?order-name) (base-color ?base-color)); 
+  ?mpi_one <- (machine_payment_info (machine_id M-RS1) (money ?m_one))
+  ?mpi_two <- (machine_payment_info (machine_id M-RS2) (money ?m_two))
+  (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id ?rid) (ptr ?msg))
+  (not (prepare_basestation (order_id ?oid) (robot_id ?rid)))
   =>
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
   (bind ?successful (pb-field-value ?msg "successful"))
-  ;(printout red ?task_id " " ?robot_id " " ?successful " " ?tid " " ?cm " " ?cr " " ?cd crlf)
 
-  ; did task 1 for robot 1 finish? 
-  (if (and (eq ?robot_id 1) (eq ?task_id 1) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr TRUE)) then 
-    (modify ?tasks_overview (can_move FALSE))
-    ; (printout green "robot one finished his task " ?task_id crlf)
-    (modify ?tasks_overview (task_id (+ ?task_id 1)))
-    ; (printout green ?task_id ?tid crlf)
-  )
-  ; did task 2 for robot 1 finish? 
-  (if (and (eq ?robot_id 1) (eq ?task_id 2) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr TRUE)) then 
-    (modify ?tasks_overview (can_retrieve FALSE))
-    ; (printout green "robot one finished his task " ?task_id crlf)
-    (modify ?tasks_overview (task_id (+ ?task_id 1)))
-    ; (printout green ?task_id ?tid crlf)
+  (if (and (eq ?cm TRUE) (eq ?robot_state MOVING) (eq ?successful TRUE)) then
+    (printout green "robot " ?rid " can now grab the base of color: " ?base-color " from order: " ?oid crlf)
   )
 )
 
-; ==========
-; ROBOT 2
-; ==========
-(defrule check-robot_two_first_task
-  (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id 2) (ptr ?msg))
-  ?tasks_overview <- (tasks_overview (robot_id 2) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (move_target ?mot) (machine_target ?mat))
-  =>
-  (bind ?task_id (pb-field-value ?msg "task_id"))
-  (bind ?robot_id (pb-field-value ?msg "robot_id"))
-  (bind ?successful (pb-field-value ?msg "successful"))
-  
-  ; check task 1 for robot 2
-  (if (and (eq ?robot_id 2) (eq ?task_id 1) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr TRUE)) then 
-    (modify ?tasks_overview (can_move FALSE))
-    (modify ?tasks_overview (task_id (+ ?task_id 1)))
-    ; (printout green "robot two finished his task " ?task_id crlf)
-  )
 
-  ; did task 2 for robot 1 finish? 
-  (if (and (eq ?robot_id 2) (eq ?task_id 2) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr FALSE)) then 
-    (modify ?tasks_overview (can_retrieve FALSE))
-    ; (printout green "robot two did something " ?task_id crlf)
-    (modify ?tasks_overview (task_id (+ ?task_id 1)))
-    ; (printout green ?task_id ?tid crlf)
-  )
-)
 
 ; ==========
 ; ROBOT 3 for Payment
