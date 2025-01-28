@@ -30,6 +30,8 @@
   (slot assigned_order (type INTEGER))
 )
 
+(deftemplate )
+
 ; facts
 (deffacts robottasks
   (tasks_overview (robot_id 1) (robot_type PRODUCTION) (task_id 1) (can_move TRUE) (can_retrieve FALSE) (can_deliver FALSE) (state IDLE) (move_target "M-BS") (machine_target "input" ))
@@ -167,8 +169,8 @@
   ?check_robot <- (check_robot (robot_id ?cid) (did_something FALSE) (is_assigned FALSE) (assigned_order ?ao))
   (test (eq ?id ?cid))
   =>
-  ; (modify ?check_robot (is_assigned TRUE))
-  ; (modify ?check_robot (assigned_order ?oid))
+  (modify ?check_robot (is_assigned TRUE))
+  (modify ?check_robot (assigned_order ?oid))
   (printout blue "Robot" "robot-id" ?id " " ?cid " " ?oid " " ?oid " " ?order-name crlf)
 )
 
