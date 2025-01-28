@@ -2,7 +2,7 @@ clips_manager:
   ros__parameters:
     environments: ["cx_rcll"]
     cx_rcll:
-      redirect_stdout_to_debug: false
+      redirect_stdout_to_debug: true
       log_clips_to_file: true
       watch: ["rules"]
       plugins: ["executive",
@@ -10,7 +10,7 @@ clips_manager:
                 "config",
                 "protobuf",
                 "files"]
-
+      
     ament_index:
       plugin: "cx::AmentIndexPlugin"
     config:
