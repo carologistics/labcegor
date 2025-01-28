@@ -199,7 +199,7 @@
   ; todo check if robot is 
   ;Get Order
   ;Prepare Basestation PrepareMachine
-  (assert (base_order_from_machine (order_id ?oid) (robot_id ?rid) (color ?color) (position "INPUT")))
+  (assert (base_order_from_machine (order_id ?oid) (robot_id ?rid) (color ?base-color) (position "INPUT")))
   (if (eq ?robot_state IDLE) then 
     (send_move_to_cmd ?rid "M-BS" "input" ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
@@ -292,7 +292,7 @@
   ?mpi_one <- (machine_payment_info (machine_id M-RS1) (money ?m_one))
   ?mpi_two <- (machine_payment_info (machine_id M-RS2) (money ?m_two))
   (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id ?rid) (ptr ?msg))
-  (not (prepare_basestation (order_id ?oid) (robot_id ?rid)))
+  (not (base_order_from_machine (order_id ?oid) (robot_id ?rid)))
   =>
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
