@@ -30,7 +30,6 @@
   (slot assigned_order (type INTEGER))
 )
 
-(deftemplate )
 
 ; facts
 (deffacts robottasks
