@@ -181,7 +181,7 @@
 ; Manage ROBOT1 for Production
 ; ==================================================================================
 (defrule move_robot_order_based
-  ?tasks_overview <- (tasks_overview (robot_id ?rid) (robot_type PRODUCTION) (task_id ?tid) (state IDLE))
+  ?tasks_overview <- (tasks_overview (robot_id ?rid) (robot_type PRODUCTION) (task_id ?tid) (state ?robot_state))
   ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE) (is_assigned TRUE))
   (assigned_order (order_id ?oid) (robot_id ?rid))
   ?order <- (order (id ?oid) (name ?order-name) (base-color ?base-color)); (workpiece ?workpiece) (complexity ?complexity) (ring-colors $?ring-colors) (cap-color ?cap-color) (quantity-requested ?requested) (quantity-delivered ?delivered) (quantity-delivered-other ?other) (delivery-begin ?begin) (delivery-end ?end) (competitive ?competitive))
