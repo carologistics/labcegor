@@ -37,8 +37,8 @@
 (deftemplate base_order_from_machine
   (slot order_id (type INTEGER))
   (slot robot_id (type INTEGER))
-  (slot color (type SYMBOL))
-  (slot position (type SYMBOL))
+  (slot color (type STRING))
+  (slot position (type STRING))
 )
 
 ; facts
