@@ -182,9 +182,10 @@
 ; Manage ROBOT1 for Production
 ; ==================================================================================
 (defrule move_robot_order_based
-  ?order <- (order (id ?oid) (name ?order-name) (workpiece ?workpiece) (complexity ?complexity) (base-color ?base-color) (ring-colors $?ring-colors) (cap-color ?cap-color) (quantity-requested ?requested) (quantity-delivered ?delivered) (quantity-delivered-other ?other) (delivery-begin ?begin) (delivery-end ?end) (competitive ?competitive))
   ?tasks_overview <- (tasks_overview (robot_id ?rid) (robot_type PRODUCTION) (task_id ?tid) (can_move TRUE) (can_retrieve ?cr) (can_deliver ?cd) (state IDLE) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE) (is_assigned TRUE) (assigned_order ?ao))
+  (assigned_order (order_id ?oid) (robot_id ?rid) )
+  ?order <- (order (id ?oid) (name ?order-name)); (workpiece ?workpiece) (complexity ?complexity) (base-color ?base-color) (ring-colors $?ring-colors) (cap-color ?cap-color) (quantity-requested ?requested) (quantity-delivered ?delivered) (quantity-delivered-other ?other) (delivery-begin ?begin) (delivery-end ?end) (competitive ?competitive))
   (protobuf-peer (name ?n) (peer-id ?rid))
   (protobuf-peer (name refbox-private) (peer-id ?refbox-id))
   =>
