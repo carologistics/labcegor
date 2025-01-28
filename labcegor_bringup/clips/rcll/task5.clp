@@ -172,7 +172,6 @@
   (not (assigned_order (order_id ?oid)))
   =>
   (modify ?check_robot (is_assigned TRUE))
-  (modify ?check_robot (assigned_order ?oid))
   (assert (assigned_order (order_id ?oid) (robot_id ?rid)))
   (printout blue "Assigned robot" ?rid " to order " ?oid crlf)
   (printout red "Test Assigned robot" ?rid " to order " ?oid crlf)
