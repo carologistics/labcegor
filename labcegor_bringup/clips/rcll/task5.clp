@@ -354,8 +354,8 @@
 (defrule check-robot_three
   (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id 3) (ptr ?msg))
   ?tasks_overview <- (tasks_overview (robot_id 3) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
-  (machine_payment_info (machine_id M-RS1) (money ?m_one))
-  (machine_payment_info (machine_id M-RS2) (money ?m_two))
+  ?mpi_one <- (machine_payment_info (machine_id M-RS1) (money ?m_one))
+  ?mpi_two <- (machine_payment_info (machine_id M-RS2) (money ?m_two))
   ?check_robot <- (check_robot (robot_id 3) (did_something TRUE))
   =>
   (bind ?task_id (pb-field-value ?msg "task_id"))
@@ -391,7 +391,6 @@
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (modify ?tasks_overview (state HOLDING))
     (modify ?check_robot (did_something FALSE))
-    (printout green "where should it go now? " ?target " " ?m_one " " ?m_two " soooo?: " (check_payment ?m_one ?m_two) crlf)
   )
 
   (if (and (eq ?robot_id 3) (eq ?task_id ?tid) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE)) then 
@@ -403,6 +402,15 @@
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (modify ?check_robot (did_something FALSE))
     (modify ?tasks_overview (state IDLE))
+    (if (not (eq ?target "NONE")) then
+      (if (eq ?target "M-RS1") then
+        (modify ?mpi_one (money (+ ?m_one 1)))
+      )
+      (if (eq ?target "M-RS2") then
+        (modify ?mpi_two (money (+ ?m_two 1)))
+      )
+    )
+    (printout green "where should it go now? " ?target " " ?m_one " " ?m_two " soooo?: " (check_payment ?m_one ?m_two) crlf)
   )
 )
 
