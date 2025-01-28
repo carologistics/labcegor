@@ -299,7 +299,7 @@
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
   (bind ?successful (pb-field-value ?msg "successful"))
-
+  (printout red "not yet there" crlf)
   (if (and (eq ?cm TRUE) (eq ?robot_state MOVING) (eq ?successful TRUE)) then
     (printout green "robot " ?rid " can now grab the base of color: " ?base-color " from order: " ?oid crlf)
   )
