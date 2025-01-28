@@ -34,6 +34,13 @@
   (slot robot_id (type INTEGER))
 )
 
+(deftemplate base_order_from_machine
+  (slot order_id (type INTEGER))
+  (slot robot_id (type INTEGER))
+  (slot color (type SYMBOL))
+  (slot position (type SYMBOL))
+)
+
 ; facts
 (deffacts robottasks
   (tasks_overview (robot_id 1) (robot_type PRODUCTION) (task_id 1) (can_move TRUE) (can_retrieve FALSE) (can_deliver FALSE) (state IDLE) (move_target "M-BS") (machine_target "input" ))
@@ -137,8 +144,8 @@
 (deffunction prepare_basestation (?m_id ?side ?color ?peer-id)
   (printout red "first message in prepare_basestation" ?m_id " " ?side " " ?color " " ?peer-id crlf)
   (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionBS")) 
-  (pb-set-field ?prep-msg "side" "OUTPUT")
-  (pb-set-field ?prep-msg "color" "BASE_BLACK")
+  (pb-set-field ?prep-msg "side" ?side)
+  (pb-set-field ?prep-msg "color" ?color)
 
   (bind ?msg (pb-create "llsf_msgs.PrepareMachine"))
   (pb-set-field ?msg "team_color" MAGENTA)
@@ -245,9 +252,11 @@
   (test (or (eq ?robot_state IDLE) (eq ?robot_state HOLDING)))
   =>
   ;Prepare Basestation PrepareMachine
-  (if (eq ?s IDLE) then
-    (prepare_basestation "M-BS" "OUTPUT" "BASE_BLACK" ?refbox-id)
-  )
+  ; (if (eq ?s IDLE) then
+  ;   (prepare_basestation "M-BS" "OUTPUT" "BASE_BLACK" ?refbox-id)
+  ; )
+  (assert base_order_from_machine (order_id 0) (robot_id 3) (color "BASE_BLACK") (position "OUTPUT"))
+  
   (if (eq ?robot_state IDLE) then 
     (send_move_to_cmd 3 ?mot ?mat ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
@@ -288,6 +297,21 @@
   (modify ?check_robot (did_something TRUE))
   (modify ?tasks_overview (state IDLE))
 )
+
+
+; ==================================================================================
+; Manage Machines
+; ==================================================================================
+(defrule manage_ordered_bases
+  (base_order_from_machine (order_id ?oid) (robot_id ?rid) (color ?color) (position ?pos))
+  (protobuf-peer (name refbox-private) (peer-id ?refbox-id))
+  (machine (name M-BS) (state ?s))
+  =>
+  (if (eq ?s IDLE) then
+    (prepare_basestation "M-BS" ?pos ?color ?refbox-id)
+  )
+)
+
 
 ; ==================================================================================
 ; CHECK STUFF
