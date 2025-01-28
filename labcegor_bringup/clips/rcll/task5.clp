@@ -165,17 +165,17 @@
 ; MOVE ROBOTS & Do Tasks
 ; ==================================================================================
 
-(defrule random-order-assignment
-  ?order <- (order (id ?oid))
-  ?tasks_overview <- (tasks_overview (robot_id ?rid) (robot_type PRODUCTION) (state IDLE))
-  ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE) (is_assigned FALSE))
-  (not (assigned_order (order_id ?oid)))
-  =>
-  (modify ?check_robot (is_assigned TRUE))
-  (assert (assigned_order (order_id ?oid) (robot_id ?rid)))
-  (printout blue "Assigned robot" ?rid " to order " ?oid crlf)
-  (printout red "Test Assigned robot" ?rid " to order " ?oid crlf)
-)
+; (defrule random-order-assignment
+;   ?order <- (order (id ?oid))
+;   ?tasks_overview <- (tasks_overview (robot_id ?rid) (robot_type PRODUCTION) (state IDLE))
+;   ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE) (is_assigned FALSE))
+;   (not (assigned_order (order_id ?oid)))
+;   =>
+;   (modify ?check_robot (is_assigned TRUE))
+;   (assert (assigned_order (order_id ?oid) (robot_id ?rid)))
+;   (printout blue "Assigned robot" ?rid " to order " ?oid crlf)
+;   (printout red "Test Assigned robot" ?rid " to order " ?oid crlf)
+; )
 
 ; ==================================================================================
 ; Manage ROBOT1 for Production
