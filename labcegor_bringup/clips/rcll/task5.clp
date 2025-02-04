@@ -41,7 +41,8 @@
   ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE) (is_assigned TRUE))
   (assigned_order (order_id ?oid) (robot_id ?rid))
   ?order <- (order (id ?oid) (name ?order-name) (base-color ?base-color)); 
-  (machine (name (sym-cat ?move_target)) (state ?s) (order ?machine_oid))
+  ; TODO make machine name dependent on move_target
+  (machine (name M-BS) (state ?s) (order ?machine_oid))
   (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
   =>
   (printout green "Basestation is in state " ?s " " ?oid " " ?machine_oid crlf)
