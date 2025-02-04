@@ -17,7 +17,7 @@
 ; Manage ROBOT1 for Production
 ; ==================================================================================
 (defrule move_robot_order_based
-  ?tasks_overview <- (tasks_overview (robot_id ?rid) (task_id ?tid) (robot_type PRODUCTION) (state ?robot_state))
+  ?tasks_overview <- (tasks_overview (robot_id ?rid) (task_id ?tid) (robot_type PRODUCTION) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE) (is_assigned TRUE))
   (assigned_order (order_id ?oid) (robot_id ?rid))
   ?order <- (order (id ?oid) (name ?order-name) (base-color ?base-color)); 
@@ -30,12 +30,30 @@
   ;Prepare Basestation PrepareMachine
   (assert (base_order_from_machine (order_id ?oid) (robot_id ?rid) (color ?base-color) (position "INPUT")))
   (if (eq ?robot_state IDLE) then 
-    (send_move_to_cmd ?rid "M-BS" "input" ?peer-id ?tid)
+    (send_move_to_cmd ?rid ?mot ?mat ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
     (modify ?tasks_overview (state MOVING))
   )
 )
 
+(defrule pickup_order_based
+  ?tasks_overview <- (tasks_overview (robot_id ?rid) (task_id ?tid) (robot_type PRODUCTION) (state ?robot_state))
+  ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE) (is_assigned TRUE))
+  (assigned_order (order_id ?oid) (robot_id ?rid))
+  ?order <- (order (id ?oid) (name ?order-name) (base-color ?base-color)); 
+  (machine (name (sym-cat ?move_target)) (state ?s) (order ?machine_oid))
+  (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
+  =>
+  (printout green "Basestation is in state " ?s " " ?oid " " ?machine_oid crlf)
+  (if (and (eq ?s READY-AT-OUTPUT) (eq ?oid ?machine_oid)) then
+    (send_retrieve_from_cmd ?rid ?mot ?mat ?peer-id ?tid)
+    (modify ?check_robot (did_something TRUE))
+    (modify ?tasks_overview (state HOLDING))
+  )
+)
+
+; (defrule deliver_order_based
+; )
 ; ==================================================================================
 ; Manage ROBOTS 3 for Payment
 ; ==================================================================================
@@ -67,11 +85,11 @@
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   ?tasks_overview <- (tasks_overview (robot_id 3) (task_id ?tid) (can_move FALSE) (can_retrieve TRUE) (can_deliver FALSE) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id 3) (did_something FALSE))
-  (machine (name M-BS) (state ?s))
+  (machine (name M-BS) (state ?s) (order ?oid))
   (test (eq ?n ROBOT3))
   =>
-  (printout red "Basestation is in state " ?s crlf)
-  (if (eq ?s READY-AT-OUTPUT) then
+  (printout red "Basestation is in state " ?s " " ?oid crlf)
+  (if (and (eq ?s READY-AT-OUTPUT) (eq ?oid 0)) then
     (send_retrieve_from_cmd 3 ?mot ?mat ?peer-id ?tid)
     ; (printout blue "part 2/3 " robot_state crlf)
     (modify ?check_robot (did_something TRUE))
