@@ -15,7 +15,7 @@
   (pb-set-field ?msg "move" ?move_msg)
   (pb-broadcast ?peer-id ?msg)
   (pb-destroy ?msg)
-  (printout blue "Move: robot: " ?r_id " task " ?task_id crlf)
+  (printout blue "Move: robot: " ?r_id " task " ?r_target " " ?task_id " " ?m_point crlf)
 )
 
 ; Retrieve
