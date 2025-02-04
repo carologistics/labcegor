@@ -23,21 +23,21 @@
     then
         ;(retract ?d)
         ;(retract ?b)
-        (assert (done (done_t_id ?t-id)))
+        ;(assert (done (done_t_id ?t-id)))
         (if (not (eq ?des ""));; aka was movment
             then
-                (update ?robo_s (?pos ?des) (?pos_wp ?des_wp) (?des "") (?des_wp "")) ;pos = des; pos_wp =des_wp, des, des_wp = ""
+                (modify ?robo_s (?pos ?des) (?pos_wp ?des_wp) (?des "") (?des_wp "")) ;pos = des; pos_wp =des_wp, des, des_wp = ""
             else ; NO MOVEMENT
                 (if (eq ?robo_order 0);; aka was retrive
                     then
-                        (update ?robo_s (?robo_order ?m_order))
-                        (update ?machine_s (?machine_order 0))
+;;                        (modify ?robo_s (?robo_order ?m_order))
+;;                        (modify ?machine_s (?machine_order 0))
                         ;update order status
                 
                     else ; was deliver        
-                        (update ?machine_s (?m_order ?robo_order))
-                        (update ?robo_s (?robo_order 0))
-                        (update ?order_s (?order_state (?pos)))
+;;                        (modify ?machine_s (?m_order ?robo_order))
+;;                        (modify ?robo_s (?robo_order 0))
+;;                        (modify ?order_s (?order_state (?pos)))
 
                 )     
         )
@@ -54,14 +54,14 @@
 
 (defrule ringstation_update
 (update_rs (id ?RS_id) (payment ?pay))
-?rs1 <- (machine_status (name "M-RS1") (slide_shelf ?pay_rs1))
-?rs2 <- (machine_status (name "M-RS2") (slide_shelf ?pay_rs2))
+?rs1 <- (machine_status (name M-RS1) (slide_shelf ?pay_rs1))
+?rs2 <- (machine_status (name M-RS2) (slide_shelf ?pay_rs2))
 =>
     (if (eq ?RS_id 1)
         then
-            (modify ?rs1 (slide_shelf (+ pay_rs1 ?pay)))
+            (modify ?rs1 (slide_shelf (+ ?pay_rs1 ?pay)))
         else
-            (modify ?rs2 (slide_shelf (+ pay_rs2 ?pay)))
+            (modify ?rs2 (slide_shelf (+ ?pay_rs2 ?pay)))
 
     )
 )

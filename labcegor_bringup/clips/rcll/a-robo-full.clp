@@ -43,6 +43,6 @@
 (deffacts team_machineinit
   (team (name MAGENTA)(prefix M))
   (init_moves)
-  (machine_status (name "M-RS1") (slide_shelf 0))
-  (machine_status (name "M-RS2") (slide_shelf 0))
+  (machine_status (name M-RS1) (slide_shelf 0))
+  (machine_status (name M-RS2) (slide_shelf 0))
 )
