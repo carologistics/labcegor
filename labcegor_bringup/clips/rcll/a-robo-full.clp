@@ -12,8 +12,8 @@
   (slot order (type INTEGER)) ;odrder id of workpice in Hand 0=empty, 20 = hands full unassigned, 2X assigend to slide fo RSX
   (slot pos (type SYMBOL)); waypoint
   (slot pos_at_waypoint (type SYMBOL));if any
-  (slot des (type SYMBOL)); destination waypoint
-  (slot des_at_waypoint (type SYMBOL));if any
+  (slot des (type SYMBOL) (default EMPTY)); destination waypoint
+  (slot des_at_waypoint (type SYMBOL) (default EMPTY));if any
 )
 (deftemplate machine_status
   (slot name (type SYMBOL))
@@ -28,6 +28,10 @@
   (slot robo_order (type INTEGER));id of last order 0 if delivered as last task
   (slot machine_order (type INTEGER) (default 0))
 )
+
+(deftemplate init_it 
+(slot id (type INTEGER))
+(slot iteration (type INTEGER)))
 
 (deftemplate update_rs
   (slot id (type INTEGER)) ;; rs1/RS2
@@ -45,4 +49,26 @@
   (init_moves)
   (machine_status (name M-RS1) (slide_shelf 0))
   (machine_status (name M-RS2) (slide_shelf 0))
+  (machine_status (name M-CS1) (task 0) (pos empty))
+  (machine_status (name M-CS2) (task 0) (pos empty))
+
+)
+
+(deftemplate action
+    (slot id (type INTEGER));robo id
+    (slot a_type (type STRING)) ;(m)ove,(r)etrive,(p)ut
+    (slot machine (type SYMBOL)) ;can be movepoint for move
+    (slot io (type SYMBOL)) ;(i)nput,(o)utput, left, center, right
+    (slot color (type SYMBOL) (default NONE) ) ;identifier or ""
+    (slot task_id (type INTEGER))
+    (slot wait (type INTEGER) (default 0))
+)
+
+(deftemplate instruct
+    ;(slot a_type (type SYMBOL)) ;(m)ove,(r)etrive,(p)ut
+    (slot machine (type SYMBOL)) ;can be movepoint for move
+    (slot operation (type SYMBOL)) ;(i)nput,(o)utput, left, center, right
+    (slot color (type SYMBOL) (default NONE) ) ;identifier or ""
+    (slot task_id (type INTEGER))
+    (slot wait (type INTEGER) (default 0))
 )
