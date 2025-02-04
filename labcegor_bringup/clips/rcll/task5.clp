@@ -188,15 +188,15 @@
 
   ; It Grapped something
   (if (and (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cd FALSE) (eq ?robot_state HOLDING) (eq ?successful TRUE)) then
-    (bind ?target_color (check_order ?oid))
+    (bind ?target (check_order ?oid))
     (modify ?tasks_overview (can_move TRUE))
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_deliver TRUE))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
+    (modify ?tasks_overview (move_target ?target))
     (modify ?check_robot (did_something FALSE))
     (modify ?machine_task_overview (machine_task NOT-SET))
     ; Todo get target based on order
-    (modify ?tasks_overview (move_target "M-RS1"))
     (modify ?tasks_overview (machine_target "input"))
     (printout green "Yippiiiiiiiiiieee" crlf)
   )
