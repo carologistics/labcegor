@@ -71,7 +71,7 @@
 
 (defrule deliver_part_to_machine_order_based
   (game-state (phase PRODUCTION))
-  ?tasks_overview <- (tasks_overview (robot_id ?rid) (task_id ?tid) (can_deliver ?cd) 
+  ?tasks_overview <- (tasks_overview (robot_id ?rid) (task_id ?tid)
                           (can_move FALSE) (can_retrieve FALSE) (can_deliver TRUE) (robot_type PRODUCTION) 
                           (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE) (is_assigned TRUE))
