@@ -60,8 +60,11 @@
   =>
   (bind ?color (get_next_order_color ?oid))
   ; instruct station to generate next color
-  ;(prepare_machine "M-BS" ?pos ?color ?refbox-id)
-  (assert (order_from_machine (machine_id ?mot) (order_id ?oid) (robot_id ?rid) (color ?color) (position "INPUT")))
+  ; (prepare_machine "M-BS" ?pos ?color ?refbox-id)
+  ; (assert (order_from_machine (machine_id ?mot) (order_id ?oid) (robot_id ?rid) (color ?color) (position "INPUT")))
+  (send_deliver_to_cmd ?rid ?mot ?mat ?peer-id ?tid)
+  (modify ?check_robot (did_something TRUE))
+  (modify ?tasks_overview (state IDLE))
 )
 
 
