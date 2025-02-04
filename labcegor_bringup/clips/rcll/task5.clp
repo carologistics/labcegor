@@ -136,7 +136,6 @@
   (machine (name M-BS) (state ?s))
   ?machine_task_overview <- (machine_task_overview (machine_id M-BS) (machine_task ?task))
   =>
-  (printout yellow "wait till it is my turn: " ?incomming-oid " " ?rid " " ?color " " ?pos " " crlf)
   (if (and (eq ?s IDLE) (not (eq ?task WORK))) then
     (prepare_basestation "M-BS" ?pos ?color ?refbox-id)
     (printout blue "prepare for order: " ?incomming-oid " color: " ?color " at: " ?pos " for robot: " ?rid crlf)
@@ -166,7 +165,7 @@
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
   (bind ?successful (pb-field-value ?msg "successful"))
-  (printout green "no where newar it should be" " " ?cm " " ?cr " " ?cd " " ?robot_state crlf)
+  ;(printout green "no where newar it should be" " " ?cm " " ?cr " " ?cd " " ?robot_state crlf)
 
   ; It moved
   (if (and (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE) (eq ?robot_state MOVING) (eq ?successful TRUE)) then
@@ -181,7 +180,7 @@
   ; It Grapped something
   (if (and (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cd FALSE) (eq ?robot_state HOLDING) (eq ?successful TRUE)) then
     (modify ?tasks_overview (can_move TRUE))
-    (modify ?tasks_overview (can_retrieve TRUE))
+    (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_deliver TRUE))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (modify ?check_robot (did_something FALSE))
