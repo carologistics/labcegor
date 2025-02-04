@@ -14,7 +14,7 @@
     ;?d <- (do (id ?id) (task ?t-id))
     ;?b <- (robo_busy (id ?id))
     ?robo_s <- (robo_status (id ?id) (task ?robo_task) (order ?robo_order) (pos ?pos) (pos_at_waypoint ?pos_wp) (des ?des) (des_at_waypoint ?des_wp))
-    (test (< ?robo_task 0)) ;; busy check
+    (test (> ?robo_task 0)) ;; busy check
     ?machine_s <- (machine_status (name ?m_name) (task ?m_task) (order ?m_order))
     ?order_s <- (order_status (id ?robo_order) (state ?order_state))
     (protobuf-msg (type "llsf_msgs.AgentTask") (msg-type ?msg-type) (client-type PEER) (ptr ?msg))
@@ -53,6 +53,17 @@
         ;    (printout green ?id ?t-id  crlf)
         )
     )
+
+(defrule waitforfinish_machine
+?machine_s <- (machine_status (name ?m_name) (task ?m_task) (order ?m_order) (pos ?m_pos))
+(test (> ?m_task 0)) 
+(machine (name ?m) (state ?m_state))
+=>
+  (if (eq ?m-state READY-AT-OUTPUT)
+  then
+  (modify (?machine_s (task 0) (pos output)))
+  )
+)
 
 
 (defrule ringstation_update
