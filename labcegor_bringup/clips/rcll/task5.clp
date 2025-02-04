@@ -122,7 +122,7 @@
   (if (eq ?s IDLE) then
     (prepare_basestation "M-BS" ?pos ?color ?refbox-id)
     (printout blue "prepare for order: " ?incomming-oid " color: " ?color " at: " ?pos " for robot: " ?rid crlf)
-    (modify ?machine (oid ?incomming-oid))
+    (modify ?machine (order ?incomming-oid))
     (retract ?machine_order)
   )
 )
