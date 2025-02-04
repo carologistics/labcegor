@@ -117,14 +117,30 @@
     (bind ?ring-colors ?order:ring-colors)
     (bind ?cap-color ?order:cap-color)
   )
+  (bind ?target_color "")
   (printout green "Order is as folloews " ?oid " " ?name " " ?base-color " "?cap-color crlf)
   (if (> (length$ ?ring-colors) 0) then 
     (printout yellow "Ring color should be" (nth$ 1 ?ring-colors) crlf)
-    (return (nth$ 1 ?ring-colors))
+    (modify ?target_color (nth$ 1 ?ring-colors))
   )
   (if (eq (length$ ?ring-colors) 0) then
     (printout yellow "Cap color should be" ?cap-color crlf)
-    (return ?cap-color)
+    (modify ?target_color ?cap-color)
   )
-  (return "NONE")
+
+  (bind ?target_machine (switch ?target_color
+    (case RING_GREEN then M-RS1)
+    (case RING_ORANGE then M-RS1)
+    (case RING_YELLOW then M-RS2)
+    (case RING_BLUE then M-RS2)
+    (case CAP_SILVER then M-CS1)
+    (case CAP_BLACK then M-CS2)
+    (case BASE_BLACK then M-BS)
+    (case BASE_RED then M-BS)
+    (case BASE_SILVER then M-BS)
+    (default M-DS)
+  ))
+  (printout yellow "Target is " ?target_machine " because of " ?target_color crlf)
+  
+  (return ?target_machine)
 )
