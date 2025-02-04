@@ -23,7 +23,9 @@
 ; ==================================================================================
 (defrule move_robot_order_based
   (game-state (phase PRODUCTION))
-  ?tasks_overview <- (tasks_overview (robot_id ?rid) (task_id ?tid) (can_move TRUE) (can_retrieve FALSE) (can_deliver ?cd) (robot_type PRODUCTION) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
+  ?tasks_overview <- (tasks_overview (robot_id ?rid) (task_id ?tid) (can_deliver ?cd) 
+                                      (can_move TRUE) (can_retrieve FALSE) (robot_type PRODUCTION) 
+                                      (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE) (is_assigned TRUE))
   (assigned_order (order_id ?oid) (robot_id ?rid))
   ?order <- (order (id ?oid) (name ?order-name) (base-color ?base-color)); 
@@ -55,7 +57,9 @@
 
 (defrule pickup_order_based
   (game-state (phase PRODUCTION))
-  ?tasks_overview <- (tasks_overview (robot_id ?rid) (task_id ?tid) (robot_type PRODUCTION) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
+  ?tasks_overview <- (tasks_overview (robot_id ?rid) (task_id ?tid) (can_deliver ?cd) 
+                                      (can_move FALSE) (can_retrieve TRUE) (robot_type PRODUCTION) 
+                                      (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE) (is_assigned TRUE))
   (assigned_order (order_id ?oid) (robot_id ?rid))
   ?order <- (order (id ?oid) (name ?order-name) (base-color ?base-color))
@@ -172,7 +176,6 @@
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
   (bind ?successful (pb-field-value ?msg "successful"))
-  (printout green "no where newar it should be" " " ?cm " " ?cr " " ?cd " " ?robot_state crlf)
 
   ; It moved
   (if (and (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE) (eq ?robot_state MOVING) (eq ?successful TRUE)) then
