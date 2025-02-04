@@ -117,7 +117,7 @@
     (bind ?ring-colors ?order:ring-colors)
     (bind ?cap-color ?order:cap-color)
   )
-  (assert ?target_color "")
+  (bind ?target_color "")
   (printout green "Order is as folloews " ?oid " " ?name " " ?base-color " "?cap-color crlf)
   (if (> (length$ ?ring-colors) 0) then 
     (printout yellow "Ring color should be" (nth$ 1 ?ring-colors) crlf)
