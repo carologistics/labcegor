@@ -72,3 +72,10 @@
     ;handeling priority
     ;staring (restricted) machine instruction when robo deliver
 )
+
+
+(defrule (new order)
+    ;(order )
+=>
+    
+)
