@@ -1,5 +1,5 @@
 ; (defrule deliver_order_based
-; (game-state (state RUNNING))
+; (game-state (phase PRODUCTION))
 ; )
 
 ; ==================================================================================
@@ -7,7 +7,7 @@
 ; ==================================================================================
 
 (defrule random-order-assignment
-  (game-state (state RUNNING))
+  (game-state (phase PRODUCTION))
   ?order <- (order (id ?oid))
   ?tasks_overview <- (tasks_overview (robot_id ?rid) (robot_type PRODUCTION) (state IDLE))
   ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE) (is_assigned FALSE))
@@ -22,7 +22,7 @@
 ; Manage ROBOT1 for Production
 ; ==================================================================================
 (defrule move_robot_order_based
-  (game-state (state RUNNING))
+  (game-state (phase PRODUCTION))
   ?tasks_overview <- (tasks_overview (robot_id ?rid) (task_id ?tid) (robot_type PRODUCTION) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE) (is_assigned TRUE))
   (assigned_order (order_id ?oid) (robot_id ?rid))
@@ -43,7 +43,7 @@
 )
 
 (defrule pickup_order_based
-  (game-state (state RUNNING))
+  (game-state (phase PRODUCTION))
   ?tasks_overview <- (tasks_overview (robot_id ?rid) (task_id ?tid) (robot_type PRODUCTION) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE) (is_assigned TRUE))
   (assigned_order (order_id ?oid) (robot_id ?rid))
@@ -61,13 +61,13 @@
 )
 
 ; (defrule deliver_order_based
-; (game-state (state RUNNING))
+; (game-state (phase PRODUCTION))
 ; )
 ; ==================================================================================
 ; Manage ROBOTS 3 for Payment
 ; ==================================================================================
 (defrule send-robot-three-to-pickup
-  (game-state (state RUNNING))
+  (game-state (phase PRODUCTION))
   (protobuf-peer (name ROBOT3) (peer-id ?peer-id))
   ?tasks_overview <- (tasks_overview (robot_id 3) (robot_type PAYMENT) (task_id ?tid) (can_move TRUE) (can_retrieve FALSE) (can_deliver ?cd) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id 3) (did_something FALSE))
@@ -91,7 +91,7 @@
 )
 
 (defrule robot-three-pickup-base
-  (game-state (state RUNNING))
+  (game-state (phase PRODUCTION))
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   ?tasks_overview <- (tasks_overview (robot_id 3) (task_id ?tid) (can_move FALSE) (can_retrieve TRUE) (can_deliver FALSE) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id 3) (did_something FALSE))
@@ -108,7 +108,7 @@
 )
 
 (defrule robot-three-deliver-base
-  (game-state (state RUNNING))
+  (game-state (phase PRODUCTION))
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   ?tasks_overview <- (tasks_overview (robot_id 3) (task_id ?tid) (can_move FALSE) (can_retrieve FALSE) (can_deliver TRUE) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id 3) (did_something FALSE))
@@ -125,7 +125,7 @@
 ; Manage Machines
 ; ==================================================================================
 (defrule manage_ordered_bases
-  (game-state (state RUNNING))
+  (game-state (phase PRODUCTION))
   ?machine_order <- (base_order_from_machine (order_id ?incomming-oid) (robot_id ?rid) (color ?color) (position ?pos))
   (protobuf-peer (name refbox-private) (peer-id ?refbox-id))
   ?machine <- (machine (name M-BS) (state ?s))
@@ -146,7 +146,7 @@
 ; ROBOTS orderbased
 ; ==========
 (defrule check_progress_off_robot_with_order
-  (game-state (state RUNNING))
+  (game-state (phase PRODUCTION))
   ?tasks_overview <- (tasks_overview (robot_id ?rid) (robot_type PRODUCTION) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE) (is_assigned TRUE))
   (assigned_order (order_id ?oid) (robot_id ?rid))
@@ -171,7 +171,7 @@
 ; ROBOT 3 for Payment
 ; ==========
 (defrule check-robot_three
-  (game-state (state RUNNING))
+  (game-state (phase PRODUCTION))
   (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id 3) (ptr ?msg))
   ?tasks_overview <- (tasks_overview (robot_id 3) (robot_type PAYMENT) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?mpi_one <- (machine_payment_info (machine_id M-RS1) (money ?m_one))
