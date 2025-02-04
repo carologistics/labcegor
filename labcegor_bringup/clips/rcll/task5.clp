@@ -56,8 +56,8 @@
   (machine (name M-BS) (state ?s))
   (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
   =>
-  (printout green ?peer-name " Basestation is in state " ?s " " ?oid " " ?machine_oid crlf)
-  (if (and (eq ?s READY-AT-OUTPUT) (eq ?oid ?machine_oid)) then
+  (printout green ?peer-name " Basestation is in state " ?s " " ?oid " " crlf)
+  (if (and (eq ?s READY-AT-OUTPUT)) then
     (send_retrieve_from_cmd ?rid ?mot ?mat ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
     (modify ?tasks_overview (state HOLDING))
@@ -100,7 +100,7 @@
   (protobuf-peer (name ?n) (peer-id ?peer-id))
   ?tasks_overview <- (tasks_overview (robot_id 3) (task_id ?tid) (can_move FALSE) (can_retrieve TRUE) (can_deliver FALSE) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id 3) (did_something FALSE))
-  (machine (name M-BS) (state ?s) (order ?oid))
+  (machine (name M-BS) (state ?s))
   ?machine_task_overview <- (machine_task_overview (name M-BS) (machine_task ?task))
   (test (eq ?n ROBOT3))
   =>
@@ -138,7 +138,6 @@
   (if (and (eq ?s IDLE) (not (eq ?task WORK))) then
     (prepare_basestation "M-BS" ?pos ?color ?refbox-id)
     (printout blue "prepare for order: " ?incomming-oid " color: " ?color " at: " ?pos " for robot: " ?rid crlf)
-    (modify ?machine (order ?incomming-oid))
     (modify ?machine_task_overview (machine_task WORK))
     (retract ?machine_order)
   )
