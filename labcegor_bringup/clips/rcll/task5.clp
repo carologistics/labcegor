@@ -114,13 +114,14 @@
 ; Manage Machines
 ; ==================================================================================
 (defrule manage_ordered_bases
-  ?machine_order <- (base_order_from_machine (order_id ?oid) (robot_id ?rid) (color ?color) (position ?pos))
+  ?machine_order <- (base_order_from_machine (order_id ?incomming-oid) (robot_id ?rid) (color ?color) (position ?pos))
   (protobuf-peer (name refbox-private) (peer-id ?refbox-id))
-  (machine (name M-BS) (state ?s))
+  ?machine <- (machine (name M-BS) (state ?s))
   =>
   (if (eq ?s IDLE) then
     (prepare_basestation "M-BS" ?pos ?color ?refbox-id)
-    (printout blue "prepare for order: " ?oid " color: " ?color " at: " ?pos " for robot: " ?rid crlf)
+    (printout blue "prepare for order: " ?incomming-oid " color: " ?color " at: " ?pos " for robot: " ?rid crlf)
+    (modify ?machine (oid ?incomming-oid))
     (retract ?machine_order)
   )
 )
@@ -222,19 +223,3 @@
     (printout green "where should it go now? " ?target " " ?m_one " " ?m_two " soooo?: " (check_payment ?m_one ?m_two) crlf)
   )
 )
-
-; Check Machine 
-(defrule check_machine_M-CS1
-  ;(machine (name M-CS1) (state ?s) (type ?t))
-  (machine (name M-BS) (state ?s) (type ?t))
-  (machine_task_overview (machine_id M-CS1) (machine_task ?mt))
-  (not (M-CS1_finished_task1))
-  =>
-  (printout red "M-BS is in state " ?s " and of type " ?t " and task " ?mt " "(eq ?s READY-AT-OUTPUT)crlf)
-  (if (eq ?s READY-AT-OUTPUT) then
-    (assert (M-CS1_finished_task1))
-  )
-)
-
-
-; 
