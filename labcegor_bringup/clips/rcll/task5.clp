@@ -51,7 +51,8 @@
   ?tasks_overview <- (tasks_overview (robot_id ?rid) (task_id ?tid) (robot_type PRODUCTION) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE) (is_assigned TRUE))
   (assigned_order (order_id ?oid) (robot_id ?rid))
-  ?order <- (order (id ?oid) (name ?order-name) (base-color ?base-color)); 
+  ?order <- (order (id ?oid) (name ?order-name) (base-color ?base-color))
+  (not (base_order_from_machine (robot_id ?rid)))
   ; TODO make machine name dependent on move_target
   (machine (name M-BS) (state ?s))
   (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
@@ -97,12 +98,12 @@
 
 (defrule robot-three-pickup-base
   (game-state (phase PRODUCTION))
-  (protobuf-peer (name ?n) (peer-id ?peer-id))
+  (protobuf-peer (name ROBOT3) (peer-id ?peer-id))
   ?tasks_overview <- (tasks_overview (robot_id 3) (task_id ?tid) (can_move FALSE) (can_retrieve TRUE) (can_deliver FALSE) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id 3) (did_something FALSE))
   (machine (name M-BS) (state ?s))
   ?machine_task_overview <- (machine_task_overview (machine_id M-BS) (machine_task ?task))
-  (test (eq ?n ROBOT3))
+  (not (base_order_from_machine (robot_id 3) ))
   =>
   (printout red "Basestation is in state " ?s " " crlf)
   (if (eq ?s READY-AT-OUTPUT) then
