@@ -118,7 +118,7 @@
     (bind $?ring-color ?order:ring-color)
     (bind ?cap-color ?order:cap-color)
   )
-  (printout green "Order is as folloews " ?oid " " ?order-name " " ?base-color " "?cap-color crlf)
+  (printout green "Order is as folloews " ?oid " " ?name " " ?base-color " "?cap-color crlf)
   
   (return "NONE")
 )
