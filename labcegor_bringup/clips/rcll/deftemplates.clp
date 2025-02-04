@@ -23,7 +23,6 @@
    (slot zone (type SYMBOL))
    (slot rotation (type INTEGER))
    (slot state (type SYMBOL))
-   (slot order (type INTEGER))
 )
 
 (deftemplate ring-assignment

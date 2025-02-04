@@ -53,7 +53,7 @@
   (assigned_order (order_id ?oid) (robot_id ?rid))
   ?order <- (order (id ?oid) (name ?order-name) (base-color ?base-color)); 
   ; TODO make machine name dependent on move_target
-  (machine (name M-BS) (state ?s) (order ?machine_oid))
+  (machine (name M-BS) (state ?s))
   (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
   =>
   (printout green ?peer-name " Basestation is in state " ?s " " ?oid " " ?machine_oid crlf)
@@ -101,6 +101,7 @@
   ?tasks_overview <- (tasks_overview (robot_id 3) (task_id ?tid) (can_move FALSE) (can_retrieve TRUE) (can_deliver FALSE) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id 3) (did_something FALSE))
   (machine (name M-BS) (state ?s) (order ?oid))
+  ?machine_task_overview <- (machine_task_overview (name M-BS) (machine_task ?task))
   (test (eq ?n ROBOT3))
   =>
   (printout red "Basestation is in state " ?s " " ?oid crlf)
@@ -131,13 +132,14 @@
   (game-state (phase PRODUCTION))
   ?machine_order <- (base_order_from_machine (order_id ?incomming-oid) (robot_id ?rid) (color ?color) (position ?pos))
   (protobuf-peer (name refbox-private) (peer-id ?refbox-id))
-  ?machine <- (machine (name M-BS) (state ?s))
+  (machine (name M-BS) (state ?s))
+  ?machine_task_overview <- (machine_task_overview (name M-BS) (machine_task ?task))
   =>
-  (if (eq ?s IDLE) then
+  (if (and (eq ?s IDLE) (not (eq ?task WORK))) then
     (prepare_basestation "M-BS" ?pos ?color ?refbox-id)
     (printout blue "prepare for order: " ?incomming-oid " color: " ?color " at: " ?pos " for robot: " ?rid crlf)
     (modify ?machine (order ?incomming-oid))
-    (modify ?machine (state BUSY))
+    (modify ?machine_task_overview (machine_task WORK))
     (retract ?machine_order)
   )
 )
@@ -158,6 +160,7 @@
   ?mpi_one <- (machine_payment_info (machine_id M-RS1) (money ?m_one))
   ?mpi_two <- (machine_payment_info (machine_id M-RS2) (money ?m_two))
   (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id ?rid) (ptr ?msg))
+  ?machine_task_overview <- (machine_task_overview (name M-BS) (machine_task ?task))
   =>
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
@@ -181,6 +184,7 @@
     (modify ?tasks_overview (can_deliver TRUE))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (modify ?check_robot (did_something FALSE))
+    (modify ?machine_task_overview (machine_task NOT-SET))
     ; Todo get target based on order
     (modify ?tasks_overview (move_target "M-RS1"))
     (modify ?tasks_overview (machine_target "input"))
@@ -199,6 +203,7 @@
   ?mpi_one <- (machine_payment_info (machine_id M-RS1) (money ?m_one))
   ?mpi_two <- (machine_payment_info (machine_id M-RS2) (money ?m_two))
   ?check_robot <- (check_robot (robot_id 3) (did_something TRUE))
+  ?machine_task_overview <- (machine_task_overview (name M-BS) (machine_task ?task))
   =>
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
@@ -225,6 +230,7 @@
 
   (if (and (eq ?robot_id 3) (eq ?task_id ?tid) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cd FALSE)) then 
     ; TODO check ?target == "NONE" and do something else if thats the case
+    (modify ?machine_task_overview (machine_task NOT-SET))
     (modify ?tasks_overview (can_move TRUE))
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_deliver TRUE))
