@@ -104,8 +104,8 @@
   ?machine_task_overview <- (machine_task_overview (machine_id M-BS) (machine_task ?task))
   (test (eq ?n ROBOT3))
   =>
-  (printout red "Basestation is in state " ?s " " ?oid crlf)
-  (if (and (eq ?s READY-AT-OUTPUT) (eq ?oid 0)) then
+  (printout red "Basestation is in state " ?s " " crlf)
+  (if (eq ?s READY-AT-OUTPUT) then
     (send_retrieve_from_cmd 3 ?mot ?mat ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
     (modify ?tasks_overview (state HOLDING))
