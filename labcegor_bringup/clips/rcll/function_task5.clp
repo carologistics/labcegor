@@ -111,7 +111,7 @@
 (deffunction check_order (?oid)
   (do-for-fact
     ((?order order))
-    (eq ?order:id)
+    (eq ?order:id ?oid )
     (bind ?oid ?order:id)
     (bind ?name ?order:order-name)
     (bind ?base-color ??order:base-color)
