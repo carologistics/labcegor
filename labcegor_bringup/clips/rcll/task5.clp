@@ -56,7 +56,7 @@
   (machine (name M-BS) (state ?s) (order ?machine_oid))
   (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
   =>
-  (printout green "Basestation is in state " ?s " " ?oid " " ?machine_oid crlf)
+  (printout green ?peer-nam " Basestation is in state " ?s " " ?oid " " ?machine_oid crlf)
   (if (and (eq ?s READY-AT-OUTPUT) (eq ?oid ?machine_oid)) then
     (send_retrieve_from_cmd ?rid ?mot ?mat ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
@@ -163,7 +163,7 @@
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
   (bind ?successful (pb-field-value ?msg "successful"))
-  (printout red "not yet there" crlf)
+  (printout green "no where newar it should be" " " ?cm " " ?cr " " ?cd " " ?robot_state crlf)
 
   ; It moved
   (if (and (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE) (eq ?robot_state MOVING) (eq ?successful TRUE)) then
