@@ -181,7 +181,7 @@
   (bind ?successful (pb-field-value ?msg "successful"))
 
   ; It moved
-  (if (and (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE) (eq ?robot_state MOVING) (eq ?successful TRUE)) then
+  (if (and (eq ?task_id ?tid) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE) (eq ?robot_state MOVING) (eq ?successful TRUE)) then
     (printout green "robot " ?rid " can now grab the base of color: " ?base-color " from order: " ?oid crlf)
     (modify ?tasks_overview (can_move FALSE))
     (modify ?tasks_overview (can_retrieve TRUE))
@@ -191,7 +191,7 @@
   )
 
   ; It Grapped something
-  (if (and (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cd FALSE) (eq ?robot_state HOLDING) (eq ?successful TRUE)) then
+  (if (and (eq ?task_id ?tid) (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cd FALSE) (eq ?robot_state HOLDING) (eq ?successful TRUE)) then
     (bind ?target (check_order ?oid))
     (modify ?tasks_overview (can_move TRUE))
     (modify ?tasks_overview (can_retrieve FALSE))
@@ -206,7 +206,7 @@
   )
 
   ; It moved to deliver
-  (if (and (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd TRUE) (eq ?robot_state CARRY) (eq ?successful TRUE)) then
+  (if (and (eq ?task_id ?tid) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd TRUE) (eq ?robot_state CARRY) (eq ?successful TRUE)) then
     (modify ?tasks_overview (can_move FALSE))
     (modify ?tasks_overview (can_deliver TRUE))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
@@ -215,7 +215,7 @@
   )
 
   ; It delivered 
-  (if (and (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE) (eq ?robot_state HOLDING) (eq ?successful TRUE)) then
+  (if (and (eq ?task_id ?tid) (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE) (eq ?robot_state HOLDING) (eq ?successful TRUE)) then
     ; TODO check if differenz between cm true or false for retrevial of product....
     (modify ?tasks_overview (can_move FALSE))
     (modify ?tasks_overview (can_retrieve TRUE))
