@@ -23,22 +23,25 @@
 ; ==================================================================================
 (defrule move_robot_order_based
   (game-state (phase PRODUCTION))
-  ?tasks_overview <- (tasks_overview (robot_id ?rid) (task_id ?tid) (robot_type PRODUCTION) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
+  ?tasks_overview <- (tasks_overview (robot_id ?rid) (task_id ?tid) (can_move TRUE) (can_retrieve FALSE) (can_deliver ?cd) (robot_type PRODUCTION) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE) (is_assigned TRUE))
   (assigned_order (order_id ?oid) (robot_id ?rid))
   ?order <- (order (id ?oid) (name ?order-name) (base-color ?base-color)); 
   (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
   =>
   (printout blue "Robot " ?peer-name " robot-id " ?rid crlf)
-  ; Todo send robot
-  ; todo check if robot is 
-  ;Get Order
-  ;Prepare Basestation PrepareMachine
+  ; Get Order
+  ; Prepare Basestation PrepareMachine
   (assert (base_order_from_machine (order_id ?oid) (robot_id ?rid) (color ?base-color) (position "INPUT")))
-  (if (eq ?robot_state IDLE) then 
+  (if (and (eq ?robot_state IDLE) (eq ?cd FALSE)) then 
     (send_move_to_cmd ?rid ?mot ?mat ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
     (modify ?tasks_overview (state MOVING))
+  )
+  (if (and (eq ?robot_state HOLDING) (eq ?cd TRUE)) then 
+    (send_move_to_cmd ?rid ?mot ?mat ?peer-id ?tid)
+    (modify ?check_robot (did_something TRUE))
+    (modify ?tasks_overview (state CARRY))
   )
 )
 
@@ -101,7 +104,6 @@
   (printout red "Basestation is in state " ?s " " ?oid crlf)
   (if (and (eq ?s READY-AT-OUTPUT) (eq ?oid 0)) then
     (send_retrieve_from_cmd 3 ?mot ?mat ?peer-id ?tid)
-    ; (printout blue "part 2/3 " robot_state crlf)
     (modify ?check_robot (did_something TRUE))
     (modify ?tasks_overview (state HOLDING))
   )
@@ -115,7 +117,6 @@
   (test (eq ?n ROBOT3))
   =>
   (send_deliver_to_cmd 3 ?mot ?mat ?peer-id ?tid)
-  ; (printout blue "part 3/3 " robot_state crlf)
   (modify ?check_robot (did_something TRUE))
   (modify ?tasks_overview (state IDLE))
 )
@@ -161,12 +162,41 @@
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
   (bind ?successful (pb-field-value ?msg "successful"))
   (printout red "not yet there" crlf)
-  (if (and (eq ?cm TRUE) (eq ?robot_state MOVING) (eq ?successful TRUE)) then
+
+  ; It moved
+  (if (and (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE) (eq ?robot_state MOVING) (eq ?successful TRUE)) then
     (printout green "robot " ?rid " can now grab the base of color: " ?base-color " from order: " ?oid crlf)
+    (modify ?tasks_overview (can_move FALSE))
+    (modify ?tasks_overview (can_retrieve TRUE))
+    (modify ?tasks_overview (task_id (+ ?task_id 1)))
+    (modify ?check_robot (did_something FALSE))
+    (modify ?tasks_overview (state IDLE))
+  )
+
+  ; It Grapped something
+  (if (and (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cd FALSE) (eq ?robot_state HOLDING) (eq ?successful TRUE)) then
+    (modify ?tasks_overview (can_move TRUE))
+    (modify ?tasks_overview (can_retrieve TRUE))
+    (modify ?tasks_overview (can_deliver TRUE))
+    (modify ?tasks_overview (task_id (+ ?task_id 1)))
+    (modify ?check_robot (did_something FALSE))
+    ; Todo get target based on order
+    (modify ?tasks_overview (move_target "M-RS1"))
+    (modify ?tasks_overview (machine_target "input"))
   )
 )
 
-
+; (if (and (eq ?robot_id 3) (eq ?task_id ?tid) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cd FALSE)) then 
+;     ; TODO get
+;     (modify ?tasks_overview (can_move TRUE))
+;     (modify ?tasks_overview (can_retrieve FALSE))
+;     (modify ?tasks_overview (can_deliver TRUE))
+;     (modify ?tasks_overview (move_target "M-RS1"))
+;     (modify ?tasks_overview (machine_target "input"))
+;     (modify ?tasks_overview (task_id (+ ?task_id 1)))
+;     (modify ?tasks_overview (state HOLDING))
+;     (modify ?check_robot (did_something FALSE))
+;   )
 
 ; ==========
 ; ROBOT 3 for Payment
