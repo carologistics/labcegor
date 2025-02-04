@@ -111,8 +111,12 @@
 (deffunction check_order (?oid)
   (do-for-fact
     ((?order order))
-    (> ?order:id (eq ?oid ?order:id))
-    (bind ?assigned_order (order (id ?oid) (name ?order-name) (base-color ?base-color) (ring-color $?ring-color) (cap-color $?cap-color)))
+    (eq ?order:id)
+    (bind ?oid ?order:id)
+    (bind ?name ?order:order-name)
+    (bind ?base-color ??order:base-color)
+    (bind $?ring-color ?order:ring-color)
+    (bind ?cap-color ?order:cap-color)
   )
   (printout green "Order is as folloews " ?oid " " ?order-name " " ?base-color " "?cap-color crlf)
   
