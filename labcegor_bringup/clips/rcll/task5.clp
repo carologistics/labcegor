@@ -46,6 +46,13 @@
   )
 )
 
+; (modify ?tasks_overview (can_move TRUE))
+;     (modify ?tasks_overview (can_retrieve FALSE))
+;     (modify ?tasks_overview (can_deliver TRUE))
+;     (modify ?tasks_overview (task_id (+ ?task_id 1)))
+;     (modify ?check_robot (did_something FALSE))
+;     (modify ?machine_task_overview (machine_task NOT-SET))
+
 (defrule pickup_order_based
   (game-state (phase PRODUCTION))
   ?tasks_overview <- (tasks_overview (robot_id ?rid) (task_id ?tid) (robot_type PRODUCTION) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
@@ -165,7 +172,7 @@
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
   (bind ?successful (pb-field-value ?msg "successful"))
-  ;(printout green "no where newar it should be" " " ?cm " " ?cr " " ?cd " " ?robot_state crlf)
+  (printout green "no where newar it should be" " " ?cm " " ?cr " " ?cd " " ?robot_state crlf)
 
   ; It moved
   (if (and (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE) (eq ?robot_state MOVING) (eq ?successful TRUE)) then
@@ -189,7 +196,6 @@
     (modify ?tasks_overview (move_target "M-RS1"))
     (modify ?tasks_overview (machine_target "input"))
     (printout green "Yippiiiiiiiiiieee" crlf)
-  
   )
 )
 
