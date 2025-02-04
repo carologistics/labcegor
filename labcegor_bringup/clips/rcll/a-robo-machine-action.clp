@@ -23,7 +23,7 @@
 )
 
 (defrule robo_retrive
-  ?ac <- (action (a_type "r") (id ?id) (machine ?wp) (io ?io) (task_id ?t-id)(wait ?w))
+  ?ac <- (action (a_type "r") (id ?id) (machine ?wp) (io ?io) (task_id ?t-id))
   ;(done (done_t_id ?w))
   (robo_status (id ?id) (pos ?wp) (pos_at_waypoint ?io))
   (protobuf-peer (name ?name) (peer-id ?peer-id))
@@ -48,7 +48,7 @@
 
 
 (defrule robo_deliver
-  ?ac <- (action (a_type "d") (id ?id) (machine ?wp) (io ?io) (task_id ?t-id)(wait ?w))
+  ?ac <- (action (a_type "d") (id ?id) (machine ?wp) (io ?io) (task_id ?t-id))
   ;(done (done_t_id ?w))
   (robo_status (id ?id) (pos ?wp) (pos_at_waypoint ?io))
   (protobuf-peer (name ?name) (peer-id ?peer-id))

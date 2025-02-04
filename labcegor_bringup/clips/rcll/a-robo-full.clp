@@ -51,7 +51,9 @@
   (machine_status (name M-RS2) (slide_shelf 0))
   (machine_status (name M-CS1) (task 0) (pos empty))
   (machine_status (name M-CS2) (task 0) (pos empty))
-
+  (robo_status (id 1) (task 0) (order 0) (pos START) (pos_at_waypoint NONE));repeat for other robos
+  (robo_status (id 2) (task 0) (order 0) (pos START) (pos_at_waypoint NONE))
+  (robo_status (id 3) (task 0) (order 0) (pos START) (pos_at_waypoint NONE))
 )
 
 (deftemplate action

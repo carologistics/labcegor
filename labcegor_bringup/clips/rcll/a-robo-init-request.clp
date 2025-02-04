@@ -22,7 +22,7 @@
     (bind ?robo_id (pb-field-value ?msg "robot_id"))
     (bind ?task_id (pb-field-value ?msg "task_id"))
     (bind ?success (pb-field-value ?msg "successful"))
-    (if (and (eq ?robo_id ?id) (eq ?success TRUE)) ;(eq ?task_id ?t-id)
+    (if (and (eq ?robo_id ?id) (eq ?task_id ?robo_task) (eq ?success TRUE)) ;(eq ?task_id ?t-id)
     then
         ;(retract ?d)
         ;(retract ?b)
@@ -44,6 +44,7 @@
 
                 )     
         )
+        (modify ?robo_s (task 0))
         (assert (request_task (id ?id) (last_task ?robo_task) (robo_order ?robo_order)(machine_order ?m_order)))
 
         ;(assert (done (done_t_id ?task))) still needed?
@@ -59,9 +60,9 @@
 (test (> ?m_task 0)) 
 (machine (name ?m) (state ?m_state))
 =>
-  (if (eq ?m-state READY-AT-OUTPUT)
+  (if (eq ?m_state READY-AT-OUTPUT)
   then
-  (modify (?machine_s (task 0) (pos output)))
+  (modify ?machine_s (task 0) (pos output))
   )
 )
 
@@ -81,7 +82,7 @@
 )
 
 (defrule request_task
-(request_task (id ?robo_id) (last_task ?last_robo_task) (robo_order ?last_robo_order)) ;(machine_order ?last_machine_order)
+?rt <- (request_task (id ?robo_id) (last_task ?last_robo_task) (robo_order ?last_robo_order)) ;(machine_order ?last_machine_order)
 ?init_it <- (init_it (id ?robo_id) (iteration ?it))
 (test (<= ?it 7))
 ;?hp_o <- (order_status (id ?hp_oid)(state ?hp_ostate) (next_step ?hp_next) (start_d_time ?hp_start) (last_d_time ?hp_last) (prio ?hp_prio));order with highest prio
@@ -90,7 +91,9 @@
 ;?r_o <-(order_status (id ?last_robo_order)(state ?r_ostate) (next_step ?r_next) (start_d_time ?r_start) (last_d_time ?r_last) (prio ?r_prio))
 ;?m_o <-(order_status (id ?last_machine_order)(state ?m_ostate) (next_step ?m_next) (start_d_time ?m_start) (last_d_time ?m_last) (prio ?m_prio))
 (machine_status (name M-CS1) (task ?m_task) (pos ?m_pos))
+?robo_s <- (robo_status (id ?robo_id) (task ?r_task) (order ?r_order))
 =>
+(retract ?rt)
 (if (eq ?hid_oid 42)
     then
     (switch ?robo_id
@@ -106,41 +109,48 @@
      )
      (case 3 then
         (switch ?it
-            (case 1
+            (case 1 then
                 (assert (action (a_type "m") (id 3) (machine M-CS1) (io input) (task_id (+ ?last_robo_task 1))))
+                (modify ?robo_s (task (+ ?last_robo_task 1)) (order 42))
             )
-            (case 2
+            (case 2 then
                 (assert (action (id 3) (a_type "r") (machine M-CS1) (io left) (task_id (+ ?last_robo_task 1)))) ;action unify
-
+                (modify ?robo_s (task (+ ?last_robo_task 1)) (order 42))
+                ;does not work rn, find bug why r message is not executet from robo
             )
-            (case 3
+            (case 3 then
                 (assert (action (id 3) (a_type "d") (machine M-CS1) (io input) (task_id (+ ?last_robo_task 1))))
             )
-            (case 4
+            (case 4 then
                 (assert (instruct (machine M-CS1) (operation RETRIEVE_CAP) (task_id  1)));needs finish of robo - easy do together with next m
                 (assert (action (id 3) (a_type "m") (machine M-CS1) (io output) (task_id (+ ?last_robo_task 1))))
             )
-            (case 5
+            (case 5 then
                 (if (and (eq ?m_task 0) (eq ?m_pos output))
                     then
                         (assert (action (id 3) (a_type "r") (machine M-CS1) (io output) (task_id (+ ?last_robo_task 1))));needs finish of machine - if machine status task 0 pos out for the machine the robo is sanding
                     else
                         (modify ?init_it (iteration (- ?it 1)))
+                        (assert (request_task (id ?robo_id) (last_task ?last_robo_task) (robo_order ?last_robo_order)))
                 )
             )
-            (case 6
+            (case 6 then
                 (assert (action (id 3) (a_type "m") (machine M-RS1) (io input) (task_id (+ ?last_robo_task 1))))
             )
-            (case 7
+            (case 7 then
                 (assert (action (id 3) (a_type "d") (machine M-RS1) (io slide) (task_id (+ ?last_robo_task 1))))
             )
+            ;(default (printout red "no more payment update - LOOP" crlf))
+
         
         )
         
         
      )
-     (modify ?init-it (iteration (+ ?it 1)))
+     ;(default (printout red "no more payment update - LOOP" crlf))
     ) 
+         (modify ?init_it (iteration (+ ?it 1)))
+
 
 )
     ;(if ) order 42 not done do init else...
