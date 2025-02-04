@@ -135,6 +135,7 @@
   (machine (name M-BS) (state ?s))
   ?machine_task_overview <- (machine_task_overview (machine_id M-BS) (machine_task ?task))
   =>
+  (printout yellow "wait till it is my turn: " ?incomming-oid " " ?rid " " ?color " " ?pos " " crlf)
   (if (and (eq ?s IDLE) (not (eq ?task WORK))) then
     (prepare_basestation "M-BS" ?pos ?color ?refbox-id)
     (printout blue "prepare for order: " ?incomming-oid " color: " ?color " at: " ?pos " for robot: " ?rid crlf)
