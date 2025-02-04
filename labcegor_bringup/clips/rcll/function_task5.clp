@@ -113,7 +113,7 @@
     ((?order order))
     (eq ?order:id ?oid)
     (bind ?oid ?order:id)
-    (bind ?name ?order:order-name)
+    (bind ?name ?order:name)
     (bind ?base-color ?order:base-color)
     (bind ?ring-colors ?order:ring-colors)
     (bind ?cap-color ?order:cap-color)
