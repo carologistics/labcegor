@@ -2,6 +2,9 @@
 (init_moves)
 =>
     (assert (order_status (id 42)))
+    (assert (init_it (id 1) (iteration 1)))
+    (assert (init_it (id 2) (iteration 1)))
+    (assert (init_it (id 3) (iteration 1)))
     (assert (request_task (id 3) (last_task 3000)))
     (assert (request_task (id 2) (last_task 2000)))
     (assert (request_task (id 1) (last_task 1000)))
@@ -19,29 +22,29 @@
     (bind ?robo_id (pb-field-value ?msg "robot_id"))
     (bind ?task_id (pb-field-value ?msg "task_id"))
     (bind ?success (pb-field-value ?msg "successful"))
-    (if (and (eq ?robo_id ?id) (eq ?task_id ?t-id) (eq ?success TRUE))
+    (if (and (eq ?robo_id ?id) (eq ?success TRUE)) ;(eq ?task_id ?t-id)
     then
         ;(retract ?d)
         ;(retract ?b)
         ;(assert (done (done_t_id ?t-id)))
         (if (not (eq ?des ""));; aka was movment
             then
-                (modify ?robo_s (?pos ?des) (?pos_wp ?des_wp) (?des "") (?des_wp "")) ;pos = des; pos_wp =des_wp, des, des_wp = ""
+                (modify ?robo_s (pos ?des) (pos_at_waypoint ?des_wp) (des EMPTY) (des_at_waypoint EMPTY)) ;pos = des; pos_wp =des_wp, des, des_wp = ""
             else ; NO MOVEMENT
                 (if (eq ?robo_order 0);; aka was retrive
                     then
-;;                        (modify ?robo_s (?robo_order ?m_order))
-;;                        (modify ?machine_s (?machine_order 0))
+                        (modify ?robo_s (order ?m_order))
+                        (modify ?machine_s (order 0))
                         ;update order status
                 
                     else ; was deliver        
-;;                        (modify ?machine_s (?m_order ?robo_order))
-;;                        (modify ?robo_s (?robo_order 0))
-;;                        (modify ?order_s (?order_state (?pos)))
+                        (modify ?machine_s (order ?robo_order))
+                        (modify ?robo_s (order 0))
+                        (modify ?order_s (state ?pos))
 
                 )     
         )
-        (assert (request_task (id ?id) (last_task ?robo_task) (robo_order ?robo_order)(m_order ?m_order)))
+        (assert (request_task (id ?id) (last_task ?robo_task) (robo_order ?robo_order)(machine_order ?m_order)))
 
         ;(assert (done (done_t_id ?task))) still needed?
         ;(printout green "TASK DONE"  crlf)
@@ -67,16 +70,68 @@
 )
 
 (defrule request_task
-(request_task (id ?robo_id) (last_task ?last_robo_task) (robo_order ?last_robo_order) (machine_order ?last_machine_order))
-;?hp_o <- (order_state (id ?hp_oid)(order_state ?hp_ostate) (next_step ?hp_next) (start_d_time ?hp_start) (last_d_time ?hp_last) (prio ?hp_prio));order with highest prio
-?hid_o <- (order_state (id ?hid_oid) (order_state ?hid_ostate) (next_step ?hid_next) (start_d_time ?hid_start) (last_d_time ?hid_last) (prio ?hid_prio));order with highest id
-(not (order_state(id ?id_1)))
-(not (and (order_satus (id ?oid&:(> ?hid_oid ?id_1)))
-    (not (order_status (id ?hid_oid))))
+(request_task (id ?robo_id) (last_task ?last_robo_task) (robo_order ?last_robo_order)) ;(machine_order ?last_machine_order)
+?init_it <- (init_it (id ?robo_id) (iteration ?it))
+(test (<= ?it 7))
+;?hp_o <- (order_status (id ?hp_oid)(state ?hp_ostate) (next_step ?hp_next) (start_d_time ?hp_start) (last_d_time ?hp_last) (prio ?hp_prio));order with highest prio
+?hid_o <- (order_status (id ?hid_oid) (state ?hid_ostate) (next_step ?hid_next) (start_d_time ?hid_start) (last_d_time ?hid_last) (prio ?hid_prio));order with highest id
+(not (order_status (id ?id_1&:(< ?hid_oid ?id_1))))
+;?r_o <-(order_status (id ?last_robo_order)(state ?r_ostate) (next_step ?r_next) (start_d_time ?r_start) (last_d_time ?r_last) (prio ?r_prio))
+;?m_o <-(order_status (id ?last_machine_order)(state ?m_ostate) (next_step ?m_next) (start_d_time ?m_start) (last_d_time ?m_last) (prio ?m_prio))
+(machine_status (name M-CS1) (task ?m_task) (pos ?m_pos))
+=>
+(if (eq ?hid_oid 42)
+    then
+    (switch ?robo_id
+     (case 1 then
+        if (eq ?it 1)
+            then
+                (assert (action (a_type "m") (id 1) (machine M-BS) (io input) (task_id (+ ?last_robo_task 1))))
+                (modify ?init_it (iteration 7))
+     )
+     (case 2 then
+        (assert (action (a_type "m") (id 2) (machine M-CS2) (io input) (task_id (+ ?last_robo_task 1))))
+        ;(instruct )
+     )
+     (case 3 then
+        (switch ?it
+            (case 1
+                (assert (action (a_type "m") (id 3) (machine M-CS1) (io input) (task_id (+ ?last_robo_task 1))))
+            )
+            (case 2
+                (assert (action (id 3) (a_type "r") (machine M-CS1) (io left) (task_id (+ ?last_robo_task 1)))) ;action unify
+
+            )
+            (case 3
+                (assert (action (id 3) (a_type "d") (machine M-CS1) (io input) (task_id (+ ?last_robo_task 1))))
+            )
+            (case 4
+                (assert (instruct (machine M-CS1) (operation RETRIEVE_CAP) (task_id  1)));needs finish of robo - easy do together with next m
+                (assert (action (id 3) (a_type "m") (machine M-CS1) (io output) (task_id (+ ?last_robo_task 1))))
+            )
+            (case 5
+                (if (and (eq ?m_task 0) (eq ?m_pos output))
+                    then
+                        (assert (action (id 3) (a_type "r") (machine M-CS1) (io output) (task_id (+ ?last_robo_task 1))));needs finish of machine - if machine status task 0 pos out for the machine the robo is sanding
+                    else
+                        (modify ?init_it (iteration (- ?it 1)))
+                )
+            )
+            (case 6
+                (assert (action (id 3) (a_type "m") (machine M-RS1) (io input) (task_id (+ ?last_robo_task 1))))
+            )
+            (case 7
+                (assert (action (id 3) (a_type "d") (machine M-RS1) (io slide) (task_id (+ ?last_robo_task 1))))
+            )
+        
+        )
+        
+        
+     )
+     (modify ?init-it (iteration (+ ?it 1)))
+    ) 
+
 )
-?r_o <-(order_state (id ?last_robo_order)(order_state ?r_ostate) (next_step ?r_next) (start_d_time ?r_start) (last_d_time ?r_last) (prio ?r_prio))
-?m_o <-(order_state (id ?last_machine_order)(order_state ?m_ostate) (next_step ?m_next) (start_d_time ?m_start) (last_d_time ?m_last) (prio ?m_prio))
-=>    
     ;(if ) order 42 not done do init else...
     ;init
     ;assigning new tasks to robos
