@@ -43,10 +43,9 @@
 
 (defrule robot-three-deliver-base
   (game-state (phase PRODUCTION))
-  (protobuf-peer (name ?n) (peer-id ?peer-id))
+  (protobuf-peer (name ROBOT3) (peer-id ?peer-id))
   ?tasks_overview <- (tasks_overview (robot_id 3) (task_id ?tid) (can_move FALSE) (can_retrieve FALSE) (can_deliver TRUE) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id 3) (did_something FALSE))
-  (test (eq ?n ROBOT3))
   =>
   (send_deliver_to_cmd 3 ?mot ?mat ?peer-id ?tid)
   (modify ?check_robot (did_something TRUE))
