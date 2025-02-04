@@ -134,6 +134,7 @@
     (prepare_basestation "M-BS" ?pos ?color ?refbox-id)
     (printout blue "prepare for order: " ?incomming-oid " color: " ?color " at: " ?pos " for robot: " ?rid crlf)
     (modify ?machine (order ?incomming-oid))
+    (modify ?machine (state BUSY))
     (retract ?machine_order)
   )
 )
