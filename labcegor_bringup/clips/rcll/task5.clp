@@ -158,7 +158,6 @@
   ?mpi_one <- (machine_payment_info (machine_id M-RS1) (money ?m_one))
   ?mpi_two <- (machine_payment_info (machine_id M-RS2) (money ?m_two))
   (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id ?rid) (ptr ?msg))
-  (not (base_order_from_machine (order_id ?oid) (robot_id ?rid)))
   =>
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
