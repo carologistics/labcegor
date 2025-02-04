@@ -35,8 +35,8 @@
   ; Get Order
   ; Prepare Basestation PrepareMachine
   (printout green "Where should it go? " ?robot_state " " ?cd crlf)
-  (assert (base_order_from_machine (order_id ?oid) (robot_id ?rid) (color ?base-color) (position "INPUT")))
   (if (and (eq ?robot_state IDLE) (eq ?cd FALSE)) then 
+    (assert (base_order_from_machine (order_id ?oid) (robot_id ?rid) (color ?base-color) (position "INPUT")))
     (send_move_to_cmd ?rid ?mot ?mat ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
     (modify ?tasks_overview (state MOVING))
