@@ -34,7 +34,6 @@
   (printout blue "Robot " ?peer-name " robot-id " ?rid crlf)
   ; Get Order
   ; Prepare Basestation PrepareMachine
-  (printout green "Where should it go? " ?robot_state " " ?cd crlf)
   (if (and (eq ?robot_state IDLE) (eq ?cd FALSE)) then 
     (assert (base_order_from_machine (order_id ?oid) (robot_id ?rid) (color ?base-color) (position "INPUT")))
     (send_move_to_cmd ?rid ?mot ?mat ?peer-id ?tid)
@@ -42,9 +41,10 @@
     (modify ?tasks_overview (state MOVING))
   )
   (if (and (eq ?robot_state HOLDING) (eq ?cd TRUE)) then 
-    (send_move_to_cmd ?rid ?mot ?mat ?peer-id ?tid)
+    (send_move_to_cmd ?rid "M-CS1" ?mat ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
     (modify ?tasks_overview (state CARRY))
+    (printout green "Now we need to find the next peace" ?robot_state " " ?cd crlf)
   )
 )
 
@@ -92,9 +92,8 @@
   =>
 
   ;Prepare Basestation PrepareMachine
-  (assert (base_order_from_machine (order_id 0) (robot_id 3) (color "BASE_BLACK") (position "OUTPUT")))
-
   (if (eq ?robot_state IDLE) then 
+    (assert (base_order_from_machine (order_id 0) (robot_id 3) (color "BASE_BLACK") (position "OUTPUT")))
     (send_move_to_cmd 3 ?mot ?mat ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
     (modify ?tasks_overview (state MOVING))
@@ -219,7 +218,7 @@
   (bind ?successful (pb-field-value ?msg "successful"))
   (bind ?target (check_payment ?m_one ?m_two))
 
-  ;(printout green "robot three did something " ?task_id " " ?tid " " ?cm  " " ?cr  " " ?cd  " " ?mot  " " ?mat  " " ?robot_state " " ?target crlf)
+  (printout green "robot three did something " ?task_id " " ?tid " " ?cm  " " ?cr  " " ?cd  " " ?mot  " " ?mat  " " ?robot_state " " ?target crlf)
   ; It has moved
   (if (and (eq ?robot_id 3) (eq ?task_id ?tid) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE)) then 
     (modify ?tasks_overview (can_move FALSE))
