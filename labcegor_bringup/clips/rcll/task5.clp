@@ -57,7 +57,7 @@
   (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
   =>
   (printout green ?peer-name " Basestation is in state " ?s " " ?oid " " crlf)
-  (if (and (eq ?s READY-AT-OUTPUT)) then
+  (if (eq ?s READY-AT-OUTPUT) then
     (send_retrieve_from_cmd ?rid ?mot ?mat ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
     (modify ?tasks_overview (state HOLDING))
@@ -101,7 +101,7 @@
   ?tasks_overview <- (tasks_overview (robot_id 3) (task_id ?tid) (can_move FALSE) (can_retrieve TRUE) (can_deliver FALSE) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id 3) (did_something FALSE))
   (machine (name M-BS) (state ?s))
-  ?machine_task_overview <- (machine_task_overview (name M-BS) (machine_task ?task))
+  ?machine_task_overview <- (machine_task_overview (machine_id M-BS) (machine_task ?task))
   (test (eq ?n ROBOT3))
   =>
   (printout red "Basestation is in state " ?s " " ?oid crlf)
@@ -133,7 +133,7 @@
   ?machine_order <- (base_order_from_machine (order_id ?incomming-oid) (robot_id ?rid) (color ?color) (position ?pos))
   (protobuf-peer (name refbox-private) (peer-id ?refbox-id))
   (machine (name M-BS) (state ?s))
-  ?machine_task_overview <- (machine_task_overview (name M-BS) (machine_task ?task))
+  ?machine_task_overview <- (machine_task_overview (machine_id M-BS) (machine_task ?task))
   =>
   (if (and (eq ?s IDLE) (not (eq ?task WORK))) then
     (prepare_basestation "M-BS" ?pos ?color ?refbox-id)
@@ -159,7 +159,7 @@
   ?mpi_one <- (machine_payment_info (machine_id M-RS1) (money ?m_one))
   ?mpi_two <- (machine_payment_info (machine_id M-RS2) (money ?m_two))
   (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id ?rid) (ptr ?msg))
-  ?machine_task_overview <- (machine_task_overview (name M-BS) (machine_task ?task))
+  ?machine_task_overview <- (machine_task_overview (machine_id M-BS) (machine_task ?task))
   =>
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
@@ -202,7 +202,7 @@
   ?mpi_one <- (machine_payment_info (machine_id M-RS1) (money ?m_one))
   ?mpi_two <- (machine_payment_info (machine_id M-RS2) (money ?m_two))
   ?check_robot <- (check_robot (robot_id 3) (did_something TRUE))
-  ?machine_task_overview <- (machine_task_overview (name M-BS) (machine_task ?task))
+  ?machine_task_overview <- (machine_task_overview (machine_id M-BS) (machine_task ?task))
   =>
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
