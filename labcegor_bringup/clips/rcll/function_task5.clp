@@ -80,8 +80,7 @@
 )
 
 ; Prepare Machine
-(deffunction prepare_basestation (?m_id ?side ?color ?peer-id)
-  (printout red "first message in prepare_basestation" ?m_id " " ?side " " ?color " " ?peer-id crlf)
+(deffunction prepare_machine (?m_id ?side ?color ?peer-id)
   (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionBS")) 
   (pb-set-field ?prep-msg "side" ?side)
   (pb-set-field ?prep-msg "color" ?color)
@@ -108,7 +107,7 @@
 )
 
 ; check order for next step
-(deffunction check_order (?oid)
+(deffunction get_next_order_color (?oid)
   (do-for-fact
     ((?order order))
     (eq ?order:id ?oid)
@@ -127,20 +126,24 @@
     (printout yellow "Cap color should be" ?cap-color crlf)
     (bind ?target_color ?cap-color)
   )
+  (return ?target_color)
+)
 
-  (bind ?target_machine (switch ?target_color
-    (case RING_GREEN then "M-RS1")
-    (case RING_ORANGE then "M-RS1")
-    (case RING_YELLOW then "M-RS2")
-    (case RING_BLUE then "M-RS2")
-    (case CAP_SILVER then "M-CS1")
-    (case CAP_BLACK then "M-CS2")
-    (case BASE_BLACK then "M-BS")
-    (case BASE_RED then "M-BS")
-    (case BASE_SILVER then "M-BS")
-    (default M-DS)
-  ))
-  (printout yellow "Target is " ?target_machine " because of " ?target_color crlf)
-  
-  (return ?target_machine)
+(deffunction check_order (?oid)
+  (bind ?color (get_next_order_color ?oid))
+  (bind ?target_machine (switch ?color
+      (case RING_GREEN then "M-RS1")
+      (case RING_ORANGE then "M-RS1")
+      (case RING_YELLOW then "M-RS2")
+      (case RING_BLUE then "M-RS2")
+      (case CAP_SILVER then "M-CS1")
+      (case CAP_BLACK then "M-CS2")
+      (case BASE_BLACK then "M-BS")
+      (case BASE_RED then "M-BS")
+      (case BASE_SILVER then "M-BS")
+      (default M-DS)
+    ))
+    (printout yellow "Target is " ?target_machine " because of " ?color crlf)
+    
+    (return ?target_machine)
 )

@@ -15,7 +15,7 @@
   ; Get Order
   ; Prepare Basestation PrepareMachine
   (if (and (eq ?robot_state IDLE) (eq ?cd FALSE)) then 
-    (assert (base_order_from_machine (order_id ?oid) (robot_id ?rid) (color ?base-color) (position "INPUT")))
+    (assert (order_from_machine (machine_id M-BS) (order_id ?oid) (robot_id ?rid) (color ?base-color) (position "INPUT")))
     (send_move_to_cmd ?rid ?mot ?mat ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
     (modify ?tasks_overview (state MOVING))
@@ -35,7 +35,7 @@
   ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE) (is_assigned TRUE))
   (assigned_order (order_id ?oid) (robot_id ?rid))
   ?order <- (order (id ?oid) (name ?order-name) (base-color ?base-color))
-  (not (base_order_from_machine (robot_id ?rid)))
+  (not (order_from_machine (robot_id ?rid)))
   ; TODO make machine name dependent on move_target
   (machine (name M-BS) (state ?s))
   (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
@@ -58,12 +58,12 @@
   (assigned_order (order_id ?oid) (robot_id ?rid))
   ?order <- (order (id ?oid) (name ?order-name) (base-color ?base-color))
   =>
-  (printout green "what will id do?" crlf)
+  (bind ?color (get_next_order_color ?oid))
+  ; instruct station to generate next color
+  ;(prepare_machine "M-BS" ?pos ?color ?refbox-id)
+  (assert (order_from_machine (machine_id ?mot) (order_id ?oid) (robot_id ?rid) (color ?color) (position "INPUT")))
 )
 
-; (defrule deliver_order_based
-; (game-state (phase PRODUCTION))
-; )
 
 ; ==================================================================================
 ; CHECK STUFF

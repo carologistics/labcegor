@@ -36,7 +36,8 @@
   (slot ready_for_next_step (type SYMBOL) (allowed-values FALSE TRUE))
 )
 
-(deftemplate base_order_from_machine
+(deftemplate order_from_machine
+  (slot machine_id (type SYMBOL))
   (slot order_id (type INTEGER))
   (slot robot_id (type INTEGER))
   (slot color (type STRING))

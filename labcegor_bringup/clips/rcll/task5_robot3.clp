@@ -11,7 +11,7 @@
 
   ;Prepare Basestation PrepareMachine
   (if (eq ?robot_state IDLE) then 
-    (assert (base_order_from_machine (order_id 0) (robot_id 3) (color "BASE_BLACK") (position "OUTPUT")))
+    (assert (order_from_machine (machine_id M-BS) (order_id 0) (robot_id 3) (color "BASE_BLACK") (position "OUTPUT")))
     (send_move_to_cmd 3 ?mot ?mat ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
     (modify ?tasks_overview (state MOVING))
@@ -31,7 +31,7 @@
   ?check_robot <- (check_robot (robot_id 3) (did_something FALSE))
   (machine (name M-BS) (state ?s))
   ?machine_task_overview <- (machine_task_overview (machine_id M-BS) (machine_task ?task))
-  (not (base_order_from_machine (robot_id 3) ))
+  (not (order_from_machine (robot_id 3) ))
   =>
   (printout red "Basestation is in state " ?s " " crlf)
   (if (eq ?s READY-AT-OUTPUT) then
