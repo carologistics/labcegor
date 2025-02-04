@@ -106,3 +106,15 @@
   )
   (return "NONE")
 )
+
+; check order for next step
+(deffunction check_order (?oid)
+  (do-for-fact
+    ((?order order))
+    (> ?order:id (eq ?oid ?order:id))
+    (bind ?assigned_order (order (id ?oid) (name ?order-name) (base-color ?base-color) (ring-color $?ring-color) (cap-color $?cap-color)))
+  )
+  (printout green "Order is as folloews " ?oid " " ?order-name " " ?base-color " "?cap-color crlf)
+  
+  (return "NONE")
+)
