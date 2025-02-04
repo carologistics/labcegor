@@ -152,7 +152,7 @@
 (defrule check_progress_off_robot_with_order
   (game-state (phase PRODUCTION))
   ?tasks_overview <- (tasks_overview (robot_id ?rid) (robot_type PRODUCTION) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
-  ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE) (is_assigned TRUE))
+  ?check_robot <- (check_robot (robot_id ?rid) (did_something TRUE) (is_assigned TRUE))
   (assigned_order (order_id ?oid) (robot_id ?rid))
   ?order <- (order (id ?oid) (name ?order-name) (base-color ?base-color)); 
   ?mpi_one <- (machine_payment_info (machine_id M-RS1) (money ?m_one))
@@ -188,18 +188,6 @@
   
   )
 )
-
-; (if (and (eq ?robot_id 3) (eq ?task_id ?tid) (eq ?successful TRUE) (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cd FALSE)) then 
-;     ; TODO get
-;     (modify ?tasks_overview (can_move TRUE))
-;     (modify ?tasks_overview (can_retrieve FALSE))
-;     (modify ?tasks_overview (can_deliver TRUE))
-;     (modify ?tasks_overview (move_target "M-RS1"))
-;     (modify ?tasks_overview (machine_target "input"))
-;     (modify ?tasks_overview (task_id (+ ?task_id 1)))
-;     (modify ?tasks_overview (state HOLDING))
-;     (modify ?check_robot (did_something FALSE))
-;   )
 
 ; ==========
 ; ROBOT 3 for Payment
