@@ -56,7 +56,7 @@
   (machine (name M-BS) (state ?s) (order ?machine_oid))
   (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
   =>
-  (printout green ?peer-nam " Basestation is in state " ?s " " ?oid " " ?machine_oid crlf)
+  (printout green ?peer-name " Basestation is in state " ?s " " ?oid " " ?machine_oid crlf)
   (if (and (eq ?s READY-AT-OUTPUT) (eq ?oid ?machine_oid)) then
     (send_retrieve_from_cmd ?rid ?mot ?mat ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
