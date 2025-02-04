@@ -29,9 +29,9 @@ clips_manager:
         "clips/labcegor_bringup/rcll/refbox-comm-init.clp",
         "clips/labcegor_bringup/rcll/sim-comm-init.clp",
         "clips/labcegor_bringup/rcll/refbox-recv.clp",
-        "clips/labcegor_bringup/rcll/task5.clp",
-        "clips/labcegor_bringup/rcll/function_task5.clp",
         "clips/labcegor_bringup/rcll/templates_task5.clp",
+        "clips/labcegor_bringup/rcll/function_task5.clp",
+        "clips/labcegor_bringup/rcll/task5.clp",
        ]
     protobuf:
       plugin: "cx::ProtobufPlugin"
