@@ -121,11 +121,11 @@
   (printout green "Order is as folloews " ?oid " " ?name " " ?base-color " "?cap-color crlf)
   (if (> (length$ ?ring-colors) 0) then 
     (printout yellow "Ring color should be" (nth$ 1 ?ring-colors) crlf)
-    (= ?target_color (nth$ 1 ?ring-colors))
+    (bind ?target_color (nth$ 1 ?ring-colors))
   )
   (if (eq (length$ ?ring-colors) 0) then
     (printout yellow "Cap color should be" ?cap-color crlf)
-    (= ?target_color ?cap-color)
+    (bind ?target_color ?cap-color)
   )
 
   (bind ?target_machine (switch ?target_color
