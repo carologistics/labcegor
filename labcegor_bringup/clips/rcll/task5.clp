@@ -41,19 +41,11 @@
     (modify ?tasks_overview (state MOVING))
   )
   (if (and (eq ?robot_state HOLDING) (eq ?cd TRUE)) then 
-    (send_move_to_cmd ?rid "M-CS1" ?mat ?peer-id ?tid)
+    (send_move_to_cmd ?rid ?mot ?mat ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
     (modify ?tasks_overview (state CARRY))
-    (printout green "Now we need to find the next peace" ?robot_state " " ?cd crlf)
   )
 )
-
-; (modify ?tasks_overview (can_move TRUE))
-;     (modify ?tasks_overview (can_retrieve FALSE))
-;     (modify ?tasks_overview (can_deliver TRUE))
-;     (modify ?tasks_overview (task_id (+ ?task_id 1)))
-;     (modify ?check_robot (did_something FALSE))
-;     (modify ?machine_task_overview (machine_task NOT-SET))
 
 (defrule pickup_order_based
   (game-state (phase PRODUCTION))
@@ -75,6 +67,18 @@
     (modify ?tasks_overview (state HOLDING))
   )
   (printout green "will it work?" crlf)
+)
+
+(defrule deliver_part_to_machine_order_based
+  (game-state (phase PRODUCTION))
+  ?tasks_overview <- (tasks_overview (robot_id ?rid) (task_id ?tid) (can_deliver ?cd) 
+                          (can_move FALSE) (can_retrieve FALSE) (can_deliver TRUE) (robot_type PRODUCTION) 
+                          (state ?robot_state) (move_target ?mot) (machine_target ?mat))
+  ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE) (is_assigned TRUE))
+  (assigned_order (order_id ?oid) (robot_id ?rid))
+  ?order <- (order (id ?oid) (name ?order-name) (base-color ?base-color))
+  =>
+  (printout green "what will id do?" crlf)
 )
 
 ; (defrule deliver_order_based
@@ -199,6 +203,26 @@
     ; Todo get target based on order
     (modify ?tasks_overview (machine_target "input"))
     (printout green "Yippiiiiiiiiiieee" crlf)
+  )
+
+  ; It moved to deliver
+  (if (and (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd TRUE) (eq ?robot_state CARRY) (eq ?successful TRUE)) then
+    (modify ?tasks_overview (can_move FALSE))
+    (modify ?tasks_overview (can_deliver TRUE))
+    (modify ?tasks_overview (task_id (+ ?task_id 1)))
+    (modify ?check_robot (did_something FALSE))
+    (modify ?tasks_overview (state HOLDING))
+  )
+
+  ; It delivered 
+  (if (and (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE) (eq ?robot_state HOLDING) (eq ?successful TRUE)) then
+    ; TODO check if differenz between cm true or false for retrevial of product....
+    (modify ?tasks_overview (can_move FALSE))
+    (modify ?tasks_overview (can_retrieve TRUE))
+    (modify ?tasks_overview (can_deliver FALSE))
+    (modify ?tasks_overview (task_id (+ ?task_id 1)))
+    (modify ?check_robot (did_something FALSE))
+    (modify ?tasks_overview (state IDLE))
   )
 )
 
