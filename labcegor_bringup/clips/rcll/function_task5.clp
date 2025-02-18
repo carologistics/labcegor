@@ -136,7 +136,7 @@
       (case RING_ORANGE then "M-RS1")
       (case RING_YELLOW then "M-RS2")
       (case RING_BLUE then "M-RS2")
-      (case CAP_SILVER then "M-CS1")
+      (case CAP_GREY then "M-CS1")
       (case CAP_BLACK then "M-CS2")
       (case BASE_BLACK then "M-BS")
       (case BASE_RED then "M-BS")
