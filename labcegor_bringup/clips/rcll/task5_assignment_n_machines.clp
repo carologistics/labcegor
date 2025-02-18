@@ -45,7 +45,7 @@
   =>
   (if (and (eq ?s IDLE) (not (eq ?task WORK))) then
     (if (eq ?machine-name "M-BS") then
-      (prepare_machine_BS ?mid ?pos ?color ?refbox-id)
+      (prepare_machine_BS "M-BS" ?pos ?color ?refbox-id)
     )
     (if (or (eq ?machine-name "M-RS1") (eq ?machine-name "M-RS2")) then
       (prepare_machine_RS ?mid ?color ?refbox-id)
@@ -56,7 +56,7 @@
     (if (eq ?machine-name "M-DS") then
       (prepare_machine_DS ?mid ?incomming-oid ?refbox-id)
     )
-    (printout red "prepare for order: " ?incomming-oid "with machine" ?mid " color: " ?color " at: " ?pos " for robot: " ?rid crlf)
+    (printout red "prepare for order: " ?incomming-oid " with machine " ?mid " color: " ?color " at: " ?pos " for robot: " ?rid crlf)
     (modify ?machine_task_overview (machine_task WORK))
     (retract ?machine_order)
   )
