@@ -9,8 +9,8 @@
   (slot can_retrieve (type SYMBOL) (allowed-values FALSE TRUE))
   (slot can_deliver (type SYMBOL) (allowed-values FALSE TRUE))
   (slot state (type SYMBOL) (allowed-values IDLE MOVING CARRY HOLDING SOMETHING))
-  (slot move_target (type STRING))
-  (slot machine_target (type STRING))
+  (slot move_target (type SYMBOL))
+  (slot machine_target (type SYMBOL))
 )
 
 (deftemplate machine_task_overview
@@ -40,9 +40,9 @@
   (slot machine_id (type SYMBOL))
   (slot order_id (type INTEGER))
   (slot robot_id (type INTEGER))
-  (slot color (type STRING))
-  (slot position (type STRING))
-  (slot operation (type STRING))
+  (slot color (type SYMBOL))
+  (slot position (type SYMBOL))
+  (slot operation (type SYMBOL))
 )
 
 ; facts

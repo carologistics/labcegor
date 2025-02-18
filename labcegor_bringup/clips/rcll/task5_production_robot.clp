@@ -14,8 +14,8 @@
   (printout blue "Robot " ?peer-name " robot-id " ?rid crlf)
   ; Get Order
   ; Prepare Basestation PrepareMachine
-  (if (and (eq ?robot_state IDLE) (eq ?cd FALSE) (eq ?mot "M-BS")) then 
-    (assert (order_from_machine (machine_id M-BS) (order_id ?oid) (robot_id ?rid) (color ?base-color) (position "INPUT")))
+  (if (and (eq ?robot_state IDLE) (eq ?cd FALSE) (eq ?mot M-BS)) then 
+    (assert (order_from_machine (machine_id M-BS) (order_id ?oid) (robot_id ?rid) (color ?base-color) (position INPUT)))
     (send_move_to_cmd ?rid ?mot ?mat ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
     (modify ?tasks_overview (state MOVING))
@@ -25,7 +25,7 @@
     (modify ?check_robot (did_something TRUE))
     (modify ?tasks_overview (state CARRY))
   )
-  (if (and (eq ?robot_state IDLE) (eq ?cd FALSE) (not (eq ?mot "M-BS"))) then 
+  (if (and (eq ?robot_state IDLE) (eq ?cd FALSE) (not (eq ?mot M-BS))) then 
     (send_move_to_cmd ?rid ?mot ?mat ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
     (modify ?tasks_overview (state MOVING))
@@ -118,7 +118,7 @@
     (modify ?check_robot (did_something FALSE))
     (modify ?machine_task_overview (machine_task NOT-SET))
     ; Todo get target based on order
-    (modify ?tasks_overview (machine_target "input"))
+    (modify ?tasks_overview (machine_target INPUT))
     (printout green "Yippiiiiiiiiiieee" crlf)
   )
 
@@ -136,13 +136,13 @@
     ; TODO check if difference between cm true or false for retrevial of product....
     (bind ?color (get_next_order_color ?oid))
     (printout green "whoooooooooooo " ?mot " " ?oid " " ?color crlf)
-    (assert (order_from_machine (machine_id ?mot) (order_id ?oid) (robot_id ?rid) (color ?color) (operation "MOUNT_CAP") (position "OUTPUT")))
+    (assert (order_from_machine (machine_id ?mot) (order_id ?oid) (robot_id ?rid) (color ?color) (operation MOUNT_CAP) (position OUTPUT)))
     
     (modify ?tasks_overview (can_move TRUE))
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_deliver FALSE))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
-    (modify ?tasks_overview (machine_target "output"))
+    (modify ?tasks_overview (machine_target output"))
     (modify ?check_robot (did_something FALSE))
     (modify ?tasks_overview (state IDLE))
     (printout red "robot " ?rid " should move to" ?mot " output " ?color crlf)
