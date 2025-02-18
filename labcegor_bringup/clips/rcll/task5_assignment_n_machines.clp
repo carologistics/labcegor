@@ -44,7 +44,7 @@
   ?machine_task_overview <- (machine_task_overview (machine_id ?mid) (machine_task ?task))
   =>
   (if (or (eq ?mid M-RS1) (eq ?mid M-RS2) (eq ?mid M-CS1) (eq ?mid M-CS2)) then
-    (printout red "Whyyyyyyy " ?s " " ?taskcrlf)
+    (printout red "Whyyyyyyy " ?s " " ?task crlf)
   )
   (if (and (eq ?s IDLE) (not (eq ?task WORK))) then
     (if (eq ?mid M-BS) then
