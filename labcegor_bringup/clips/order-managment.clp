@@ -1,3 +1,10 @@
+(defglobal ?*counter* = 0)
+
+(deffunction next-number* ()
+  (bind ?*counter* (+ ?*counter* 1))  ; Increment the counter by 1 
+  (return ?*counter*)
+)
+
 (deftemplate order
   (slot id (type INTEGER))
   (slot refbox-order)
@@ -6,8 +13,9 @@
 )
 
 (deftemplate move_base
-  (slot robot-id (type INTEGER)
-    (allowed-values 1 2 3))
+  (slot task_id (type INTEGER) (default-dynamic (next-number*)))
+  ; (slot robot-id (type INTEGER)
+  ;   (allowed-values 1 2 3))
   (slot from (type SYMBOL))
   (slot from_side (type SYMBOL) (default SHELF)
     (allowed-values OUTPUT SHELF))
@@ -16,42 +24,33 @@
     (allowed-values INPUT SLIDE))
   (multislot depend_on)
   (slot state (type SYMBOL)
-    (allowed-values PRE MOVING_TO GRIPPING MOVING_AWAY PUTTING FINISHED)
+    (allowed-values PRE MOVING_FROM MOVED_FROM GRIPPING GRIPPED MOVING_TARGET MOVED_TARGET PUTTING FINISHED)
   )
   (slot finished (type SYMBOL) (default FALSE)
     (allowed-values FALSE TRUE))
 )
 
 (deftemplate instruct
-    (slot action (type SYMBOL)
-        (allowed-values DELIVER RETRIEVE DISPENSE-BASE BUFFER-CAP MOUNT-RING MOUNT-CAP DELIVER))
-    (slot machine (type SYMBOL)
-     (allowed-values M-BS M-CS1 M-CS2 M-RS1 M-RS2 M-SS M-DS C-BS C-CS1 C-CS2 C-RS1 C-RS2 C-SS C-DS))
-    (slot side (type SYMBOL)
-      (allowed-values INPUT OUTPUT)) ; FOR BS
-    (slot base_color (type SYMBOL)
-      (allowed-values BASE_BLACK BASE_SILVER BASE_RED)) ; FOR BS
-    (slot order-id (type INTEGER)) ; FOR DS
-    (multislot depend_on)
-    (slot finished (type SYMBOL) (default FALSE)
-      (allowed-values FALSE TRUE))
+  (slot action (type SYMBOL)
+      (allowed-values DELIVER RETRIEVE DISPENSE-BASE BUFFER-CAP MOUNT-RING MOUNT-CAP DELIVER))
+  (slot machine (type SYMBOL)
+    (allowed-values M-BS M-CS1 M-CS2 M-RS1 M-RS2 M-SS M-DS C-BS C-CS1 C-CS2 C-RS1 C-RS2 C-SS C-DS))
+  (slot side (type SYMBOL)
+    (allowed-values INPUT OUTPUT)) ; FOR BS
+  (slot base_color (type SYMBOL)
+    (allowed-values BASE_BLACK BASE_SILVER BASE_RED)) ; FOR BS
+  (slot order-id (type INTEGER)) ; FOR DS
+  (multislot depend_on)
+  (slot finished (type SYMBOL) (default FALSE)
+    (allowed-values FALSE TRUE))
 )
-
-(deffunction dismantel-order (?order)
+(deffunction dismantel-order (?order ?team)
   (bind ?id (fact-slot-value ?order id))
   (bind ?refbox-order (fact-slot-value ?order refbox-order))
   ; (bind ?complexity (fact-slot-value ?order complexity))
   (bind ?base (fact-slot-value ?refbox-order base-color))
   ; (bind ?cap (fact-slot-value ?order cap))
   ; (bind ?rings (fact-slot-value ?order ring_colors))
-
-  (bind ?team FALSE)
-  (do-for-fact ((?game-state game-state)) TRUE (bind ?team ?game-state:team))
-  
-  (if (not ?team)
-    then
-    (printout red "A ERROR HAPPEND TEAM NOT FOUND" crlf)
-  )
 
   ; INSTRUCT base depend on nothing
   ; move_base to cap station depend on buffer cap instruction
@@ -79,13 +78,20 @@
 )
 
 (defrule select-order
-    ?refbox-order <- (refbox-order (id ?id) (complexity C0))
-    (not (order (id ?id) (finished TRUE)))
-    (not (and (refbox-order (id ?oid&: (< ?oid ?id))) 
-               (order (id ?oid) (finished FALSE)) 
-    ))
+  ?refbox-order <- (refbox-order (id ?id) (complexity C0))
+  (not (order (finished FALSE)))
+  (not (and (refbox-order (id ?oid&: (< ?oid ?id))) 
+              (order (id ?oid) (finished FALSE)) 
+  ))
+  (game-state (team-color ?team&: (neq ?team NOT-SET)))
 =>
   (bind ?order (assert (order (id ?id) (refbox-order ?refbox-order))))
   (printout green "ORDER SELECTING" crlf)
-  (dismantel-order ?order) 
+  (dismantel-order ?order ?team)
 )
+
+; (defrule dasf
+;   (time ?now)
+; =>
+;   (ppdefrule select-order)
+; )
