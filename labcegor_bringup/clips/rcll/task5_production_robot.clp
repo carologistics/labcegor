@@ -15,7 +15,7 @@
   ; Get Order
   ; Prepare Basestation PrepareMachine
   (if (and (eq ?robot_state IDLE) (eq ?cd FALSE) (eq ?mot M-BS)) then 
-    (assert (order_from_machine (machine_id M-BS) (order_id ?oid) (robot_id ?rid) (color ?base-color) (position INPUT)))
+    (assert (order_from_machine (machine_id M-BS) (order_id ?oid) (robot_id ?rid) (color ?base-color) (position "input")))
     (send_move_to_cmd ?rid ?mot ?mat ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
     (modify ?tasks_overview (state MOVING))
