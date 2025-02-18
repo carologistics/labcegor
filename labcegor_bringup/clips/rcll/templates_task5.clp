@@ -41,7 +41,7 @@
   (slot order_id (type INTEGER))
   (slot robot_id (type INTEGER))
   (slot color (type SYMBOL))
-  (slot position (type STRING))
+  (slot position (type SYMBOL))
   (slot operation (type SYMBOL))
 )
 
