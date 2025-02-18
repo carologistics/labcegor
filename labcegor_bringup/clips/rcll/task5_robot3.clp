@@ -11,7 +11,7 @@
 
   ;Prepare Basestation PrepareMachine
   (if (eq ?robot_state IDLE) then 
-    (assert (order_from_machine (machine_id M-BS) (order_id 0) (robot_id 3) (color "BASE_BLACK") (position "OUTPUT")))
+    (assert (order_from_machine (machine_id M-BS) (order_id 0) (robot_id 3) (color BASE_BLACK) (position OUTPUT)))
     (send_move_to_cmd 3 ?mot ?mat ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
     (modify ?tasks_overview (state MOVING))
@@ -98,7 +98,7 @@
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_deliver TRUE))
     (modify ?tasks_overview (move_target ?target))
-    (modify ?tasks_overview (machine_target "slide"))
+    (modify ?tasks_overview (machine_target SLIDE))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (modify ?tasks_overview (state HOLDING))
     (modify ?check_robot (did_something FALSE))
@@ -108,20 +108,20 @@
     (modify ?tasks_overview (can_move TRUE))
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_deliver FALSE))
-    (modify ?tasks_overview (move_target "M-BS"))
-    (modify ?tasks_overview (machine_target "output"))
+    (modify ?tasks_overview (move_target M-BS))
+    (modify ?tasks_overview (machine_target OUTPUT))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (modify ?check_robot (did_something FALSE))
     (modify ?tasks_overview (state IDLE))
-    (if (not (eq ?target "NONE")) then
-      (if (eq ?target "M-RS1") then
+    (if (not (eq ?target NONE)) then
+      (if (eq ?target M-RS1) then
         (modify ?mpi_one (money (+ ?m_one 1)))
       )
-      (if (eq ?target "M-RS2") then
+      (if (eq ?target M-RS2) then
         (modify ?mpi_two (money (+ ?m_two 1)))
       )
     )
-    (if (eq ?target "NONE") then
+    (if (eq ?target NONE) then
       (modify ?tasks_overview (robot_type HELPER))
       (printout red "Robot Three should start something different now." crlf)
     )
