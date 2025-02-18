@@ -10,7 +10,7 @@
   (slot can_deliver (type SYMBOL) (allowed-values FALSE TRUE))
   (slot state (type SYMBOL) (allowed-values IDLE MOVING CARRY HOLDING SOMETHING))
   (slot move_target (type SYMBOL))
-  (slot machine_target (type Str))
+  (slot machine_target (type STRING))
 )
 
 (deftemplate machine_task_overview
