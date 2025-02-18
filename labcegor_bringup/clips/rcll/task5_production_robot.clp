@@ -42,7 +42,7 @@
   ?order <- (order (id ?oid) (name ?order-name) (base-color ?base-color))
   (not (order_from_machine (robot_id ?rid)))
   ; TODO make machine name dependent on move_target
-  (machine (name ?machine-name&:(eq ?machine-name? (sym-cat ?mot))) (state ?s))
+  (machine (name ?machine-name&:(eq ?machine-name (sym-cat ?mot))) (state ?s))
   (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
   =>
   (printout green ?peer-name " Basestation is in state " ?s " " ?oid " " crlf)
