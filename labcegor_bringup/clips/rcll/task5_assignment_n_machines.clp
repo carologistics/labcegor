@@ -48,10 +48,10 @@
       (prepare_machine_BS ?mid ?pos ?color ?refbox-id)
     )
     (if (or (eq ?machine-name "M-RS1") (eq ?machine-name "M-RS2")) then
-      (prepare_machine_RS ?mid ?pos ?color ?refbox-id)
+      (prepare_machine_RS ?mid ?color ?refbox-id)
     )
     (if ((eq ?machine-name "M-CS")) then
-      (prepare_machine_CS ?mid ?cs_order ?refbox-id)
+      (prepare_machine_CS ?mid ?operation ?refbox-id)
     )
     (if (eq ?machine-name "M-DS") then
       (prepare_machine_DS ?mid ?incomming-oid ?refbox-id)

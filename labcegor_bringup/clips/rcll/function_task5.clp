@@ -120,7 +120,7 @@
   (printout red ?m_id " " ?operation " " ?peer-id crlf)
 )
 
-(deffunction prepare_machine_DS (?m_id ?order_id ?color ?peer-id)
+(deffunction prepare_machine_DS (?m_id ?order_id ?peer-id)
   (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionCS")) 
   (pb-set-field ?prep-msg "order_id" ?order_id)
 
@@ -130,7 +130,7 @@
   (pb-set-field ?msg "instruction_cs" ?prep-msg)
   (pb-broadcast ?peer-id ?msg)
   (pb-destroy ?msg)
-  (printout red ?m_id " " ?operation " " ?peer-id crlf)
+  (printout red ?m_id " " ?order_id " " ?peer-id crlf)
 )
 
 ; Which Machine to bribe?
