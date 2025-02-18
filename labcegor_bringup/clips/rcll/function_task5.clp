@@ -160,6 +160,7 @@
   (if (eq (length$ ?ring-colors) 0) then
     (printout yellow "Cap color should be " ?cap-color crlf)
     (bind ?target_color ?cap-color)
+    (bind ?cap-color "Bring_it_home") ; next delivery point should be the DS
   )
   (if (> (length$ ?ring-colors) 0) then 
     (printout yellow "Ring color should be " (first$ ?ring-colors) crlf)
