@@ -42,7 +42,7 @@
   (slot is-busy (type SYMBOL) (allowed-values TRUE FALSE) (default FALSE))
 )
 
-(deftemplate order
+(deftemplate refbox-order
   (slot id (type INTEGER))
   (slot name (type SYMBOL))
   (slot workpiece (type SYMBOL))

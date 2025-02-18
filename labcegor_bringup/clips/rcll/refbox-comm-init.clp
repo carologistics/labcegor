@@ -26,6 +26,7 @@
   (confval (path "/game/parameters/rcll/cyan_send_port") (value ?cyan-send-port))
   (confval (path "/game/parameters/rcll/magenta_recv_port") (value ?magenta-recv-port))
   (confval (path "/game/parameters/rcll/magenta_send_port") (value ?magenta-send-port))
+  (not (executive-finalize))
   (not (protobuf-peer (name refbox-private)))
   =>
   (if (eq ?team-color CYAN)

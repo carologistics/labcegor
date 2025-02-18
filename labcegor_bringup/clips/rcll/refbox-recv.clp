@@ -137,7 +137,7 @@
   (retract ?pb-msg)
 )
 
-(defrule refbox-recv-OrderInfo
+(defrule refbox-recv-refbox-OrderInfo
   "Assert products sent by the refbox."
   ?pb-msg <- (protobuf-msg (type "llsf_msgs.OrderInfo") (ptr ?ptr))
   (game-state (team ?team) (team-color ?team-color))
@@ -145,7 +145,7 @@
   (foreach ?o (pb-field-list ?ptr "orders")
     (bind ?id (pb-field-value ?o "id"))
     (bind ?name (sym-cat O ?id))
-    ;check if the order is new
+    ;check if the refbox-order is new
     (bind ?complexity (pb-field-value ?o "complexity"))
     (bind ?competitive (pb-field-value ?o "competitive"))
     (bind ?quantity-requested (pb-field-value ?o "quantity_requested"))
@@ -165,7 +165,7 @@
       (bind ?qd-them (pb-field-value ?o "quantity_delivered_cyan"))
       (bind ?qd-us (pb-field-value ?o "quantity_delivered_magenta"))
     )
-    (assert (order 
+    (assert (refbox-order
       (id ?id)
       (name ?name)
       (complexity ?complexity)
@@ -180,7 +180,7 @@
       (quantity-delivered-other ?qd-them)
     ))
   )
-  (delayed-do-for-all-facts ((?o1 order) (?o2 order)) (and (< (fact-index ?o1) (fact-index ?o2)) (eq ?o1:id ?o2:id))
+  (delayed-do-for-all-facts ((?o1 refbox-order) (?o2 refbox-order)) (and (< (fact-index ?o1) (fact-index ?o2)) (eq ?o1:id ?o2:id))
    (retract ?o1)
   )
   (retract ?pb-msg)
