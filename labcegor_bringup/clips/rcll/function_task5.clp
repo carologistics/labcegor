@@ -163,10 +163,10 @@
     (bind ?cap-color "Bring_it_home") ; next delivery point should be the DS
   )
   (if (> (length$ ?ring-colors) 0) then 
-    (printout yellow "Ring color should be " (first$ ?ring-colors) crlf)
-    (bind ?target_color (first$ ?ring-colors))
+    (printout yellow "Ring color should be " (nth$ 1 ?ring-colors) crlf)
+    (bind ?target_color (nth$ 1 ?ring-colors))
     (bind ?ring-colors (rest$ ?ring-colors))
-    (printout yellow "nexT color should be " (first$ ?ring-colors) crlf)
+    (printout yellow "nexT color should be " (nth$ 1 ?ring-colors) crlf)
   )
   (return ?target_color)
 )
