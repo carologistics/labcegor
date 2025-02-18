@@ -156,7 +156,7 @@
     (bind ?cap-color ?order:cap-color)
   )
   (bind ?target_color "")
-  (printout green "Order is as folloews " ?oid " " ?name " " ?base-color " "?cap-color crlf)
+  (printout green "Order is as follows " ?oid " " ?name " " ?base-color " " ?cap-color " number of rings_left: " (length$ ?ring-colors)  crlf)
   (if (eq (length$ ?ring-colors) 0) then
     (printout yellow "Cap color should be " ?cap-color crlf)
     (bind ?target_color ?cap-color)
