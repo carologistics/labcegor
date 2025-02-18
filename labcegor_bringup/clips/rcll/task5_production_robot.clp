@@ -139,8 +139,11 @@
     (if (or (eq ?mot "M-CS1") (eq ?mot "M-CS2")) then 
       (assert (order_from_machine (machine_id ?mot) (order_id ?oid) (robot_id ?rid) (operation "MOUNT_CAP") (position "OUTPUT")))
     )
-    (if (or (eq ?mot "M-RS1") (eq ?mot "M-RS2") (eq ?mot "M-BS") (eq ?mot "M-DS")) then 
+    (if (or (eq ?mot "M-RS1") (eq ?mot "M-RS2")) then 
       (assert (order_from_machine (machine_id ?mot) (order_id ?oid) (robot_id ?rid) (color ?color) (position "OUTPUT")))
+    )
+    (if (or (eq ?mot "M-BS") (eq ?mot "M-DS")) then 
+      (assert (order_from_machine (machine_id ?mot) (order_id ?oid) (robot_id ?rid) (color ?color) (position "INPUT")))
     )
     (modify ?tasks_overview (can_move TRUE))
     (modify ?tasks_overview (can_retrieve FALSE))

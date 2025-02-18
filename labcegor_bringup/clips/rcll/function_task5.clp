@@ -67,17 +67,17 @@
 )
 
 ; Retrieve from Machine
-(deffunction send_cmd_to_machine (?m_id ?operation ?peer-id)
-  (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionCS")) 
-  (pb-set-field ?prep-msg "operation" ?operation) ; "RETRIEVE_CAP")
+; (deffunction send_cmd_to_machine (?m_id ?operation ?peer-id)
+;   (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionCS")) 
+;   (pb-set-field ?prep-msg "operation" ?operation) ; "RETRIEVE_CAP")
 
-  (bind ?msg (pb-create "llsf_msgs.PrepareMachine"))
-  (pb-set-field ?msg "team_color" MAGENTA)
-  (pb-set-field ?msg "machine" ?m_id)
-  (pb-set-field ?msg "instruction_cs" ?prep-msg)
-  (pb-broadcast ?peer-id ?msg)
-  (pb-destroy ?msg)
-)
+;   (bind ?msg (pb-create "llsf_msgs.PrepareMachine"))
+;   (pb-set-field ?msg "team_color" MAGENTA)
+;   (pb-set-field ?msg "machine" ?m_id)
+;   (pb-set-field ?msg "instruction_cs" ?prep-msg)
+;   (pb-broadcast ?peer-id ?msg)
+;   (pb-destroy ?msg)
+; )
 
 ; Prepare Machine
 (deffunction prepare_machine_BS (?m_id ?side ?color ?peer-id)
