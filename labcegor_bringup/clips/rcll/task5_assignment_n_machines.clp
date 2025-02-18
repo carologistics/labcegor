@@ -48,7 +48,7 @@
     (printout red "M-RS" crlf)
     (prepare_machine_RS ?machine_id ?color ?refbox-id)
   
-    (printout red "prepare for order: " ?incomming-oid " with machine " ?mid " eq " (or (eq ?machine_id M-RS1) (eq ?machine_id M-RS2)) " color: " ?color " at: " ?pos " for robot: " ?rid crlf)
+    (printout red "prepare for order: " ?incomming-oid " with machine " ?machine_id" eq " (or (eq ?machine_id M-RS1) (eq ?machine_id M-RS2)) " color: " ?color " at: " ?pos " for robot: " ?rid crlf)
     (modify ?machine_task_overview (machine_task WORK))
     (retract ?machine_order)
   )
@@ -66,7 +66,7 @@
     (printout red "M-CS" crlf)
     (prepare_machine_CS ?machine_id ?operation ?refbox-id)
 
-    (printout red "prepare for order: " ?incomming-oid " with machine " ?mid " eq " (or (eq ?machine_id M-CS1) (eq ?machine_id M-CS2)) " color: " ?color " at: " ?pos " for robot: " ?rid crlf)
+    (printout red "prepare for order: " ?incomming-oid " with machine " ?machine_id" eq " (or (eq ?machine_id M-CS1) (eq ?machine_id M-CS2)) " color: " ?color " at: " ?pos " for robot: " ?rid crlf)
     (modify ?machine_task_overview (machine_task WORK))
     (retract ?machine_order)
   )
@@ -84,7 +84,7 @@
     (printout red "M-DS" crlf)
     (prepare_machine_DS ?mid ?incomming-oid ?refbox-id)
 
-    (printout red "prepare for order: " ?incomming-oid " with machine " ?mid " eq " (eq ?mid M-DS) " color: " ?color " at: " ?pos " for robot: " ?rid crlf)
+    (printout red "prepare for order: " ?incomming-oid " with machine " ?machine_id" eq " (eq ?mid M-DS) " color: " ?color " at: " ?pos " for robot: " ?rid crlf)
     (modify ?machine_task_overview (machine_task WORK))
     (retract ?machine_order)
   )
