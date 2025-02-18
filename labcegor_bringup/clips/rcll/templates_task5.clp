@@ -64,7 +64,7 @@
   (machine_task_overview (machine_id M-RS1) (machine_task NOT-SET))
   (machine_task_overview (machine_id M-RS2) (machine_task NOT-SET))
   (machine_task_overview (machine_id M-DS) (machine_task NOT-SET))
-  (machine_task_overview (machine_id M-RSS) (machine_task NOT-SET))
+  (machine_task_overview (machine_id M-SS) (machine_task NOT-SET))
   (machine_task_overview (machine_id M-BS) (machine_task NOT-SET))
   (machine_payment_info (machine_id M-RS1) (money 0))
   (machine_payment_info (machine_id M-RS2) (money 0))
