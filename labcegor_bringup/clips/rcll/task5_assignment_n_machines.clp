@@ -82,7 +82,7 @@
   (if (and (eq ?s IDLE) (not (eq ?task WORK))) then
     
     (printout red "M-DS" crlf)
-    (prepare_machine_DS ?mid ?incomming-oid ?refbox-id)
+    (prepare_machine_DS ?machine_id ?incomming-oid ?refbox-id)
 
     (printout red "prepare for order: " ?incomming-oid " with machine " ?machine_id" eq " (eq ?mid M-DS) " color: " ?color " at: " ?pos " for robot: " ?rid crlf)
     (modify ?machine_task_overview (machine_task WORK))
