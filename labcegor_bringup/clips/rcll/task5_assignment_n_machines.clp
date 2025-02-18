@@ -40,23 +40,23 @@
   (game-state (phase PRODUCTION))
   ?machine_order <- (order_from_machine (machine_id ?mid) (order_id ?incomming-oid) (robot_id ?rid) (color ?color) (position ?pos) (operation ?operation))
   (protobuf-peer (name refbox-private) (peer-id ?refbox-id))
-  (machine (name ?machine-name) (state ?s))
+  (machine (name ?mid) (state ?s))
   ?machine_task_overview <- (machine_task_overview (machine_id ?mid) (machine_task ?task))
   =>
   (if (and (eq ?s IDLE) (not (eq ?task WORK))) then
-    (if (eq ?machine-name "M-BS") then
+    (if (eq ?mid "M-BS") then
       (printout red "M-BS" crlf)
       (prepare_machine_BS "M-BS" ?pos ?color ?refbox-id)
     )
-    (if (or (eq ?machine-name "M-RS1") (eq ?machine-name "M-RS2")) then
+    (if (or (eq ?mid "M-RS1") (eq ?mid "M-RS2")) then
       (printout red "M-RS" crlf)
       (prepare_machine_RS ?mid ?color ?refbox-id)
     )
-    (if (eq ?machine-name "M-CS") then
+    (if (eq ?mid "M-CS") then
       (printout red "M-CS" crlf)
       (prepare_machine_CS ?mid ?operation ?refbox-id)
     )
-    (if (eq ?machine-name "M-DS") then
+    (if (eq ?mid "M-DS") then
       (printout red "M-DS" crlf)
       (prepare_machine_DS ?mid ?incomming-oid ?refbox-id)
     )
