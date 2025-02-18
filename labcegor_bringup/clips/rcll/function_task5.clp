@@ -80,7 +80,7 @@
 )
 
 ; Prepare Machine
-(deffunction prepare_machine (?m_id ?side ?color ?peer-id)
+(deffunction prepare_machine_BS (?m_id ?side ?color ?peer-id)
   (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionBS")) 
   (pb-set-field ?prep-msg "side" ?side)
   (pb-set-field ?prep-msg "color" ?color)
@@ -92,6 +92,45 @@
   (pb-broadcast ?peer-id ?msg)
   (pb-destroy ?msg)
   (printout red ?m_id " " ?side " " ?color " " ?peer-id crlf)
+)
+
+(deffunction prepare_machine_RS (?m_id ?color ?peer-id)
+  (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionRS"))
+  (pb-set-field ?prep-msg "ring-color" ?color)
+
+  (bind ?msg (pb-create "llsf_msgs.PrepareMachine"))
+  (pb-set-field ?msg "team_color" MAGENTA)
+  (pb-set-field ?msg "machine" ?m_id)
+  (pb-set-field ?msg "instruction_rs" ?prep-msg)
+  (pb-broadcast ?peer-id ?msg)
+  (pb-destroy ?msg)
+  (printout red ?m_id " " ?color " " ?peer-id crlf)
+)
+
+(deffunction prepare_machine_CS (?m_id ?operation ?peer-id)
+  (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionCS")) 
+  (pb-set-field ?prep-msg "operation" ?operation)
+
+  (bind ?msg (pb-create "llsf_msgs.PrepareMachine"))
+  (pb-set-field ?msg "team_color" MAGENTA)
+  (pb-set-field ?msg "machine" ?m_id)
+  (pb-set-field ?msg "instruction_cs" ?prep-msg)
+  (pb-broadcast ?peer-id ?msg)
+  (pb-destroy ?msg)
+  (printout red ?m_id " " ?operation " " ?peer-id crlf)
+)
+
+(deffunction prepare_machine_DS (?m_id ?order_id ?color ?peer-id)
+  (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionCS")) 
+  (pb-set-field ?prep-msg "order_id" ?order_id)
+
+  (bind ?msg (pb-create "llsf_msgs.PrepareMachine"))
+  (pb-set-field ?msg "team_color" MAGENTA)
+  (pb-set-field ?msg "machine" ?m_id)
+  (pb-set-field ?msg "instruction_cs" ?prep-msg)
+  (pb-broadcast ?peer-id ?msg)
+  (pb-destroy ?msg)
+  (printout red ?m_id " " ?operation " " ?peer-id crlf)
 )
 
 ; Which Machine to bribe?

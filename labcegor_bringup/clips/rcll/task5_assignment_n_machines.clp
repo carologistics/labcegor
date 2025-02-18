@@ -21,32 +21,42 @@
 ; ==================================================================================
 ; Manage Machines
 ; ==================================================================================
-(defrule manage_ordered_bases
-  (game-state (phase PRODUCTION))
-  ?machine_order <- (order_from_machine (machine_id M-BS) (order_id ?incomming-oid) (robot_id ?rid) (color ?color) (position ?pos))
-  (protobuf-peer (name refbox-private) (peer-id ?refbox-id))
-  (machine (name M-BS) (state ?s))
-  ?machine_task_overview <- (machine_task_overview (machine_id M-BS) (machine_task ?task))
-  =>
-  (if (and (eq ?s IDLE) (not (eq ?task WORK))) then
-    (prepare_machine "M-BS" ?pos ?color ?refbox-id)
-    (printout blue "prepare for order: " ?incomming-oid " color: " ?color " at: " ?pos " for robot: " ?rid crlf)
-    (modify ?machine_task_overview (machine_task WORK))
-    (retract ?machine_order)
-  )
-)
+; (defrule manage_ordered_bases
+;   (game-state (phase PRODUCTION))
+;   ?machine_order <- (order_from_machine (machine_id M-BS) (order_id ?incomming-oid) (robot_id ?rid) (color ?color) (position ?pos))
+;   (protobuf-peer (name refbox-private) (peer-id ?refbox-id))
+;   (machine (name M-BS) (state ?s))
+;   ?machine_task_overview <- (machine_task_overview (machine_id M-BS) (machine_task ?task))
+;   =>
+;   (if (and (eq ?s IDLE) (not (eq ?task WORK))) then
+;     (prepare_machine_BS "M-BS" ?pos ?color ?refbox-id)
+;     (printout blue "prepare for order: " ?incomming-oid " color: " ?color " at: " ?pos " for robot: " ?rid crlf)
+;     (modify ?machine_task_overview (machine_task WORK))
+;     (retract ?machine_order)
+;   )
+; )
 
 (defrule manage_ordered_rings
   (game-state (phase PRODUCTION))
-  ?machine_order <- (order_from_machine (machine_id ?mid) (order_id ?incomming-oid) (robot_id ?rid) (color ?color) (position ?pos))
+  ?machine_order <- (order_from_machine (machine_id ?mid) (order_id ?incomming-oid) (robot_id ?rid) (color ?color) (position ?pos) (operation ?operation))
   (protobuf-peer (name refbox-private) (peer-id ?refbox-id))
-  (machine (name ?mid) (state ?s))
+  (machine (name ?machine-name) (state ?s))
   ?machine_task_overview <- (machine_task_overview (machine_id ?mid) (machine_task ?task))
-  (test (not (eq ?mid M-BS)))
   =>
   (if (and (eq ?s IDLE) (not (eq ?task WORK))) then
-    (prepare_machine ?mid ?pos ?color ?refbox-id)
-    (printout blue "prepare for order: " ?incomming-oid "with machine" ?mid " color: " ?color " at: " ?pos " for robot: " ?rid crlf)
+    (if (eq ?machine-name "M-BS") then
+      (prepare_machine_BS ?mid ?pos ?color ?refbox-id)
+    )
+    (if (or (eq ?machine-name "M-RS1") (eq ?machine-name "M-RS2")) then
+      (prepare_machine_RS ?mid ?pos ?color ?refbox-id)
+    )
+    (if ((eq ?machine-name "M-CS")) then
+      (prepare_machine_CS ?mid ?cs_order ?refbox-id)
+    )
+    (if (eq ?machine-name "M-DS") then
+      (prepare_machine_DS ?mid ?incomming-oid ?refbox-id)
+    )
+    (printout red "prepare for order: " ?incomming-oid "with machine" ?mid " color: " ?color " at: " ?pos " for robot: " ?rid crlf)
     (modify ?machine_task_overview (machine_task WORK))
     (retract ?machine_order)
   )

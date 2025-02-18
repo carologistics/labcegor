@@ -42,6 +42,7 @@
   (slot robot_id (type INTEGER))
   (slot color (type STRING))
   (slot position (type STRING))
+  (slot operation (type STRING))
 )
 
 ; facts
