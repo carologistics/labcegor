@@ -60,7 +60,7 @@
       (printout red "M-DS" crlf)
       (prepare_machine_DS ?mid ?incomming-oid ?refbox-id)
     )
-    (printout red "prepare for order: " ?incomming-oid " with machine " ?mid " color: " ?color " at: " ?pos " for robot: " ?rid crlf)
+    (printout red "prepare for order: " ?incomming-oid " with machine " ?mid " eq " (eq ?mid M-BS) " color: " ?color " at: " ?pos " for robot: " ?rid crlf)
     (modify ?machine_task_overview (machine_task WORK))
     (retract ?machine_order)
   )
