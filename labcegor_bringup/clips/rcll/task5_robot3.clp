@@ -33,7 +33,6 @@
   ?machine_task_overview <- (machine_task_overview (machine_id M-BS) (machine_task ?task))
   (not (order_from_machine (robot_id 3) ))
   =>
-  (printout red "Basestation is in state " ?s " " crlf)
   (if (eq ?s READY-AT-OUTPUT) then
     (send_retrieve_from_cmd 3 ?mot ?mat ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
