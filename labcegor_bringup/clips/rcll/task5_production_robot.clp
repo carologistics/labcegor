@@ -136,7 +136,7 @@
     ; TODO check if difference between cm true or false for retrevial of product....
     (printout green "whoooooooooooo" crlf)
     (bind ?color (get_next_order_color ?oid))
-    (assert (order_from_machine (machine_id ?mot) (order_id ?oid) (robot_id ?rid) (color ?color) (position "INPUT")))
+    (assert (order_from_machine (machine_id ?mot) (order_id ?oid) (robot_id ?rid) (color ?color) (position "OUTPUT")))
     (modify ?tasks_overview (can_move TRUE))
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_deliver FALSE))
