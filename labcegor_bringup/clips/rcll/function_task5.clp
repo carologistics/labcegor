@@ -154,7 +154,7 @@
     (bind ?base-color ?order:base-color)
     (bind ?ring-colors ?order:ring-colors)
     (bind ?cap-color ?order:cap-color)
-    
+
     (bind ?target_color "")
     (printout green "Order is as follows " ?oid " " ?name " " ?base-color " " ?cap-color " number of rings_left: " (length$ ?ring-colors)  crlf)
     (if (eq (length$ ?ring-colors) 0) then
@@ -167,7 +167,7 @@
       (printout yellow "Ring color should be " (nth$ 1 ?ring-colors) crlf)
       (bind ?target_color (nth$ 1 ?ring-colors))
       (bind ?ring-colors (rest$ ?ring-colors))
-      (printout yellow "nexT color should be " (nth$ 1 ?ring-colors) crlf)
+      (printout yellow "nexT color should be " (nth$ 1 ?ring-colors) " " (length$ ?ring-colors) crlf)
       (modify ?order (ring-colors ?ring-colors))
     )
     (return ?target_color)
