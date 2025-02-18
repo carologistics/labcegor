@@ -45,13 +45,13 @@
   (machine (name ?machine-name&:(eq ?machine-name (sym-cat ?mot))) (state ?s))
   (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
   =>
-  ; (printout green ?peer-name " Basestation is in state " ?s " " ?oid " " crlf)
+  (printout green ?peer-name " " ?mot" is in state " ?s " " ?oid " " crlf)
   (if (eq ?s READY-AT-OUTPUT) then
     (send_retrieve_from_cmd ?rid ?mot ?mat ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
     (modify ?tasks_overview (state HOLDING))
   )
-  (printout green "will it work?" crlf)
+  (printout green "will it work? " ?mot crlf)
 )
 
 (defrule deliver_part_to_machine_order_based
