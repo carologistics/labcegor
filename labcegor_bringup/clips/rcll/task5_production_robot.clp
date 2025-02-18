@@ -62,7 +62,6 @@
   (bind ?color (get_next_order_color ?oid))
   ; instruct station to generate next color
   ; (prepare_machine "M-BS" ?pos ?color ?refbox-id)
-  ; (assert (order_from_machine (machine_id ?mot) (order_id ?oid) (robot_id ?rid) (color ?color) (position "INPUT")))
   (send_deliver_to_cmd ?rid ?mot ?mat ?peer-id ?tid)
   (modify ?check_robot (did_something TRUE))
   (modify ?tasks_overview (state IDLE))
@@ -126,7 +125,9 @@
 
   ; It delivered 
   (if (and (eq ?task_id ?tid) (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE) (eq ?robot_state IDLE) (eq ?successful TRUE)) then
-    ; TODO check if differenz between cm true or false for retrevial of product....
+    ; TODO check if difference between cm true or false for retrevial of product....
+    (printout green "whoooooooooooo" crlf)
+    (assert (order_from_machine (machine_id ?mot) (order_id ?oid) (robot_id ?rid) (color ?color) (position "INPUT")))
     (modify ?tasks_overview (can_move TRUE))
     (modify ?tasks_overview (can_retrieve TRUE))
     (modify ?tasks_overview (can_deliver FALSE))
@@ -134,6 +135,5 @@
     (modify ?tasks_overview (machine_target "output"))
     (modify ?check_robot (did_something FALSE))
     (modify ?tasks_overview (state IDLE))
-    
   )
 )
