@@ -30,6 +30,7 @@ clips_manager:
         "clips/labcegor_bringup/rcll/sim-comm-init.clp",
         "clips/labcegor_bringup/rcll/refbox-recv.clp",
         "clips/labcegor_bringup/main.clp",
+        "clips/labcegor_bringup/order-managment.clp",
        ]
     protobuf:
       plugin: "cx::ProtobufPlugin"
