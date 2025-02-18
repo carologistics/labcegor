@@ -137,7 +137,7 @@
     (printout green "whoooooooooooo" crlf)
     (bind ?color (get_next_order_color ?oid))
     (if (or (eq ?mot "M-CS1") (eq ?mot "M-CS2")) then 
-      (assert (order_from_machine (machine_id ?mot) (order_id ?oid) (robot_id ?rid) (operation MOUNT_CAP) (position "OUTPUT")))
+      (assert (order_from_machine (machine_id ?mot) (order_id ?oid) (robot_id ?rid) (operation "MOUNT_CAP") (position "OUTPUT")))
     )
     (if (or (eq ?mot "M-RS1") (eq ?mot "M-RS2") (eq ?mot "M-BS") (eq ?mot "M-DS")) then 
       (assert (order_from_machine (machine_id ?mot) (order_id ?oid) (robot_id ?rid) (color ?color) (position "OUTPUT")))

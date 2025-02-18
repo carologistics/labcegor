@@ -50,7 +50,7 @@
     (if (or (eq ?machine-name "M-RS1") (eq ?machine-name "M-RS2")) then
       (prepare_machine_RS ?mid ?color ?refbox-id)
     )
-    (if ((eq ?machine-name "M-CS")) then
+    (if (eq ?machine-name "M-CS") then
       (prepare_machine_CS ?mid ?operation ?refbox-id)
     )
     (if (eq ?machine-name "M-DS") then
