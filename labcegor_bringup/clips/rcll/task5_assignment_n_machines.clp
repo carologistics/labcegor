@@ -44,19 +44,19 @@
   ?machine_task_overview <- (machine_task_overview (machine_id ?mid) (machine_task ?task))
   =>
   (if (and (eq ?s IDLE) (not (eq ?task WORK))) then
-    (if (eq ?mid "M-BS") then
+    (if (eq ?mid M-BS) then
       (printout red "M-BS" crlf)
       (prepare_machine_BS "M-BS" ?pos ?color ?refbox-id)
     )
-    (if (or (eq ?mid "M-RS1") (eq ?mid "M-RS2")) then
+    (if (or (eq ?mid M-RS1) (eq ?mid M-RS2)) then
       (printout red "M-RS" crlf)
       (prepare_machine_RS ?mid ?color ?refbox-id)
     )
-    (if (eq ?mid "M-CS") then
+    (if (eq ?mid M-CS) then
       (printout red "M-CS" crlf)
       (prepare_machine_CS ?mid ?operation ?refbox-id)
     )
-    (if (eq ?mid "M-DS") then
+    (if (eq ?mid M-DS) then
       (printout red "M-DS" crlf)
       (prepare_machine_DS ?mid ?incomming-oid ?refbox-id)
     )
