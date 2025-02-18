@@ -36,7 +36,7 @@
 ;   )
 ; )
 
-(defrule manage_ordered_rings
+(defrule manage_ordered_stuff
   (game-state (phase PRODUCTION))
   ?machine_order <- (order_from_machine (machine_id ?mid) (order_id ?incomming-oid) (robot_id ?rid) (color ?color) (position ?pos) (operation ?operation))
   (protobuf-peer (name refbox-private) (peer-id ?refbox-id))
@@ -57,7 +57,7 @@
       (printout red "M-RS" crlf)
       (prepare_machine_RS ?mid ?color ?refbox-id)
     )
-    (if (eq ?mid M-CS) then
+    (if (or (eq ?mid M-CS1) (eq ?mid M-CS2)) then
       (printout red "M-CS" crlf)
       (prepare_machine_CS ?mid ?operation ?refbox-id)
     )
