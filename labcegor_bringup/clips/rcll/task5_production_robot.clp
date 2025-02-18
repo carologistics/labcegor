@@ -118,7 +118,7 @@
     (modify ?check_robot (did_something FALSE))
     (modify ?machine_task_overview (machine_task NOT-SET))
     ; Todo get target based on order
-    (modify ?tasks_overview (machine_target INPUT))
+    (modify ?tasks_overview (machine_target "input"))
     (printout green "Yippiiiiiiiiiieee" crlf)
   )
 
@@ -142,7 +142,7 @@
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_deliver FALSE))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
-    (modify ?tasks_overview (machine_target output"))
+    (modify ?tasks_overview (machine_target "output"))
     (modify ?check_robot (did_something FALSE))
     (modify ?tasks_overview (state IDLE))
     (printout red "robot " ?rid " should move to" ?mot " output " ?color crlf)
