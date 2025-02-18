@@ -96,7 +96,7 @@
 
 (deffunction prepare_machine_RS (?m_id ?color ?peer-id)
   (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionRS"))
-  (pb-set-field ?prep-msg "ring-color" ?color)
+  (pb-set-field ?prep-msg "ring_color" ?color)
 
   (bind ?msg (pb-create "llsf_msgs.PrepareMachine"))
   (pb-set-field ?msg "team_color" MAGENTA)
