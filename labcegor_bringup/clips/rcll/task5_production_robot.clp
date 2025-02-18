@@ -127,6 +127,7 @@
   (if (and (eq ?task_id ?tid) (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE) (eq ?robot_state IDLE) (eq ?successful TRUE)) then
     ; TODO check if difference between cm true or false for retrevial of product....
     (printout green "whoooooooooooo" crlf)
+    (bind ?color (get_next_order_color ?oid))
     (assert (order_from_machine (machine_id ?mot) (order_id ?oid) (robot_id ?rid) (color ?color) (position "INPUT")))
     (modify ?tasks_overview (can_move TRUE))
     (modify ?tasks_overview (can_retrieve TRUE))
