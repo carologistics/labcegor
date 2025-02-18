@@ -94,7 +94,7 @@
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
   (bind ?successful (pb-field-value ?msg "successful"))
 
-  (if ((eq ?successful TRUE)) then
+  (if (eq ?successful TRUE) then
     (printout blue "Robot " ?rid " State: " ?robot_state " " ?tid " " ?cm " " ?cr " " ?cd " " ?mot " " ?mat crlf)
   )
   ; It moved
