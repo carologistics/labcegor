@@ -164,7 +164,7 @@
   (if (> (length$ ?ring-colors) 0) then 
     (printout yellow "Ring color should be " (first$ ?ring-colors) crlf)
     (bind ?target_color (first$ ?ring-colors))
-    (bind ?ring-colors (rest$ ring-colors))
+    (bind ?ring-colors (rest$ ?ring-colors))
     (printout yellow "nexT color should be " (first$ ?ring-colors) crlf)
   )
   (return ?target_color)
