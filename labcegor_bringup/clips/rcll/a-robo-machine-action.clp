@@ -25,7 +25,8 @@
 (defrule robo_retrive
   ?ac <- (action (a_type "r") (id ?id) (machine ?wp) (io ?io) (task_id ?t-id))
   ;(done (done_t_id ?w))
-  (robo_status (id ?id) (pos ?wp) (pos_at_waypoint ?io))
+  (robo_status (id ?id) (pos ?wp) (pos_at_waypoint ?p_at_wp))
+  (test (or (eq ?io ?p_at_wp) (and (eq ?p_at_wp input) (or (eq ?io left) (eq ?io center)(eq ?io right)))))
   (protobuf-peer (name ?name) (peer-id ?peer-id))
   (test (eq ?name (sym-cat (str-cat "ROBOT" ?id))))
   ;old;?lt <-(last_task (id ?id) (l_task_id ?last_t))
@@ -50,7 +51,8 @@
 (defrule robo_deliver
   ?ac <- (action (a_type "d") (id ?id) (machine ?wp) (io ?io) (task_id ?t-id))
   ;(done (done_t_id ?w))
-  (robo_status (id ?id) (pos ?wp) (pos_at_waypoint ?io))
+  (robo_status (id ?id) (pos ?wp) (pos_at_waypoint ?p_at_wp))
+  (test (or (eq ?io ?p_at_wp) (and (eq ?p_at_wp input) (eq ?io slide))))
   (protobuf-peer (name ?name) (peer-id ?peer-id))
   (test (eq ?name (sym-cat (str-cat "ROBOT" ?id))))
   ;old;?pay_rs1 <- (payments (station 1) (total_in ?t_in1) (current_in ?c_in1))
@@ -67,14 +69,16 @@
   (pb-set-field ?msg "robot_id" ?id)
   (bind ?deliver-msg (pb-create "llsf_msgs.Deliver")) 
   (pb-set-field ?deliver-msg "machine_id" ?wp)
-  (pb-set-field ?deliver-msg"machine_point" ?io)
-  (if (eq ?io slide)
+  (pb-set-field ?deliver-msg "machine_point" ?io)
+  (if (eq slide ?io)
     then
-      if(eq ?wp M-RS1)
-        then
-          (assert (update_rs (id 1) (payment 1)))
-        else
-          (assert (update_rs (id 2) (payment 1)))
+      (printout red ?io crlf)
+  ;    if(eq ?wp M-RS1)
+  ;      then
+  ;        (assert (update_rs (id 1) (payment 1)))
+  ;      else
+  ;        (assert (update_rs (id 2) (payment 1)))
+  ;  else
   )
   (pb-set-field ?msg "deliver" ?deliver-msg)
   (pb-broadcast ?peer-id ?msg)
@@ -93,8 +97,9 @@
   (bind ?msg (pb-create "llsf_msgs.PrepareMachine"))
   (pb-set-field ?msg "team_color" MAGENTA)
   (pb-set-field ?msg "machine" ?m)
-  (if (or (eq ?m "M-CS1") (eq ?m "M-CS2"))
+  (if (or (eq ?m M-CS1) (eq ?m M-CS2))
     then
+      (printout green "reached if in machine instruct" crlf)
       (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionCS")) 
       (pb-set-field ?prep-msg "operation" ?op)
       (pb-set-field ?msg "instruction_cs" ?prep-msg)
@@ -102,4 +107,5 @@
   
   (pb-broadcast ?peer-id ?msg)
   (pb-destroy ?msg)
+  (printout green "message sent" crlf)
 )
