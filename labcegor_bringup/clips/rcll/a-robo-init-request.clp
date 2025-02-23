@@ -17,6 +17,7 @@
     ?robo_s <- (robo_status (id ?id) (task ?robo_task) (order ?robo_order) (pos ?pos) (pos_at_waypoint ?pos_wp) (des ?des) (des_at_waypoint ?des_wp))
     (test (> ?robo_task 0)) ;; busy check
     ?machine_s <- (machine_status (name ?m_name) (task ?m_task) (order ?m_order));TODO ?name müsste pos für binding (update), klappt dann aber bei retrive nicht
+    (test (or (eq ?m_name ?des) (eq ?m_name ?pos)))
     ?order_s <- (order_status (id ?order_oid) (state ?order_state))
     (test (or (eq ?robo_order 0) (eq ?robo_order 40) (eq ?robo_order ?order_oid)))
     (protobuf-msg (type "llsf_msgs.AgentTask") (msg-type ?msg-type) (client-type PEER) (ptr ?msg))
@@ -75,7 +76,7 @@
 ?rs1 <- (machine_status (name M-RS1) (slide_shelf ?pay_rs1))
 ?rs2 <- (machine_status (name M-RS2) (slide_shelf ?pay_rs2))
 =>
-    retract ?update
+    (retract ?update)
     (if (eq ?RS_id 1)
         then
             (modify ?rs1 (slide_shelf (+ ?pay_rs1 ?pay)))

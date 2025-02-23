@@ -73,12 +73,13 @@
   (if (eq slide ?io)
     then
       (printout red ?io crlf)
-  ;    if(eq ?wp M-RS1)
-  ;      then
-  ;        (assert (update_rs (id 1) (payment 1)))
-  ;      else
-  ;        (assert (update_rs (id 2) (payment 1)))
-  ;  else
+      (if(eq ?wp M-RS1)
+        then
+          (assert (update_rs (id 1) (payment 1)))
+        else
+          (assert (update_rs (id 2) (payment 1)))
+      )
+    else
   )
   (pb-set-field ?msg "deliver" ?deliver-msg)
   (pb-broadcast ?peer-id ?msg)
