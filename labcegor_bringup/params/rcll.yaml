@@ -29,7 +29,10 @@ clips_manager:
         "clips/labcegor_bringup/rcll/refbox-comm-init.clp",
         "clips/labcegor_bringup/rcll/sim-comm-init.clp",
         "clips/labcegor_bringup/rcll/refbox-recv.clp",
+        "clips/labcegor_bringup/deftemplates.clp",
         "clips/labcegor_bringup/order-managment.clp",
+        "clips/labcegor_bringup/robot.clp",
+        "clips/labcegor_bringup/machine.clp",
         "clips/labcegor_bringup/main.clp",
        ]
     protobuf:
