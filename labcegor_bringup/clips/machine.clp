@@ -1,0 +1,91 @@
+(deffunction instruct-bs(?instruct ?refbox)
+    (bind ?team (fact-slot-value ?instruct team))
+    (bind ?machine (fact-slot-value ?instruct machine))
+    (bind ?side (fact-slot-value ?instruct side))
+    (bind ?base_color (fact-slot-value ?instruct base_color))
+
+    (bind ?msg (pb-create "llsf_msgs.PrepareMachine"))
+    (pb-set-field ?msg "team_color" ?team)
+    (pb-set-field ?msg "machine" ?machine)
+    (bind ?bs-msg (pb-create "llsf_msgs.PrepareInstructionBS"))
+    (pb-set-field ?bs-msg "side" ?side)
+    (pb-set-field ?bs-msg "color" ?base_color)
+    (pb-set-field ?msg "instruction_bs" ?bs-msg)
+    (pb-broadcast ?refbox ?msg)
+    (pb-destroy ?msg)
+    (pb-destroy ?bs-msg)
+)
+
+(deffunction instruct-cs(?instruct ?refbox)
+    (bind ?team (fact-slot-value ?instruct team))
+    (bind ?machine (fact-slot-value ?instruct machine))
+    (bind ?operation (fact-slot-value ?instruct operation))
+
+    (bind ?msg (pb-create "llsf_msgs.PrepareMachine"))
+    (pb-set-field ?msg "team_color" ?team)
+    (pb-set-field ?msg "machine" ?machine)
+    (bind ?cs-msg (pb-create "llsf_msgs.PrepareInstructionCS"))
+    (pb-set-field ?cs-msg "operation" ?operation)
+    (pb-set-field ?msg "instruction_cs" ?cs-msg)
+    (pb-broadcast ?refbox ?msg)
+    (pb-destroy ?msg)
+    (pb-destroy ?cs-msg)
+)
+
+(deffunction instruct-rs(?instruct ?refbox)
+    (bind ?team (fact-slot-value ?instruct team))
+    (bind ?machine (fact-slot-value ?instruct machine))
+    (bind ?ring_color (fact-slot-value ?instruct ring_color))
+
+    (bind ?msg (pb-create "llsf_msgs.PrepareMachine"))
+    (pb-set-field ?msg "team_color" ?team)
+    (pb-set-field ?msg "machine" ?machine)
+    (bind ?rs-msg (pb-create "llsf_msgs.PrepareInstructionRS"))
+    (pb-set-field ?rs-msg "ring_color" ?ring_color)
+    (pb-set-field ?msg "instruction_rs" ?rs-msg)
+    (pb-broadcast ?refbox ?msg)
+    (pb-destroy ?msg)
+    (pb-destroy ?rs-msg)
+)
+
+(deffunction instruct-ds(?instruct ?refbox)
+    (bind ?team (fact-slot-value ?instruct team))
+    (bind ?machine (fact-slot-value ?instruct machine))
+    (bind ?order_id (fact-slot-value ?instruct order_id))
+
+    (bind ?msg (pb-create "llsf_msgs.PrepareMachine"))
+    (pb-set-field ?msg "team_color" ?team)
+    (pb-set-field ?msg "machine" ?machine)
+    (bind ?ds-msg (pb-create "llsf_msgs.PrepareInstructionDS"))
+    (pb-set-field ?ds-msg "order_id" ?order_id)
+    (pb-set-field ?msg "instruction_ds" ?ds-msg)
+    (pb-broadcast ?refbox ?msg)
+    (pb-destroy ?msg)
+    (pb-destroy ?ds-msg)
+)
+
+(defrule send-instruct-machine
+    (protobuf-peer (name refbox-private) (peer-id ?peer-id))
+    ?instruct <- (instruct (state PRE) (depend_on) (operation ?operation))
+=>
+    (printout red "Instructing operation: " ?operation crlf)
+    (switch ?operation
+        (case DELIVER then 
+            (instruct-ds ?instruct ?peer-id)
+        )
+        (case DISPENSE-BASE then 
+            (instruct-bs ?instruct ?peer-id)
+        )
+        (case RETRIEVE_CAP then 
+            (instruct-cs ?instruct ?peer-id)
+        )
+        (case MOUNT_CAP then 
+            (instruct-cs ?instruct ?peer-id)
+        )
+        (case MOUNT-RING then 
+            (instruct-rs ?instruct ?peer-id)
+        )
+    )
+
+    (modify ?instruct (state SEND))
+)

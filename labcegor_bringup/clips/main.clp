@@ -1,5 +1,5 @@
 (defrule update-instruct
-  ?instruct <- (machine-instruct (state PRE) (machine ?machine))
+  ?instruct <- (instruct (state SEND) (machine ?machine))
   (machine (name ?machine) (state PROCESSING))
 =>
   (printout green "Update instruct " ?instruct)
@@ -7,11 +7,25 @@
 )
 
 (defrule finished-instruct
-  ?instruct <- (machine-instruct (state STARTED) (machine ?machine))
-  (machine (name ?machine) (state IDLE))
+  ?instruct <- (instruct (state STARTED) (machine ?machine))
+  (machine (name ?machine) (state READY-AT-OUTPUT))
 =>
   (printout green "Finished instruct " ?instruct)
   (modify ?instruct (state FINISHED))
+)
+
+(defrule clear-after-instruct
+  ?finished_instruct <- (instruct (state FINISHED))
+=>
+  (printout blue "Cleaning up after Instruct")
+  (do-for-all-facts ((?move move_base)) 
+   (member$ ?finished_instruct ?move:depend_on) 
+    (modify ?move (depend_on (delete-member$ ?move:depend_on ?finished_instruct)))
+  )
+  (do-for-all-facts ((?instruct instruct)) 
+   (member$ ?finished_instruct ?instruct:depend_on) 
+    (modify ?instruct (depend_on (delete-member$ ?instruct:depend_on ?finished_instruct)))
+  )
 )
 
 (defrule finished-move-base
@@ -19,11 +33,13 @@
 =>
   (printout blue "Cleaning up after Task")
 
-  (do-for-all-facts ((?instruct instruct)) (member$ ?move_base ?instruct:depend_on) 
-    ((modify ?instruct (depend_on (delete-member$ ?instruct:depend_on ?move_base))))
+  (do-for-all-facts ((?instruct instruct)) 
+    (member$ ?move_base ?instruct:depend_on) 
+    (modify ?instruct (depend_on (delete-member$ ?instruct:depend_on ?move_base)))
   )
-  (do-for-all-facts ((?move move_base)) (member$ ?move_base ?move:depend_on) 
-    ((modify ?move (depend_on (delete-member$ ?move:depend_on ?move_base))))
+  (do-for-all-facts ((?move move_base))
+   (member$ ?move_base ?move:depend_on) 
+   (modify ?move (depend_on (delete-member$ ?move:depend_on ?move_base)))
   )
 )
 
@@ -68,4 +84,12 @@
       )
     )
   )
+)
+
+(defrule start
+  (not (started))
+=>
+  (unwatch facts protobuf-msg protobuf-peer game-time ring-spec)
+  (unwatch rules protobuf-cleanup-message refbox-recv-RingInfo refbox-recv-RobotInfo refbox-recv-GameState refbox-recv-refbox-OrderInfo refbox-recv-MachineInfo finished-task)
+  (assert (started))
 )
