@@ -86,6 +86,10 @@
     )
     
 )
+(deffunction oneof (?v $?values) ;taken from https://stackoverflow.com/questions/64005026/the-switch-function-in-clips
+   (if (member$ ?v ?values)
+      then ?v
+      else (not ?v)))
 
 (defrule request_task
 ?rt <- (request_task (id ?robo_id) (last_task ?last_robo_task) (robo_order ?last_robo_order)) ;(machine_order ?last_machine_order)
@@ -101,47 +105,44 @@
 (test (or (and (eq ?m_name ?pos) (eq ?m_pos output)) (not (eq ?pos_wp output)))) ;robo not at a output, but if the coresponding machine is ready
 =>
 (retract ?rt)
-(if (eq ?hid_oid 42)
+(if (eq ?hid_oid 42);init
     then
     (switch ?robo_id
      (case 1 then
         if (eq ?it 1)
             then
-                (assert (action (a_type "m") (id 1) (machine M-BS) (io input) (task_id (+ ?last_robo_task 1))))
-                (modify ?init_it (iteration 7))
+                (assert (instruct (machine M-BS) (operation OUTPUT) (color BASE_RED) (task_id  1)));;adapt to order
+                (assert (action (a_type "m") (id 1) (machine M-BS) (io OUTPUT) (task_id (+ ?last_robo_task 1))))
+                (modify ?init_it (iteration 8))
      )
-     (case 2 then
-        (assert (action (a_type "m") (id 2) (machine M-CS2) (io input) (task_id (+ ?last_robo_task 1))))
-        ;(instruct )
-     )
-     (case 3 then
+     (case (oneof ?robo_id 2 3) then ;;TODO schöner frage Tarki
         (switch ?it
             (case 1 then
-                (assert (action (a_type "m") (id 3) (machine M-CS1) (io input) (task_id (+ ?last_robo_task 1))))
-                (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-CS1) (des_at_waypoint input))
+                (assert (action (a_type "m") (id ?robo_id) (machine (sym-cat (str-cat "M-CS" (- ?robo_id 1)))) (io input) (task_id (+ ?last_robo_task 1))))
+                (modify ?robo_s (task (+ ?last_robo_task 1)) (des (sym-cat (str-cat "M-CS" (- ?robo_id 1)))) (des_at_waypoint input))
                 (modify ?init_it (iteration (+ ?it 1)))
             )
             (case 2 then
-                (assert (action (id 3) (a_type "r") (machine M-CS1) (io left) (task_id (+ ?last_robo_task 1)))) ;action unify
+                (assert (action (id ?robo_id) (a_type "r") (machine (sym-cat (str-cat "M-CS" (- ?robo_id 1)))) (io left) (task_id (+ ?last_robo_task 1)))) ;action unify
                 (modify ?robo_s (task (+ ?last_robo_task 1)))
                 (modify ?init_it (iteration (+ ?it 1)))
             )
             (case 3 then
-                (assert (action (id 3) (a_type "d") (machine M-CS1) (io input) (task_id (+ ?last_robo_task 1))))
+                (assert (action (id ?robo_id) (a_type "d") (machine (sym-cat (str-cat "M-CS" (- ?robo_id 1)))) (io input) (task_id (+ ?last_robo_task 1))))
                 (modify ?robo_s (task (+ ?last_robo_task 1)))
                 (modify ?init_it (iteration (+ ?it 1)))
             )
             (case 4 then
-                (assert (instruct (machine M-CS1) (operation RETRIEVE_CAP) (task_id  1)));needs finish of robo - easy do together with next m
+                (assert (instruct (machine (sym-cat (str-cat "M-CS" (- ?robo_id 1)))) (operation RETRIEVE_CAP) (task_id  1)));needs finish of robo - easy do together with next m
                 (modify ?machine_s (task 1))
-                (assert (action (id 3) (a_type "m") (machine M-CS1) (io output) (task_id (+ ?last_robo_task 1))))
-                (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-CS1) (des_at_waypoint output))
+                (assert (action (id ?robo_id) (a_type "m") (machine (sym-cat (str-cat "M-CS" (- ?robo_id 1)))) (io output) (task_id (+ ?last_robo_task 1))))
+                (modify ?robo_s (task (+ ?last_robo_task 1)) (des (sym-cat (str-cat "M-CS" (- ?robo_id 1)))) (des_at_waypoint output))
                 (modify ?init_it (iteration (+ ?it 1)))
             )
             (case 5 then
                 (if (and (eq ?m_task 0) (eq ?m_pos output))
                     then
-                        (assert (action (id 3) (a_type "r") (machine M-CS1) (io output) (task_id (+ ?last_robo_task 1))));needs finish of machine - if machine status task 0 pos out for the machine the robo is sanding
+                        (assert (action (id ?robo_id) (a_type "r") (machine (sym-cat (str-cat "M-CS" (- ?robo_id 1)))) (io output) (task_id (+ ?last_robo_task 1))));needs finish of machine - if machine status task 0 pos out for the machine the robo is sanding
                         (modify ?robo_s (task (+ ?last_robo_task 1)))
                         (modify ?init_it (iteration (+ ?it 1)))
                     else
@@ -150,22 +151,21 @@
                 )
             )
             (case 6 then
-                (assert (action (id 3) (a_type "m") (machine M-RS1) (io input) (task_id (+ ?last_robo_task 1))))
-                (modify ?robo_s (task (+ ?last_robo_task 1)) (order 42) (des M-RS1) (des_at_waypoint input))
+                (assert (action (id ?robo_id) (a_type "m") (machine (sym-cat (str-cat "M-RS" (- ?robo_id 1)))) (io input) (task_id (+ ?last_robo_task 1))))
+                (modify ?robo_s (task (+ ?last_robo_task 1)) (order 42) (des (sym-cat (str-cat "M-RS" (- ?robo_id 1)))) (des_at_waypoint input))
                 (modify ?init_it (iteration (+ ?it 1)))
             )
             (case 7 then
-                (assert (action (id 3) (a_type "d") (machine M-RS1) (io slide) (task_id (+ ?last_robo_task 1))))
+                (assert (action (id ?robo_id) (a_type "d") (machine (sym-cat (str-cat "M-RS" (- ?robo_id 1)))) (io slide) (task_id (+ ?last_robo_task 1))))
                 (modify ?init_it (iteration (+ ?it 1)))
             )
-            ;(default (printout red "no more payment update - LOOP" crlf))
-
-        
         )
-        
+     )  
         
      )
      ;(default (printout red "no more payment update - LOOP" crlf))
+    else
+    (printout red "normal order processing started" crlf);normal order processing
     ) 
     
 
@@ -176,8 +176,16 @@
     ;assigning new tasks to robos
     ;handeling priority
     ;staring (restricted) machine instruction when robo deliver
-)
+(defrule complete_init
+    (init_it (id 1) (iteration 8))
+    (init_it (id 2) (iteration 8))
+    (init_it (id 3) (iteration 8))
+    ?o_state <- (order_status (id 42) (state ?order_s))
+    (test (not (eq ?order_s DONE)))
+=>
+    (modify ?o_state (state DONE))
 
+)
 
 (defrule procces_new_order
 (new order)

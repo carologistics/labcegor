@@ -88,7 +88,7 @@
 
 (defrule machine-instruct
   (protobuf-peer (name refbox-private) (peer-id ?peer-id))
-  ?inst <- (instruct (machine ?m) (operation ?op) (task_id ?t-id) (wait ?w))
+  ?inst <- (instruct (machine ?m) (operation ?op) (color ?c) (task_id ?t-id) (wait ?w))
   ;(done (done_t_id ?w))
   ;(not (machine_busy (id ?m)))
   ;?lt <-(last_task (id 4) (l_task_id ?last_t))
@@ -100,13 +100,20 @@
   (pb-set-field ?msg "machine" ?m)
   (if (or (eq ?m M-CS1) (eq ?m M-CS2))
     then
-      (printout green "reached if in machine instruct" crlf)
+      ;
       (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionCS")) 
       (pb-set-field ?prep-msg "operation" ?op)
       (pb-set-field ?msg "instruction_cs" ?prep-msg)
   )
-  
+  (if(eq ?m M-BS)
+    then
+      ;(printout green "reached if in machine instruct" crlf)
+      (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionBS")) 
+      (pb-set-field ?prep-msg "side" ?op)
+      (pb-set-field ?prep-msg "color" ?c)
+      (pb-set-field ?msg "instruction_bs" ?prep-msg)
+  )
   (pb-broadcast ?peer-id ?msg)
   (pb-destroy ?msg)
-  (printout green "message sent" crlf)
+  ;(printout green "message sent" crlf)
 )
