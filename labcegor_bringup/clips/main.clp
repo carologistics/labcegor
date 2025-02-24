@@ -8,14 +8,14 @@
 
 (defrule finished-instruct
   ?instruct <- (instruct (state STARTED) (machine ?machine))
-  (machine (name ?machine) (state READY-AT-OUTPUT))
+  (machine (name ?machine) (state ?s&:(or (eq ?s READY-AT-OUTPUT) (eq ?s IDLE))))
 =>
   (printout green "Finished instruct " ?instruct)
   (modify ?instruct (state FINISHED))
 )
 
 (defrule clear-after-instruct
-  ?finished_instruct <- (instruct (state FINISHED))
+  ?finished_instruct <- (instruct (state FINISHED) (machine ?machine))
 =>
   (printout blue "Cleaning up after Instruct")
   (do-for-all-facts ((?move move_base)) 
@@ -25,6 +25,14 @@
   (do-for-all-facts ((?instruct instruct)) 
    (member$ ?finished_instruct ?instruct:depend_on) 
     (modify ?instruct (depend_on (delete-member$ ?instruct:depend_on ?finished_instruct)))
+  )
+
+  (if (str-index DS ?machine)
+    then
+    (bind ?order_id (fact-slot-value ?finished_instruct order_id))
+    (do-for-fact ((?order order)) (eq ?order:id ?order_id)
+      (modify ?order (finished TRUE))
+    )
   )
 )
 

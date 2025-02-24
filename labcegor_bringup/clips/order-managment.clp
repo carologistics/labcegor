@@ -19,7 +19,7 @@
       (if (eq ?team CYAN) then (bind ?cs_machine C-CS1) else (bind ?cs_machine M-CS1))
   )
   (if (eq ?team CYAN) then (bind ?bs_machine C-BS) else (bind ?bs_machine M-BS))
-  (if (eq ?team CYAN) then (bind ?bs_machine C-DS) else (bind ?ds_machine M-DS))
+  (if (eq ?team CYAN) then (bind ?ds_machine C-DS) else (bind ?ds_machine M-DS))
   (if (eq ?team CYAN) then (bind ?rs1_machine C-RS1) else (bind ?rs1_machine M-RS1))
   (bind ?dispense (assert (instruct (operation DISPENSE-BASE) (machine ?bs_machine) (side OUTPUT) (base_color ?base) (team ?team))))
   (bind ?shelf_to_cs (assert (move_base (from ?cs_machine) (from_side SHELF) (target ?cs_machine))))
