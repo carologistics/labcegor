@@ -1,14 +1,157 @@
 (defrule init_all
 (init_moves)
 =>
-    (assert (order_status (id 42)))
-    (assert (order_status (id 40) (state NONE)))
+    (assert (order_status (id 42) (prio 0)))
+    (assert (order_status (id 40) (state NONE) (prio 0)))
     (assert (init_it (id 1) (iteration 1)))
     (assert (init_it (id 2) (iteration 1)))
     (assert (init_it (id 3) (iteration 1)))
     (assert (request_task (id 3) (last_task 3000)))
     (assert (request_task (id 2) (last_task 2000)))
     (assert (request_task (id 1) (last_task 1000)))
+)
+
+
+(defrule ringstation_update
+?update <- (update_rs (id ?RS_id) (payment ?pay))
+?rs1 <- (machine_status (name M-RS1) (slide_shelf ?pay_rs1))
+?rs2 <- (machine_status (name M-RS2) (slide_shelf ?pay_rs2))
+=>
+    (retract ?update)
+    (if (eq ?RS_id 1)
+        then
+            (modify ?rs1 (slide_shelf (+ ?pay_rs1 ?pay)))
+        else
+            (modify ?rs2 (slide_shelf (+ ?pay_rs2 ?pay)))
+    )
+    
+)
+
+(defrule procces_new_order
+?new_o <- (newOrder (id ?id))
+(order (id ?id)(complexity ?complexity)(delivery-begin ?begin)(delivery-end ?end))
+(test (or (eq ?id 1) (eq ?id 1))); zwishcen Lösung, betrachte nur orders 1 und 2 !!!! UPDATE WHEN THAT IS RUNING
+(not (processed_order (id ?id)))
+=>
+(retract ?new_o)
+(assert (processed_order (id ?id)))
+(assert (order_status (id ?id) (state RC) (next_step Base) (start_d_time ?begin) (last_d_time ?end) (prio (- 100 ?id))))
+)
+
+(deffunction oneof (?v $?values) ;taken from https://stackoverflow.com/questions/64005026/the-switch-function-in-clips
+   (if (member$ ?v ?values)
+      then ?v
+      else (not ?v)))
+
+(defrule request_task
+?rt <- (request_task (id ?robo_id) (last_task ?last_robo_task) (robo_order ?last_robo_order)) ;(machine_order ?last_machine_order)
+?init_it <- (init_it (id ?robo_id) (iteration ?it))
+;(test (<= ?it 7))
+;(not (newOrder)) ;;think of new check
+?hp_o <- (order_status (id ?hp_oid)(state ?hp_ostate) (next_step ?hp_next) (start_d_time ?hp_start) (last_d_time ?hp_last) (prio ?hp_prio));order with highest prio
+(not (order_status (prio ?prio_1&:(< ?hp_prio ?prio_1)))) ;; find order with highest prio
+(order (id ?hp_oid) (base-color ?hp_base) (ring-colors $?hp_colors) (cap-color ?hp_cap))
+?hid_o <- (order_status (id ?hid_oid) (state ?hid_ostate) (next_step ?hid_next) (start_d_time ?hid_start) (last_d_time ?hid_last) (prio ?hid_prio));order with highest id
+(not (order_status (id ?id_1&:(< ?hid_oid ?id_1))))
+?machine_s <- (machine_status (name ?m_name) (task ?m_task) (pos ?m_pos))
+?robo_s <- (robo_status (id ?robo_id) (task ?r_task) (order ?r_order) (pos ?pos) (pos_at_waypoint ?pos_wp))
+(test (or (and (eq ?m_name ?pos) (eq ?m_pos OUTPUT)) (not (eq ?pos_wp OUTPUT)))) ;robo not at a output, but if the coresponding machine is ready
+;?r_o <-(order_status (id ?last_robo_order)(state ?r_ostate) (next_step ?r_next) (start_d_time ?r_start) (last_d_time ?r_last) (prio ?r_prio))
+;?m_o <-(order_status (id ?last_machine_order)(state ?m_ostate) (next_step ?m_next) (start_d_time ?m_start) (last_d_time ?m_last) (prio ?m_prio))
+=>
+(retract ?rt)
+(if (eq ?hid_oid 42);init
+    then
+    (switch ?robo_id
+     (case 1 then
+        if (eq ?it 1)
+            then
+                (assert (instruct (machine M-BS) (operation OUTPUT) (color ?hp_base) (task_id  1)));;adapt to order
+                (assert (action (a_type "m") (id 1) (machine M-BS) (io OUTPUT) (task_id (+ ?last_robo_task 1))))
+                (modify ?init_it (iteration 8))
+     )
+     (case (oneof ?robo_id 2 3) then ;;TODO schöner frage Tarki
+        (switch ?it
+            (case 1 then
+                (assert (action (a_type "m") (id ?robo_id) (machine (sym-cat (str-cat "M-CS" (- ?robo_id 1)))) (io INPUT) (task_id (+ ?last_robo_task 1))))
+                (modify ?robo_s (task (+ ?last_robo_task 1)) (des (sym-cat (str-cat "M-CS" (- ?robo_id 1)))) (des_at_waypoint INPUT))
+                (modify ?init_it (iteration (+ ?it 1)))
+            )
+            (case 2 then
+                (assert (action (id ?robo_id) (a_type "r") (machine (sym-cat (str-cat "M-CS" (- ?robo_id 1)))) (io SHELF) (task_id (+ ?last_robo_task 1)))) ;action unify
+                (modify ?robo_s (task (+ ?last_robo_task 1)))
+                (modify ?init_it (iteration (+ ?it 1)))
+            )
+            (case 3 then
+                (assert (action (id ?robo_id) (a_type "d") (machine (sym-cat (str-cat "M-CS" (- ?robo_id 1)))) (io INPUT) (task_id (+ ?last_robo_task 1))))
+                (modify ?robo_s (task (+ ?last_robo_task 1)))
+                (modify ?init_it (iteration (+ ?it 1)))
+            )
+            (case 4 then
+                (assert (instruct (machine (sym-cat (str-cat "M-CS" (- ?robo_id 1)))) (operation RETRIEVE_CAP) (task_id  1)));needs finish of robo - easy do together with next m
+                (modify ?machine_s (task 1))
+                (assert (action (id ?robo_id) (a_type "m") (machine (sym-cat (str-cat "M-CS" (- ?robo_id 1)))) (io OUTPUT) (task_id (+ ?last_robo_task 1))))
+                (modify ?robo_s (task (+ ?last_robo_task 1)) (des (sym-cat (str-cat "M-CS" (- ?robo_id 1)))) (des_at_waypoint OUTPUT))
+                (modify ?init_it (iteration (+ ?it 1)))
+            )
+            (case 5 then
+                (if (and (eq ?m_task 0) (eq ?m_pos OUTPUT))
+                    then
+                        (assert (action (id ?robo_id) (a_type "r") (machine (sym-cat (str-cat "M-CS" (- ?robo_id 1)))) (io OUTPUT) (task_id (+ ?last_robo_task 1))));needs finish of machine - if machine status task 0 pos out for the machine the robo is sanding
+                        (modify ?robo_s (task (+ ?last_robo_task 1)))
+                        (modify ?init_it (iteration (+ ?it 1)))
+                    else
+                        (modify ?init_it (iteration 5)) ; loop untill if true
+                        (assert (request_task (id ?robo_id) (last_task ?last_robo_task) (robo_order ?last_robo_order)))
+                )
+            )
+            (case 6 then
+                (assert (action (id ?robo_id) (a_type "m") (machine (sym-cat (str-cat "M-RS" (- ?robo_id 1)))) (io INPUT) (task_id (+ ?last_robo_task 1))))
+                (modify ?robo_s (task (+ ?last_robo_task 1)) (order 42) (des (sym-cat (str-cat "M-RS" (- ?robo_id 1)))) (des_at_waypoint INPUT))
+                (modify ?init_it (iteration (+ ?it 1)))
+            )
+            (case 7 then
+                (assert (action (id ?robo_id) (a_type "d") (machine (sym-cat (str-cat "M-RS" (- ?robo_id 1)))) (io SLIDE) (task_id (+ ?last_robo_task 1))))
+                (modify ?init_it (iteration (+ ?it 1)))
+            )
+        )
+     )  
+        
+    )
+    else
+    (switch ?robo_id
+        (case 1 then
+
+        )
+
+    )
+    
+    ;else ;init done
+    ;switch by robot seee notes
+)
+    ;assigning new tasks to robos
+    ;handeling priority
+    ;staring (restricted) machine instruction when robo deliver
+    ;in machine_instruct add payment check for RS - sollte to test. sonst 2 regeln
+)
+
+(defrule complete_init
+    (init_it (id 1) (iteration 8))
+    (init_it (id 2) (iteration 8))
+    (init_it (id 3) (iteration 8))
+    ?o_state <- (order_status (id 42) (state ?order_s))
+    (test (not (eq ?order_s DONE)))
+=>
+    (modify ?o_state (state DONE))
+)
+
+(defrule waitforfinish_machine; does not fire why? if state is variable it fires exactly once, but too early
+;wron machine bound conection with line 100
+?machine_s <- (machine_status (name ?m_name) (task ?m_task) (order ?m_order) (pos ?m_pos))
+(test (> ?m_task 0)) 
+(machine (name ?m_name) (state READY-AT-OUTPUT))
+=>
+  (modify ?machine_s (task 0) (pos OUTPUT))
 )
 
 (defrule waitforfinish_robo
@@ -60,136 +203,3 @@
         ;    (printout green ?id ?t-id  crlf)
         )
     )
-
-(defrule waitforfinish_machine; does not fire why? if state is variable it fires exactly once, but too early
-;wron machine bound conection with line 100
-?machine_s <- (machine_status (name ?m_name) (task ?m_task) (order ?m_order) (pos ?m_pos))
-(test (> ?m_task 0)) 
-(machine (name ?m_name) (state READY-AT-OUTPUT))
-=>
-  (modify ?machine_s (task 0) (pos output))
-)
-
-
-(defrule ringstation_update
-?update <- (update_rs (id ?RS_id) (payment ?pay))
-?rs1 <- (machine_status (name M-RS1) (slide_shelf ?pay_rs1))
-?rs2 <- (machine_status (name M-RS2) (slide_shelf ?pay_rs2))
-=>
-    (retract ?update)
-    (if (eq ?RS_id 1)
-        then
-            (modify ?rs1 (slide_shelf (+ ?pay_rs1 ?pay)))
-        else
-            (modify ?rs2 (slide_shelf (+ ?pay_rs2 ?pay)))
-
-    )
-    
-)
-(deffunction oneof (?v $?values) ;taken from https://stackoverflow.com/questions/64005026/the-switch-function-in-clips
-   (if (member$ ?v ?values)
-      then ?v
-      else (not ?v)))
-
-(defrule request_task
-?rt <- (request_task (id ?robo_id) (last_task ?last_robo_task) (robo_order ?last_robo_order)) ;(machine_order ?last_machine_order)
-?init_it <- (init_it (id ?robo_id) (iteration ?it))
-(test (<= ?it 7))
-;?hp_o <- (order_status (id ?hp_oid)(state ?hp_ostate) (next_step ?hp_next) (start_d_time ?hp_start) (last_d_time ?hp_last) (prio ?hp_prio));order with highest prio
-?hid_o <- (order_status (id ?hid_oid) (state ?hid_ostate) (next_step ?hid_next) (start_d_time ?hid_start) (last_d_time ?hid_last) (prio ?hid_prio));order with highest id
-(not (order_status (id ?id_1&:(< ?hid_oid ?id_1))))
-;?r_o <-(order_status (id ?last_robo_order)(state ?r_ostate) (next_step ?r_next) (start_d_time ?r_start) (last_d_time ?r_last) (prio ?r_prio))
-;?m_o <-(order_status (id ?last_machine_order)(state ?m_ostate) (next_step ?m_next) (start_d_time ?m_start) (last_d_time ?m_last) (prio ?m_prio))
-?machine_s <- (machine_status (name ?m_name) (task ?m_task) (pos ?m_pos))
-?robo_s <- (robo_status (id ?robo_id) (task ?r_task) (order ?r_order) (pos ?pos) (pos_at_waypoint ?pos_wp))
-(test (or (and (eq ?m_name ?pos) (eq ?m_pos output)) (not (eq ?pos_wp output)))) ;robo not at a output, but if the coresponding machine is ready
-=>
-(retract ?rt)
-(if (eq ?hid_oid 42);init
-    then
-    (switch ?robo_id
-     (case 1 then
-        if (eq ?it 1)
-            then
-                (assert (instruct (machine M-BS) (operation OUTPUT) (color BASE_RED) (task_id  1)));;adapt to order
-                (assert (action (a_type "m") (id 1) (machine M-BS) (io OUTPUT) (task_id (+ ?last_robo_task 1))))
-                (modify ?init_it (iteration 8))
-     )
-     (case (oneof ?robo_id 2 3) then ;;TODO schöner frage Tarki
-        (switch ?it
-            (case 1 then
-                (assert (action (a_type "m") (id ?robo_id) (machine (sym-cat (str-cat "M-CS" (- ?robo_id 1)))) (io input) (task_id (+ ?last_robo_task 1))))
-                (modify ?robo_s (task (+ ?last_robo_task 1)) (des (sym-cat (str-cat "M-CS" (- ?robo_id 1)))) (des_at_waypoint input))
-                (modify ?init_it (iteration (+ ?it 1)))
-            )
-            (case 2 then
-                (assert (action (id ?robo_id) (a_type "r") (machine (sym-cat (str-cat "M-CS" (- ?robo_id 1)))) (io left) (task_id (+ ?last_robo_task 1)))) ;action unify
-                (modify ?robo_s (task (+ ?last_robo_task 1)))
-                (modify ?init_it (iteration (+ ?it 1)))
-            )
-            (case 3 then
-                (assert (action (id ?robo_id) (a_type "d") (machine (sym-cat (str-cat "M-CS" (- ?robo_id 1)))) (io input) (task_id (+ ?last_robo_task 1))))
-                (modify ?robo_s (task (+ ?last_robo_task 1)))
-                (modify ?init_it (iteration (+ ?it 1)))
-            )
-            (case 4 then
-                (assert (instruct (machine (sym-cat (str-cat "M-CS" (- ?robo_id 1)))) (operation RETRIEVE_CAP) (task_id  1)));needs finish of robo - easy do together with next m
-                (modify ?machine_s (task 1))
-                (assert (action (id ?robo_id) (a_type "m") (machine (sym-cat (str-cat "M-CS" (- ?robo_id 1)))) (io output) (task_id (+ ?last_robo_task 1))))
-                (modify ?robo_s (task (+ ?last_robo_task 1)) (des (sym-cat (str-cat "M-CS" (- ?robo_id 1)))) (des_at_waypoint output))
-                (modify ?init_it (iteration (+ ?it 1)))
-            )
-            (case 5 then
-                (if (and (eq ?m_task 0) (eq ?m_pos output))
-                    then
-                        (assert (action (id ?robo_id) (a_type "r") (machine (sym-cat (str-cat "M-CS" (- ?robo_id 1)))) (io output) (task_id (+ ?last_robo_task 1))));needs finish of machine - if machine status task 0 pos out for the machine the robo is sanding
-                        (modify ?robo_s (task (+ ?last_robo_task 1)))
-                        (modify ?init_it (iteration (+ ?it 1)))
-                    else
-                        (modify ?init_it (iteration 5)) ; loop untill if true
-                        (assert (request_task (id ?robo_id) (last_task ?last_robo_task) (robo_order ?last_robo_order)))
-                )
-            )
-            (case 6 then
-                (assert (action (id ?robo_id) (a_type "m") (machine (sym-cat (str-cat "M-RS" (- ?robo_id 1)))) (io input) (task_id (+ ?last_robo_task 1))))
-                (modify ?robo_s (task (+ ?last_robo_task 1)) (order 42) (des (sym-cat (str-cat "M-RS" (- ?robo_id 1)))) (des_at_waypoint input))
-                (modify ?init_it (iteration (+ ?it 1)))
-            )
-            (case 7 then
-                (assert (action (id ?robo_id) (a_type "d") (machine (sym-cat (str-cat "M-RS" (- ?robo_id 1)))) (io slide) (task_id (+ ?last_robo_task 1))))
-                (modify ?init_it (iteration (+ ?it 1)))
-            )
-        )
-     )  
-        
-     )
-     ;(default (printout red "no more payment update - LOOP" crlf))
-    else
-    (printout red "normal order processing started" crlf);normal order processing
-    ) 
-    
-
-
-)
-    ;(if ) order 42 not done do init else...
-    ;init
-    ;assigning new tasks to robos
-    ;handeling priority
-    ;staring (restricted) machine instruction when robo deliver
-(defrule complete_init
-    (init_it (id 1) (iteration 8))
-    (init_it (id 2) (iteration 8))
-    (init_it (id 3) (iteration 8))
-    ?o_state <- (order_status (id 42) (state ?order_s))
-    (test (not (eq ?order_s DONE)))
-=>
-    (modify ?o_state (state DONE))
-
-)
-
-(defrule procces_new_order
-(new order)
-    ;(order )
-=>
-    
-)

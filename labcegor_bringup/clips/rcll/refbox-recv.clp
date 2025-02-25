@@ -179,6 +179,7 @@
       (quantity-delivered ?qd-us)
       (quantity-delivered-other ?qd-them)
     ))
+    (assert (newOrder (id ?id)));added to triger processing in my code
   )
   (delayed-do-for-all-facts ((?o1 order) (?o2 order)) (and (< (fact-index ?o1) (fact-index ?o2)) (eq ?o1:id ?o2:id))
    (retract ?o1)

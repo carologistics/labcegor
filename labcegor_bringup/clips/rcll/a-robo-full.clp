@@ -19,7 +19,7 @@
   (slot name (type SYMBOL))
   (slot task (type INTEGER) (default 0)) ;0/1 ?
   (slot order (type INTEGER) (default 0)) ; order id 0= emty, 20 full unassigend
-  (slot pos (type SYMBOL)(allowed-values input inside output empty) (default empty)) ; for CS especialy wp not cap
+  (slot pos (type SYMBOL)(allowed-values INPUT inside OUTPUT empty) (default empty)) ; for CS especialy wp not cap
   (slot slide_shelf (type INTEGER)) ; 0,1,2,3 (pay in for RS) (0,1,2 - pickup point fo CS) 
 )
 (deftemplate request_task
@@ -75,3 +75,5 @@
     (slot task_id (type INTEGER))
     (slot wait (type INTEGER) (default 0))
 )
+(deftemplate processed_order
+(slot id (type INTEGER)))

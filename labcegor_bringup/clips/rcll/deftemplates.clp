@@ -60,3 +60,6 @@
   (slot delivery-end (type INTEGER))
   (slot competitive (type SYMBOL))
 )
+
+(deftemplate newOrder
+(slot id (type INTEGER)))
