@@ -157,7 +157,7 @@
 
     (bind ?target_color "")
     (printout green "Order is as follows " ?oid " " ?name " " ?base-color " " ?cap-color " number of rings_left: " (length$ ?ring-colors)  crlf)
-    (if (eq (length$ ?ring-colors) 0) then
+    (if (or (eq (length$ ?ring-colors) 0) (eq (nth$ 1 ?ring-colors) nil)) then
       (printout yellow "Cap color should be " ?cap-color crlf)
       (bind ?target_color ?cap-color)
       (bind ?cap-color "Bring_it_home") ; next delivery point should be the DS
@@ -167,7 +167,7 @@
       (printout yellow "Ring color should be " (nth$ 1 ?ring-colors) crlf)
       (bind ?target_color (nth$ 1 ?ring-colors))
       (bind ?ring-colors (rest$ ?ring-colors))
-      (printout yellow "nexT color should be " (nth$ 1 ?ring-colors) " " (length$ ?ring-colors) crlf)
+      (printout yellow "nexT color should be " (nth$ 1 ?ring-colors) " " (length$ ?ring-colors) " " (eq (nth$ 1 ?ring-colors) nil) crlf)
       (modify ?order (ring-colors ?ring-colors))
     )
     (return ?target_color)
