@@ -121,7 +121,7 @@
 )
 
 (deffunction prepare_machine_DS (?m_id ?order_id ?peer-id)
-  (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionCS")) 
+  (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionDS")) 
   (pb-set-field ?prep-msg "order_id" ?order_id)
 
   (bind ?msg (pb-create "llsf_msgs.PrepareMachine"))
