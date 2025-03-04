@@ -99,7 +99,7 @@
     (printout blue "Robot " ?rid " State: " ?robot_state " " ?tid " " ?cm " " ?cr " " ?cd " " ?mot " " ?mat crlf)
   )
   ; It moved
-  (if (and (eq ?task_id ?tid) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE) (eq ?robot_state MOVING) (eq ?successful TRUE) (eq ?mat "input")) then
+  (if (and (eq ?task_id ?tid) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE) (eq ?robot_state MOVING) (eq ?successful TRUE) (eq ?mat "Input")) then
     (printout green "robot " ?rid " can now grab the base of color: " ?base-color " from order: " ?oid crlf)
     (modify ?tasks_overview (can_move FALSE))
     (modify ?tasks_overview (can_retrieve TRUE))
@@ -108,7 +108,7 @@
     (modify ?tasks_overview (state IDLE))
   )
 
-  (if (and (eq ?task_id ?tid) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE) (eq ?robot_state MOVING) (eq ?successful TRUE) (eq ?mat "output")) then
+  (if (and (eq ?task_id ?tid) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE) (eq ?robot_state MOVING) (eq ?successful TRUE) (eq ?mat "Output")) then
     (modify ?tasks_overview (can_move FALSE))
     (modify ?tasks_overview (can_retrieve TRUE))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
@@ -127,7 +127,7 @@
     (modify ?check_robot (did_something FALSE))
     (modify ?machine_task_overview (machine_task NOT-SET))
     ; Todo get target based on order
-    (modify ?tasks_overview (machine_target "input"))
+    (modify ?tasks_overview (machine_target "Input"))
     ; (printout green "Yippiiiiiiiiiieee" crlf)
   )
 
@@ -151,7 +151,7 @@
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_deliver FALSE))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
-    (modify ?tasks_overview (machine_target "output"))
+    (modify ?tasks_overview (machine_target "Output"))
     (modify ?check_robot (did_something FALSE))
     (modify ?tasks_overview (state IDLE))
     (printout red "robot " ?rid " should move to" ?mot " output " ?color crlf)
