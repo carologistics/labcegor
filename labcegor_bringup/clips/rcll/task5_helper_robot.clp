@@ -144,7 +144,7 @@
           ; (printout red "Robot helper should start something different now." crlf)
         )
       )
-    (modify ?tasks_overview (machine_target "Input"))
+    (modify ?tasks_overview (machine_target "Output"))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (modify ?check_robot (did_something FALSE))
     (modify ?tasks_overview (state IDLE))

@@ -135,20 +135,20 @@
     
     (if (not (or (eq ?mot M-CS1) (eq ?mot M-CS2))) then
       (assert (order_from_machine (machine_id ?mot) (order_id 0) (robot_id ?rid) (operation RETRIEVE_CAP)))
-    (if (not (eq ?target NONE)) then
-      (if (eq ?target M-RS1) then
-        (modify ?mpi_one (payment (+ ?m_one 1)))
+      (if (not (eq ?target NONE)) then
+        (if (eq ?target M-RS1) then
+          (modify ?mpi_one (payment (+ ?m_one 1)))
+        )
+        (if (eq ?target M-RS2) then
+          (modify ?mpi_two (payment (+ ?m_two 1)))
+        )
       )
-      (if (eq ?target M-RS2) then
-        (modify ?mpi_two (payment (+ ?m_two 1)))
-      )
-    )
       (if (eq ?target NONE) then
         (modify ?tasks_overview (robot_type HELPER))
         ; (printout red "Robot Three should start something different now." crlf)
       )
+      (modify ?tasks_overview (move_target M-BS))
     )
-    (modify ?tasks_overview (move_target M-BS))
     (modify ?tasks_overview (machine_target "Output"))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (modify ?check_robot (did_something FALSE))
