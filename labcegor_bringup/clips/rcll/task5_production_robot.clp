@@ -103,9 +103,9 @@
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
   (bind ?successful (pb-field-value ?msg "successful"))
 
-  (if (eq ?successful TRUE) then
-    (printout blue "Robot " ?rid " State: " ?robot_state " " ?tid " " ?cm " " ?cr " " ?cd " " ?mot " " ?mat crlf)
-  )
+  ; (if (eq ?successful TRUE) then
+  ;   (printout blue "Robot " ?rid " State: " ?robot_state " " ?tid " " ?cm " " ?cr " " ?cd " " ?mot " " ?mat crlf)
+  ; )
   ; It moved
   (if (and (eq ?task_id ?tid) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE) (eq ?robot_state MOVING) (eq ?successful TRUE) (eq ?mat "Input")) then
     (printout green "robot " ?rid " can now grab the base of color: " ?base-color " from order: " ?oid crlf)
