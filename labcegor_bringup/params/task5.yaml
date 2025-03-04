@@ -23,7 +23,7 @@ clips_manager:
     files:
       plugin: "cx::FileLoadPlugin"
       pkg_share_dirs: ["labcegor_bringup"]
-      batch: [
+      load: [
         "clips/labcegor_bringup/rcll/deftemplates.clp",
         "clips/labcegor_bringup/rcll/init.clp",
         "clips/labcegor_bringup/rcll/refbox-comm-init.clp",
