@@ -3,7 +3,7 @@
 ; ==================================================================================
 (defrule send-robot-three-to-pickup
   (game-state (phase PRODUCTION))
-  ?tasks_overview <- (tasks_overview (robot_id ?rid) (robot_type HELPER) (task_id ?tid) (can_move TRUE) (can_retrieve FALSE) (can_deliver ?cd) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
+  ?tasks_overview <- (tasks_overview (robot_id ?rid) (robot_type PAYMENT) (task_id ?tid) (can_move TRUE) (can_retrieve FALSE) (can_deliver ?cd) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE))
   (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
   (test (or (eq ?robot_state IDLE) (eq ?robot_state HOLDING)))
