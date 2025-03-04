@@ -110,8 +110,8 @@
     (modify ?tasks_overview (can_move TRUE))
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_deliver TRUE))
-    (modify ?tasks_overview (move_target ?target))
     (if (not (or (eq ?mot M-CS1) (eq ?mot M-CS2)))then
+      (modify ?tasks_overview (move_target ?target))
       (modify ?tasks_overview (machine_target "Slide"))
     )
     (if (and (or (eq ?mot M-CS1) (eq ?mot M-CS2)) (eq ?mounted FALSE) )then
