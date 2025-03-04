@@ -133,6 +133,7 @@
     (printout red "Robot Three and CS should do something now.... " ?mot " " (or (eq ?mot M-CS1) (eq ?mot M-CS2)) " " (eq ?mounted FALSE) " " ?mounted  crlf)
     (if (and (or (eq ?mot M-CS1) (eq ?mot M-CS2)) (eq ?mounted FALSE) ) then
       (assert (order_from_machine (machine_id ?mot) (order_id 0) (robot_id ?rid) (operation RETRIEVE_CAP)))
+      ; Machine fact
       ; (modify ?machine_task_overview (mounted TRUE))
     )
     

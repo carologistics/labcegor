@@ -34,6 +34,7 @@
     (modify ?machine_task_overview (machine_task WORK))
     (retract ?machine_order)
   )
+  (watch activations manage_ordered_caps)
 )
 
 (defrule manage_ordered_rings
