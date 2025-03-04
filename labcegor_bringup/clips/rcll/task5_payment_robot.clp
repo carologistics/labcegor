@@ -43,7 +43,6 @@
 
   (if (and (or (eq ?mot M-CS1) (eq ?mot M-CS2)) (eq ?mounted FALSE)) then
     (send_retrieve_from_cmd ?rid ?mot "Shelf" ?peer-id ?tid)
-    (modify ?tasks_overview (machine_target "Input"))
     (modify ?check_robot (did_something TRUE))
     (modify ?tasks_overview (state HOLDING))
   )
@@ -130,11 +129,11 @@
     (modify ?tasks_overview (can_move TRUE))
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_deliver FALSE))
-    (printout red "Robot Three and CS should do something now.... " ?mot " " (or (eq ?mot M-CS1) (eq ?mot M-CS2)) " " (eq ?mounted FALSE) " " ?mounted  crlf)
+    
     (if (and (or (eq ?mot M-CS1) (eq ?mot M-CS2)) (eq ?mounted FALSE) ) then
       (assert (order_from_machine (machine_id ?mot) (order_id 0) (robot_id ?rid) (operation RETRIEVE_CAP)))
-      ; Machine fact
-      ; (modify ?machine_task_overview (mounted TRUE))
+      (modify ?machine_task_overview (mounted TRUE))
+      (modify ?tasks_overview (move_target ?target))
     )
     
     (if (not (or (eq ?mot M-CS1) (eq ?mot M-CS2))) then
