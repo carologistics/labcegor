@@ -36,7 +36,6 @@
   )
 )
 
-
 (defrule manage_ordered_rings
   (game-state (phase PRODUCTION))
   ?machine_order <- (order_from_machine (machine_id ?machine_id&:(or (eq ?machine_id M-RS1) (eq ?machine_id M-RS2)) ) (order_id ?incomming-oid) (robot_id ?rid) (color ?color) (position ?pos) (operation ?operation))

@@ -85,7 +85,7 @@
   (bind ?successful (pb-field-value ?msg "successful"))
   (bind ?target (check_payment ?m_one ?m_two))
   
-  (printout red "robot helper did something " ?task_id " " ?tid " " ?cm  " " ?cr  " " ?cd  " " ?mot  " " ?mat  " " ?robot_state " " ?target crlf)
+  ; (printout red "robot helper did something " ?task_id " " ?tid " " ?cm  " " ?cr  " " ?cd  " " ?mot  " " ?mat  " " ?robot_state " " ?target crlf)
   ; It has moved
   (if (and (eq ?robot_id ?rid) (eq ?task_id ?tid) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE)) then 
     (modify ?tasks_overview (can_move FALSE))
@@ -109,6 +109,10 @@
     (modify ?tasks_overview (can_move TRUE))
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_deliver TRUE))
+    (if (and (or (eq ?mot M-CS1) (eq ?mot M-CS2)) (eq ?mounted TRUE) ) then
+      (printout yellow "Robot has probably a cap carrier in its claw " ?robot_state " " ?mot " " ?machine_target " " crlf)
+    )
+
     (if (or (not (or (eq ?mot M-CS1) (eq ?mot M-CS2))) (eq ?mounted TRUE) )then
       (modify ?tasks_overview (move_target ?target))
       (modify ?tasks_overview (machine_target "Slide"))
