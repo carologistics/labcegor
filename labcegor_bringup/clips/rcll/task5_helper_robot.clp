@@ -9,7 +9,7 @@
   (test (or (eq ?robot_state IDLE) (eq ?robot_state HOLDING)))
   =>
   
-  (printout green "ROBOT " ?rid " " ?robot_state " " ?mot " " ?mat " " ?peer-id crlf)
+  ; (printout green "ROBOT " ?rid " " ?robot_state " " ?mot " " ?mat " " ?peer-id crlf)
 
   ;Prepare Basestation PrepareMachine
   (if (eq ?robot_state IDLE) then 
