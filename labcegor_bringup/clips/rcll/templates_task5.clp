@@ -50,8 +50,8 @@
 ; facts
 (deffacts robottasks
   (tasks_overview (robot_id 1) (robot_type PRODUCTION) (task_id 1) (can_move TRUE) (can_retrieve FALSE) (can_deliver FALSE) (state IDLE) (move_target M-BS) (machine_target "Input" ))
-  (tasks_overview (robot_id 2) (robot_type HELPER) (task_id 1) (can_move TRUE) (can_retrieve FALSE) (can_deliver FALSE) (state IDLE) (move_target M-CS2) (machine_target "Output" ))
-  (tasks_overview (robot_id 3) (robot_type PAYMENT) (task_id 1) (can_move TRUE) (can_retrieve FALSE) (can_deliver FALSE) (state IDLE) (move_target M-CS1) (machine_target "Output" ))
+  (tasks_overview (robot_id 2) (robot_type HELPER) (task_id 1) (can_move TRUE) (can_retrieve FALSE) (can_deliver FALSE) (state IDLE) (move_target M-CS2) (machine_target "Input" ))
+  (tasks_overview (robot_id 3) (robot_type PAYMENT) (task_id 1) (can_move TRUE) (can_retrieve FALSE) (can_deliver FALSE) (state IDLE) (move_target M-CS1) (machine_target "Input" ))
   (check_robot (robot_id 1) (did_something FALSE) (is_assigned TRUE) (go_to_next_step TRUE))
   (check_robot (robot_id 2) (did_something FALSE) (is_assigned TRUE) (go_to_next_step TRUE))
   (check_robot (robot_id 3) (did_something FALSE) (is_assigned FALSE) (go_to_next_step TRUE))

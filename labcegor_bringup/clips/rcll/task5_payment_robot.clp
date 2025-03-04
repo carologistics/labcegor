@@ -14,7 +14,7 @@
     (if (eq ?mot M-BS) then
       (assert (order_from_machine (machine_id ?mot) (order_id 0) (robot_id ?rid) (color BASE_BLACK) (position OUTPUT)))
     )
-    (if (or (eq ?mot M-CS1) (eq ?mot M-CS2)) then
+    (if (and (or (eq ?mot M-CS1) (eq ?mot M-CS2)) (eq ?mounted FALSE) then
       (modify ?tasks_overview (machine_target "INPUT"))
     )
     (send_move_to_cmd ?rid ?mot ?mat ?peer-id ?tid)
@@ -38,6 +38,12 @@
   ?machine_task_overview <- (machine_task_overview (machine_id ?mot) (machine_task ?task) (payment ?payment) (mounted ?mounted))
   (not (order_from_machine (robot_id ?rid) ))
   =>
+  (if (and (or (eq ?mot M-CS1) (eq ?mot M-CS2)) (eq ?mounted FALSE)) then
+    (send_retrieve_from_cmd ?rid ?mot "Shelf" ?peer-id ?tid)
+    (modify ?tasks_overview (machine_target "Shelf"))
+    (modify ?check_robot (did_something TRUE))
+    (modify ?tasks_overview (state HOLDING))
+  )
   (if (eq ?s READY-AT-OUTPUT) then
     (send_retrieve_from_cmd ?rid ?mot ?mat ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
@@ -79,7 +85,7 @@
   (bind ?successful (pb-field-value ?msg "successful"))
   (bind ?target (check_payment ?m_one ?m_two))
 
-  ; (printout green "robot three did something " ?task_id " " ?tid " " ?cm  " " ?cr  " " ?cd  " " ?mot  " " ?mat  " " ?robot_state " " ?target crlf)
+  (printout green "robot three did something " ?task_id " " ?tid " " ?cm  " " ?cr  " " ?cd  " " ?mot  " " ?mat  " " ?robot_state " " ?target crlf)
   ; It has moved
   (if (and (eq ?robot_id ?rid) (eq ?task_id ?tid) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE)) then 
     (modify ?tasks_overview (can_move FALSE))
@@ -104,7 +110,12 @@
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_deliver TRUE))
     (modify ?tasks_overview (move_target ?target))
-    (modify ?tasks_overview (machine_target "Slide"))
+    (if (not (or (eq ?mot M-CS1) (eq ?mot M-CS2)))then
+      (modify ?tasks_overview (machine_target "Slide"))
+    )
+    (if (not (or (eq ?mot M-CS1) (eq ?mot M-CS2)) (eq ?mounted FALSE) )then
+      (modify ?tasks_overview (machine_target "Input"))
+    )
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (modify ?tasks_overview (state HOLDING))
     (modify ?check_robot (did_something FALSE))
@@ -114,6 +125,9 @@
     (modify ?tasks_overview (can_move TRUE))
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_deliver FALSE))
+    (if (and (or (eq ?mot M-CS1) (eq ?mot M-CS2)) (eq ?mounted FALSE) ) then
+      (assert (order_from_machine (machine_id ?mot) (order_id 0) (robot_id ?rid) (operation RETRIEVE_CAP)))
+    )
     (modify ?tasks_overview (move_target M-BS))
     (modify ?tasks_overview (machine_target "Output"))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
