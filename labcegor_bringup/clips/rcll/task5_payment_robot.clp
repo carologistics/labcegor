@@ -6,6 +6,7 @@
   ?tasks_overview <- (tasks_overview (robot_id ?rid) (robot_type PAYMENT) (task_id ?tid) (can_move TRUE) (can_retrieve FALSE) (can_deliver ?cd) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE))
   (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
+  ?machine_task_overview <- (machine_task_overview (machine_id ?mot) (machine_task ?task) (payment ?payment) (mounted ?mounted))
   (test (or (eq ?robot_state IDLE) (eq ?robot_state HOLDING)))
   =>
 
@@ -116,7 +117,7 @@
     (if (not (or (eq ?mot M-CS1) (eq ?mot M-CS2)))then
       (modify ?tasks_overview (machine_target "Slide"))
     )
-    (if (not (or (eq ?mot M-CS1) (eq ?mot M-CS2)) (eq ?mounted FALSE) )then
+    (if (and (or (eq ?mot M-CS1) (eq ?mot M-CS2)) (eq ?mounted FALSE) )then
       (modify ?tasks_overview (machine_target "Input"))
     )
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
