@@ -85,7 +85,7 @@
   (bind ?successful (pb-field-value ?msg "successful"))
   (bind ?target (check_payment ?m_one ?m_two))
   
-  ; (printout red "robot helper did something " ?task_id " " ?tid " " ?cm  " " ?cr  " " ?cd  " " ?mot  " " ?mat  " " ?robot_state " " ?target crlf)
+  (printout red "robot helper did something " ?task_id " " ?tid " " ?cm  " " ?cr  " " ?cd  " " ?mot  " " ?mat  " " ?robot_state " " ?target crlf)
   ; It has moved
   (if (and (eq ?robot_id ?rid) (eq ?task_id ?tid) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE)) then 
     (modify ?tasks_overview (can_move FALSE))
@@ -128,7 +128,6 @@
     (if (and (or (eq ?mot M-CS1) (eq ?mot M-CS2)) (eq ?mounted FALSE) ) then
       (assert (order_from_machine (machine_id ?mot) (order_id 0) (robot_id ?rid) (operation RETRIEVE_CAP)))
       (modify ?machine_task_overview (mounted TRUE))
-      (modify ?tasks_overview (move_target ?target))
     )
     
     (if (not (or (eq ?mot M-CS1) (eq ?mot M-CS2))) then
