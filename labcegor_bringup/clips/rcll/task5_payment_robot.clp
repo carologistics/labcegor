@@ -8,6 +8,8 @@
   (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
   (test (or (eq ?robot_state IDLE) (eq ?robot_state HOLDING)))
   =>
+  
+  (printout red "ROBOT " ?rid " " ?robot_state " " ?mot " " ?mat " " ?peer-id crlf)
 
   ;Prepare Basestation PrepareMachine
   (if (eq ?robot_state IDLE) then 
@@ -26,7 +28,6 @@
     (modify ?check_robot (did_something TRUE))
     (modify ?tasks_overview (state CARRY))
   )
-  (printout red "ROBOT " ?rid " " ?robot_state " " ?mot " " ?mat " " ?peer-id crlf)
 )
 
 (defrule robot-three-pickup-base
