@@ -1,7 +1,7 @@
 ; ==================================================================================
 ; Manage ROBOTS as Helper
 ; ==================================================================================
-(defrule send-robot-three-to-pickup
+(defrule send-robot-helper-to-pickup
   (game-state (phase PRODUCTION))
   ?tasks_overview <- (tasks_overview (robot_id ?rid) (robot_type HELPER) (task_id ?tid) (can_move TRUE) (can_retrieve FALSE) (can_deliver ?cd) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE))
@@ -9,7 +9,7 @@
   (test (or (eq ?robot_state IDLE) (eq ?robot_state HOLDING)))
   =>
   
-  (printout red "ROBOT " ?rid " " ?robot_state " " ?mot " " ?mat " " ?peer-id crlf)
+  (printout green "ROBOT " ?rid " " ?robot_state " " ?mot " " ?mat " " ?peer-id crlf)
 
   ;Prepare Basestation PrepareMachine
   (if (eq ?robot_state IDLE) then 
