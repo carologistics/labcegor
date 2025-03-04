@@ -37,21 +37,6 @@
   (watch activations manage_ordered_caps)
 )
 
-(defrule manage_ordered_caps
-  (game-state (phase PRODUCTION))
-  ?machine_order <- (order_from_machine (machine_id ?machine_id&:(or (eq ?machine_id M-CS1) (eq ?machine_id M-CS2))) (order_id ?incomming-oid) (robot_id ?rid) (operation ?operation))
-  (protobuf-peer (name refbox-private) (peer-id ?refbox-id))
-  (machine (name ?machine_id) (state ?s))
-  ?machine_task_overview <- (machine_task_overview (machine_id ?machine_id) (machine_task ?task))
-  =>
-  (if (and (eq ?s IDLE) (not (eq ?task WORK))) then
-    
-    (printout red "M-CS " ?machine_id " ?operation crlf)
-    (prepare_machine_CS ?machine_id ?operation ?refbox-id)
-    (modify ?machine_task_overview (machine_task WORK))
-    (retract ?machine_order)
-  )
-)
 
 (defrule manage_ordered_rings
   (game-state (phase PRODUCTION))
@@ -84,6 +69,22 @@
     (prepare_machine_DS ?machine_id ?incomming-oid ?refbox-id)
 
     (printout red "prepare for order: " ?incomming-oid " with machine " ?machine_id" eq " (eq ?machine_id M-DS) " color: " ?color " at: " ?pos " for robot: " ?rid crlf)
+    (modify ?machine_task_overview (machine_task WORK))
+    (retract ?machine_order)
+  )
+)
+
+(defrule manage_ordered_caps
+  (game-state (phase PRODUCTION))
+  ?machine_order <- (order_from_machine (machine_id ?machine_id&:(or (eq ?machine_id M-CS1) (eq ?machine_id M-CS2))) (order_id ?incomming-oid) (robot_id ?rid) (operation ?operation))
+  (protobuf-peer (name refbox-private) (peer-id ?refbox-id))
+  (machine (name ?machine_id) (state ?s))
+  ?machine_task_overview <- (machine_task_overview (machine_id ?machine_id) (machine_task ?task))
+  =>
+  (if (and (eq ?s IDLE) (not (eq ?task WORK))) then
+    
+    (printout red "M-CS " ?machine_id " " ?operation crlf)
+    (prepare_machine_CS ?machine_id ?operation ?refbox-id)
     (modify ?machine_task_overview (machine_task WORK))
     (retract ?machine_order)
   )
