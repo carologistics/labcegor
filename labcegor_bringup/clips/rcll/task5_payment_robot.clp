@@ -8,7 +8,7 @@
   (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
   (test (or (eq ?robot_state IDLE) (eq ?robot_state HOLDING)))
   =>
-  
+
   (printout red "ROBOT " ?rid " " ?robot_state " " ?mot " " ?mat " " ?peer-id crlf)
 
   ;Prepare Basestation PrepareMachine
@@ -16,7 +16,7 @@
     (if (eq ?mot M-BS) then
       (assert (order_from_machine (machine_id ?mot) (order_id 0) (robot_id ?rid) (color BASE_BLACK) (position OUTPUT)))
     )
-    (if (and (or (eq ?mot M-CS1) (eq ?mot M-CS2)) (eq ?mounted FALSE) then
+    (if (and (or (eq ?mot M-CS1) (eq ?mot M-CS2)) (eq ?mounted FALSE)) then
       (modify ?tasks_overview (machine_target "INPUT"))
     )
     (send_move_to_cmd ?rid ?mot ?mat ?peer-id ?tid)
