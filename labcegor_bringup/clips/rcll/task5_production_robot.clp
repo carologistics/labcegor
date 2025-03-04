@@ -10,6 +10,7 @@
   (assigned_order (order_id ?oid) (robot_id ?rid))
   ?order <- (order (id ?oid) (name ?order-name) (base-color ?base-color)); 
   (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
+  ?machine_task_overview <- (machine_task_overview (machine_id ?mot) (machine_task ?task) (payment ?payment) (mounted ?mounted))
   =>
   (printout blue "Robot " ?peer-name " robot-id " ?rid crlf)
   ; Get Order
@@ -21,9 +22,16 @@
     (modify ?tasks_overview (state MOVING))
   )
   (if (and (eq ?robot_state HOLDING) (eq ?cd TRUE)) then 
-    (send_move_to_cmd ?rid ?mot ?mat ?peer-id ?tid)
-    (modify ?check_robot (did_something TRUE))
-    (modify ?tasks_overview (state CARRY))
+    (if (not (or (eq ?mot M-CS1) (eq ?mot M-CS2))) then
+      (send_move_to_cmd ?rid ?mot ?mat ?peer-id ?tid)
+      (modify ?check_robot (did_something TRUE))
+      (modify ?tasks_overview (state CARRY))
+    )
+    (if (and (or (eq ?mot M-CS1) (eq ?mot M-CS2)) (eq ?mounted TRUE)) then
+      (send_move_to_cmd ?rid ?mot ?mat ?peer-id ?tid)
+      (modify ?check_robot (did_something TRUE))
+      (modify ?tasks_overview (state CARRY))
+    )
   )
   (if (and (eq ?robot_state IDLE) (eq ?cd FALSE) (not (eq ?mot M-BS))) then 
     (send_move_to_cmd ?rid ?mot ?mat ?peer-id ?tid)

@@ -11,7 +11,12 @@
 
   ;Prepare Basestation PrepareMachine
   (if (eq ?robot_state IDLE) then 
-    (assert (order_from_machine (machine_id ?mot) (order_id 0) (robot_id ?rid) (color BASE_BLACK) (position OUTPUT)))
+    (if (eq ?mot M-BS) then
+      (assert (order_from_machine (machine_id ?mot) (order_id 0) (robot_id ?rid) (color BASE_BLACK) (position OUTPUT)))
+    )
+    (if (or (eq ?mot M-CS1) (eq ?mot M-CS2)) then
+      (modify ?tasks_overview (machine_target "INPUT"))
+    )
     (send_move_to_cmd ?rid ?mot ?mat ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
     (modify ?tasks_overview (state MOVING))
@@ -29,8 +34,8 @@
   ?tasks_overview <- (tasks_overview (robot_id ?rid) (task_id ?tid) (can_move FALSE) (can_retrieve TRUE) (can_deliver FALSE) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE))
   (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
-  (machine (name M-BS) (state ?s))
-  ?machine_task_overview <- (machine_task_overview (machine_id M-BS) (machine_task ?task))
+  (machine (name ?mot) (state ?s))
+  ?machine_task_overview <- (machine_task_overview (machine_id ?mot) (machine_task ?task) (payment ?payment) (mounted ?mounted))
   (not (order_from_machine (robot_id ?rid) ))
   =>
   (if (eq ?s READY-AT-OUTPUT) then
@@ -61,10 +66,12 @@
 (defrule check-robot_three
   (game-state (phase PRODUCTION))
   ?tasks_overview <- (tasks_overview (robot_id ?rid) (robot_type PAYMENT) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
-  ?mpi_one <- (machine_payment_info (machine_id M-RS1) (money ?m_one))
-  ?mpi_two <- (machine_payment_info (machine_id M-RS2) (money ?m_two))
+  ?mpi_one <- (machine_task_overview (machine_id M-RS1) (payment ?m_one))
+  ?mpi_two <- (machine_task_overview (machine_id M-RS2) (payment ?m_two))
+  ?mcs_one <- (machine_task_overview (machine_id M-CS1) (mounted ?cs_one))
+  ?mcs_two <- (machine_task_overview (machine_id M-CS2) (mounted ?cs_two))
   ?check_robot <- (check_robot (robot_id ?rid) (did_something TRUE))
-  ?machine_task_overview <- (machine_task_overview (machine_id M-BS) (machine_task ?task))
+  ?machine_task_overview <- (machine_task_overview (machine_id ?mot) (machine_task ?task) (payment ?payment) (mounted ?mounted))
   (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id ?rid) (ptr ?msg))
   =>
   (bind ?task_id (pb-field-value ?msg "task_id"))
@@ -114,10 +121,10 @@
     (modify ?tasks_overview (state IDLE))
     (if (not (eq ?target NONE)) then
       (if (eq ?target M-RS1) then
-        (modify ?mpi_one (money (+ ?m_one 1)))
+        (modify ?mpi_one (payment (+ ?m_one 1)))
       )
       (if (eq ?target M-RS2) then
-        (modify ?mpi_two (money (+ ?m_two 1)))
+        (modify ?mpi_two (payment (+ ?m_two 1)))
       )
     )
     (if (eq ?target NONE) then
