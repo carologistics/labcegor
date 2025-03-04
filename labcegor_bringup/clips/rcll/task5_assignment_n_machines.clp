@@ -71,7 +71,6 @@
   )
 )
 
-
 (defrule manage_ordered_Delivery
   (game-state (phase PRODUCTION))
   ?machine_order <- (order_from_machine (machine_id M-DS) (order_id ?incomming-oid) (robot_id ?rid) (color ?color) (position ?pos) (operation ?operation))
