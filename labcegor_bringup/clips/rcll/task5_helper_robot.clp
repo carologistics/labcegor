@@ -9,7 +9,7 @@
   (test (or (eq ?robot_state IDLE) (eq ?robot_state HOLDING)))
   =>
 
-  ; (printout red "ROBOT " ?rid " " ?robot_state " " ?mot " " ?mat " " ?peer-id crlf)
+  (printout red "ROBOT Move " ?rid " " ?robot_state " " ?mot " " ?mat " " ?peer-id crlf)
 
   ;Prepare Basestation PrepareMachine
   (if (eq ?robot_state IDLE) then 
@@ -36,6 +36,7 @@
   ?machine_task_overview <- (machine_task_overview (machine_id ?mot) (machine_task ?task) (payment ?payment) (mounted ?mounted))
   (not (order_from_machine (robot_id ?rid) ))
   =>
+  (printout red "ROBOT Pickup " ?rid " " ?robot_state " " ?mot " " ?mat " " ?s ?peer-id crlf)
   (if (and (or (eq ?mot M-CS1) (eq ?mot M-CS2)) (eq ?mounted FALSE)) then
     (send_retrieve_from_cmd ?rid ?mot "Shelf" ?peer-id ?tid)
     (modify ?tasks_overview (machine_target "Input"))
@@ -109,10 +110,6 @@
     (modify ?tasks_overview (can_move TRUE))
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_deliver TRUE))
-    (printout yellow "Robot " ?rid " has probably a cap carrier in its claw " ?robot_state " " ?mot " " ?mat " " ?mounted " " crlf)
-    (if (and (or (eq ?mot M-CS1) (eq ?mot M-CS2)) (eq ?mounted TRUE) ) then
-      (printout yellow "Robot has probably a cap carrier in its claw " ?robot_state " " ?mot " " ?mat " " crlf)
-    )
 
     (if (or (not (or (eq ?mot M-CS1) (eq ?mot M-CS2))) (eq ?mounted TRUE) )then
       (modify ?tasks_overview (move_target ?target))
