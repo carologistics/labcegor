@@ -51,11 +51,12 @@
 ?hp_o <- (order_status (id ?hp_oid)(state ?hp_ostate) (next_step ?hp_next) (start_d_time ?hp_start) (last_d_time ?hp_last) (prio ?hp_prio));order with highest prio
 (not (order_status (prio ?prio_1&:(< ?hp_prio ?prio_1)))) ;; find order with highest prio
 (order (id ?hp_oid) (base-color ?hp_base) (ring-colors $?hp_colors) (cap-color ?hp_cap))
-?hid_o <- (order_status (id ?hid_oid) (state ?hid_ostate) (next_step ?hid_next) (start_d_time ?hid_start) (last_d_time ?hid_last) (prio ?hid_prio));order with highest id
+?hid_o <- (order_status (id ?hid_oid) (state ?hid_ostate) (prio ?hid_prio));order with highest id
 (not (order_status (id ?id_1&:(< ?hid_oid ?id_1))))
 ?machine_s <- (machine_status (name ?m_name) (task ?m_task) (pos ?m_pos))
-?robo_s <- (robo_status (id ?robo_id) (task ?r_task) (order ?r_order) (pos ?pos) (pos_at_waypoint ?pos_wp))
-(test (or (and (eq ?m_name ?pos) (eq ?m_pos OUTPUT)) (not (eq ?pos_wp OUTPUT)))) ;robo not at a output, but if the coresponding machine is ready
+?robo_s <- (robo_status (id ?robo_id) (task ?r_task) (order ?r_order) (pos ?pos) (pos_at_waypoint ?pos_wp) (des ?des))
+(test (or (eq ?m_name ?pos) (eq ?m_name ?des)))
+;(test (or (not (and (eq ?m_name ?pos) (eq ?m_pos OUTPUT))) (and (eq ?pos_wp OUTPUT) (eq ?m_name ?pos)))) ;robo not at a output, but if the coresponding machine is ready;;;;error weil worng match.... seach for differet solution
 ;?r_o <-(order_status (id ?last_robo_order)(state ?r_ostate) (next_step ?r_next) (start_d_time ?r_start) (last_d_time ?r_last) (prio ?r_prio))
 ;?m_o <-(order_status (id ?last_machine_order)(state ?m_ostate) (next_step ?m_next) (start_d_time ?m_start) (last_d_time ?m_last) (prio ?m_prio))
 =>
@@ -64,11 +65,13 @@
     then
     (switch ?robo_id
      (case 1 then
-        if (eq ?it 1)
+        (if (eq ?it 1)
             then
-                (assert (instruct (machine M-BS) (operation OUTPUT) (color ?hp_base) (task_id  1)));;adapt to order
+                (assert (instruct (machine M-BS) (operation OUTPUT) (color ?hp_base) (task_id  1) (oder_id ?hp_oid)));;adapt to order
                 (assert (action (a_type "m") (id 1) (machine M-BS) (io OUTPUT) (task_id (+ ?last_robo_task 1))))
                 (modify ?init_it (iteration 8))
+                (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-BS) (des_at_waypoint OUTPUT))
+        )
      )
      (case (oneof ?robo_id 2 3) then ;;TODO schöner frage Tarki
         (switch ?it
@@ -118,14 +121,24 @@
      )  
         
     )
+
     else
     (switch ?robo_id
         (case 1 then
-
+            (if (and (eq ?m_task 0) (eq ?m_pos OUTPUT))
+                    then
+                        (assert (action (id ?robo_id) (a_type "r") (machine ?m_name) (io OUTPUT) (task_id (+ ?last_robo_task 1))));needs finish of machine - if machine status task 0 pos out for the machine the robo is sanding
+                        (modify ?robo_s (task (+ ?last_robo_task 1)))
+                    else
+                        (assert (request_task (id ?robo_id) (last_task ?last_robo_task) (robo_order ?last_robo_order)))
+            )
+        )
+        (case 2 then
+            ;noop
         )
 
     )
-    
+
     ;else ;init done
     ;switch by robot seee notes
 )
@@ -142,7 +155,8 @@
     ?o_state <- (order_status (id 42) (state ?order_s))
     (test (not (eq ?order_s DONE)))
 =>
-    (modify ?o_state (state DONE))
+    ;(modify ?o_state (state DONE))
+    (retract ?o_state)
 )
 
 (defrule waitforfinish_machine; does not fire why? if state is variable it fires exactly once, but too early
@@ -184,6 +198,7 @@
                             else (modify ?robo_s (order 40))
                         )
                         (modify ?machine_s (order 0))
+                        (modify ?machine_s (pos empty))
                         ;update order status
                 
                     else ; was deliver        

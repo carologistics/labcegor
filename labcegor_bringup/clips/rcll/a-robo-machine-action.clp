@@ -88,9 +88,9 @@
 
 (defrule machine-instruct
   (protobuf-peer (name refbox-private) (peer-id ?peer-id))
-  ?inst <- (instruct (machine ?m) (operation ?op) (color ?c) (task_id ?t-id) (wait ?w))
+  ?inst <- (instruct (machine ?m) (operation ?op) (color ?c) (task_id ?t-id) (wait ?w) (oder_id ?o_id))
   ;(test (member$ ?m (create$ M-BS M-CS1 M-CS2 M-BS) ))
-  (machine_status (name ?m) (slide_shelf ?pay_in))
+  ?m_sate <- (machine_status (name ?m) (slide_shelf ?pay_in))
   (ring-spec (color ?ca) (cost ?ring_cost))
   (test (or (not (member$ ?c (create$ RING_BLUE RING_ORANGE RING_GEEEN RING_YELLOW)))
                   (eq ?c ?ca)))
@@ -99,6 +99,7 @@
   (test (or (not (or (eq ?m M-RS1) (eq ?m M-RS2))) (>= ?pay_in ?ring_cost)) ) 
   =>
   (retract ?inst)
+  (modify ?m_sate (task 97) (order ?o_id) (pos INPUT)) ;task 97 is hotfix maybe change later, should not be needed else where apart form wait for check
   ; OLD (assert (machine_busy (id ?m)))
   ;Old (modify ?lt (l_task_id ?t-id))
   (bind ?msg (pb-create "llsf_msgs.PrepareMachine"))

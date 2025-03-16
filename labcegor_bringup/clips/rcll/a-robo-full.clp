@@ -74,6 +74,7 @@
     (slot color (type SYMBOL) (default NONE) ) ;identifier or ""
     (slot task_id (type INTEGER))
     (slot wait (type INTEGER) (default 0))
+    (slot oder_id (type INTEGER))
 )
 (deftemplate processed_order
 (slot id (type INTEGER)))
