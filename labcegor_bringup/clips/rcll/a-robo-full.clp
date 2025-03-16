@@ -1,7 +1,8 @@
 (deftemplate order_status
   (slot id (type INTEGER))
   (slot state (type SYMBOL)); (allowed-values RC BS RS1 RS2 CS1 CS2 DE))
-  (slot next_step (type SYMBOL) (allowed-values Base Ring_1 Ring_2 Ring_3 Cap Deliver None))
+  (slot next_step (type SYMBOL) (allowed-values BASE RING_1 RING_2 RING_3 CAP DELIVER NONE))
+  (slot complexity (type SYMBOL))
   (slot start_d_time (type INTEGER))
   (slot last_d_time (type INTEGER))
   (slot prio (type INTEGER))
@@ -28,7 +29,19 @@
   (slot robo_order (type INTEGER));id of last order 0 if delivered as last task
   (slot machine_order (type INTEGER) (default 0))
 )
-
+(deftemplate order_colors
+(slot id (type INTEGER))
+(slot base (type SYMBOL))
+(slot ring_1 (type SYMBOL))
+(slot ring_2 (type SYMBOL))
+(slot ring_3 (type SYMBOL))
+(slot cap (type SYMBOL))
+)
+(deftemplate perprocess_ring_colors 
+(slot id (type INTEGER))
+(multislot rings (type SYMBOL))
+(slot it (type INTEGER))
+)
 (deftemplate init_it 
 (slot id (type INTEGER))
 (slot iteration (type INTEGER)))

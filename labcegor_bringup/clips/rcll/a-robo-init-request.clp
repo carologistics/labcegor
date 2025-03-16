@@ -2,7 +2,7 @@
 (init_moves)
 =>
     (assert (order_status (id 42) (prio 0)))
-    (assert (order_status (id 40) (state NONE) (prio 0)))
+    (assert (order_status (id 40) (state NONE) (prio 0) (complexity C0)))
     (assert (init_it (id 1) (iteration 1)))
     (assert (init_it (id 2) (iteration 1)))
     (assert (init_it (id 3) (iteration 1)))
@@ -10,6 +10,77 @@
     (assert (request_task (id 2) (last_task 2000)))
     (assert (request_task (id 1) (last_task 1000)))
 )
+
+(defrule waitforfinish_machine; does not fire why? if state is variable it fires exactly once, but too early
+;wron machine bound conection with line 100
+?machine_s <- (machine_status (name ?m_name) (task ?m_task) (order ?m_order) (pos ?m_pos))
+(test (> ?m_task 0)) 
+(machine (name ?m_name) (state ?m_state))
+(test (or (eq ?m_state READY-AT-OUTPUT) (eq ?m_state PREPARED)))
+=>
+  (modify ?machine_s (task 0) (pos OUTPUT))
+)
+
+(defrule waitforfinish_robo
+    ;?d <- (do (id ?id) (task ?t-id))
+    ;?b <- (robo_busy (id ?id))
+    ?robo_s <- (robo_status (id ?id) (task ?robo_task) (order ?robo_order) (pos ?pos) (pos_at_waypoint ?pos_wp) (des ?des) (des_at_waypoint ?des_wp))
+    (test (> ?robo_task 0)) ;; busy check
+    ?machine_s <- (machine_status (name ?m_name) (task ?m_task) (order ?m_order));TODO ?name müsste pos für binding (update), klappt dann aber bei retrive nicht
+    (test (or (eq ?m_name ?des) (eq ?m_name ?pos)))
+    ?order_s <- (order_status (id ?order_oid) (state ?order_state) (complexity ?complexity))
+    (test (or (eq ?robo_order 0) (eq ?robo_order 40) (eq ?robo_order ?order_oid)))
+    (protobuf-msg (type "llsf_msgs.AgentTask") (msg-type ?msg-type) (client-type PEER) (ptr ?msg))
+=>
+    (bind ?robo_id (pb-field-value ?msg "robot_id"))
+    (bind ?task_id (pb-field-value ?msg "task_id"))
+    (bind ?success (pb-field-value ?msg "successful"))
+    (if (and (eq ?robo_id ?id) (eq ?task_id ?robo_task) (eq ?success TRUE)) ;(eq ?task_id ?t-id)
+    then
+        ;(retract ?d)
+        ;(retract ?b)
+        ;(assert (done (done_t_id ?t-id)))
+        (if (not (eq ?des EMPTY));; aka was movment
+            then
+                (modify ?robo_s (pos ?des) (pos_at_waypoint ?des_wp) (des EMPTY) (des_at_waypoint EMPTY)) ;pos = des; pos_wp =des_wp, des, des_wp = ""
+            else ; NO MOVEMENT
+                (if (eq ?robo_order 0);; aka was retrive
+                    then
+                        (if (not (eq ?m_order 0))
+                            then (modify ?robo_s (order ?m_order))
+                            else (modify ?robo_s (order 40))
+                        )
+                        (modify ?machine_s (order 0))
+                        (modify ?machine_s (pos empty))
+                        ;update order status
+                
+                    else ; was deliver        
+                        (modify ?machine_s (order ?robo_order))
+                        (modify ?robo_s (order 0))
+                        (modify ?order_s (state ?pos))
+                        (switch ?pos  ;Update next step
+                            (case M-BS then (if (eq ?complexity C0) then (modify ?order_s (next_step DELIVER)) else (modify ?order_s (next_step RING_1))))
+                            (case M-RS1 then (if (eq ?complexity C1) then (modify ?order_s (next_step DELIVER)) else (modify ?order_s (next_step RING_2))))
+                            (case M-RS2 then (if (eq ?complexity C2) then (modify ?order_s (next_step DELIVER)) else (modify ?order_s (next_step RING_3))))
+                            (case M-CS1 then (modify ?order_s (next_step DELIVER)))
+                            (case M-CS2 then (modify ?order_s (next_step DELIVER)))
+                            (case M-DS then (modify ?order_s (next_step NONE)))
+
+                        )
+
+                )     
+        )
+        (modify ?robo_s (task 0))
+        (assert (request_task (id ?id) (last_task ?robo_task) (robo_order ?robo_order)(machine_order ?m_order)))
+
+        ;(assert (done (done_t_id ?task))) still needed?
+        ;(printout green "TASK DONE"  crlf)
+        ;else
+        ;    (printout green ?robo_id ?task_id ?success  crlf)
+        ;    (printout green ?id ?t-id  crlf)
+        )
+    )
+
 
 
 (defrule ringstation_update
@@ -27,16 +98,41 @@
     
 )
 
+(defrule perprocess_ring_colors
+?prp_r_c <- (perprocess_ring_colors (id ?id) (rings ?ring1 $?rings_rest) (it ?it))
+?order_c <- (order_colors (id ?id))
+=>
+(switch ?it
+    (case 1 then
+        (modify ?order_c (ring_1 ?ring1))
+        (assert (perprocess_ring_colors (id ?id) (rings $?rings_rest) (it (+ ?it 1))))
+    )
+    (case 2 then
+        (modify ?order_c (ring_2 ?ring1))
+        (assert (perprocess_ring_colors (id ?id) (rings $?rings_rest) (it (+ ?it 1))))
+    )
+    (case 3 then
+        (modify ?order_c (ring_3 ?ring1))
+    )
+)
+)
+
 (defrule procces_new_order
 ?new_o <- (newOrder (id ?id))
-(order (id ?id)(complexity ?complexity)(delivery-begin ?begin)(delivery-end ?end))
-(test (or (eq ?id 1) (eq ?id 1))); zwishcen Lösung, betrachte nur orders 1 und 2 !!!! UPDATE WHEN THAT IS RUNING
+(order (id ?id)(complexity ?complexity)(delivery-begin ?begin)(delivery-end ?end) (base-color ?base) (ring-colors ?ring-colors) (cap-color ?cap))
+(test (or (eq ?id 1) (eq ?id 0))); zwishcen Lösung, betrachte nur orders 1 und 2 !!!! UPDATE WHEN THAT IS RUNING
 (not (processed_order (id ?id)))
 =>
 (retract ?new_o)
 (assert (processed_order (id ?id)))
-(assert (order_status (id ?id) (state RC) (next_step Base) (start_d_time ?begin) (last_d_time ?end) (prio (- 100 ?id))))
+(assert (order_status (id ?id) (state RC) (next_step BASE) (complexity ?complexity) (start_d_time ?begin) (last_d_time ?end) (prio (- 100 ?id))))
+(assert (order_colors (id ?id) (base ?base) (cap ?cap)))
+(if (not (eq ?complexity C0))
+ then 
+ (assert (perprocess_ring_colors (id ?id) (rings ?ring-colors) (it 1)))
 )
+)
+
 
 (deffunction oneof (?v $?values) ;taken from https://stackoverflow.com/questions/64005026/the-switch-function-in-clips
    (if (member$ ?v ?values)
@@ -55,13 +151,13 @@
 (not (order_status (id ?id_1&:(< ?hid_oid ?id_1))))
 ?machine_s <- (machine_status (name ?m_name) (task ?m_task) (pos ?m_pos))
 ?robo_s <- (robo_status (id ?robo_id) (task ?r_task) (order ?r_order) (pos ?pos) (pos_at_waypoint ?pos_wp) (des ?des))
-(test (or (eq ?m_name ?pos) (eq ?m_name ?des)))
+(test (or (eq ?m_name ?pos) (eq ?m_name ?des) (eq ?pos START)))
 ;(test (or (not (and (eq ?m_name ?pos) (eq ?m_pos OUTPUT))) (and (eq ?pos_wp OUTPUT) (eq ?m_name ?pos)))) ;robo not at a output, but if the coresponding machine is ready;;;;error weil worng match.... seach for differet solution
 ;?r_o <-(order_status (id ?last_robo_order)(state ?r_ostate) (next_step ?r_next) (start_d_time ?r_start) (last_d_time ?r_last) (prio ?r_prio))
 ;?m_o <-(order_status (id ?last_machine_order)(state ?m_ostate) (next_step ?m_next) (start_d_time ?m_start) (last_d_time ?m_last) (prio ?m_prio))
 =>
 (retract ?rt)
-(if (eq ?hid_oid 42);init
+(if (< ?it 8); (eq ?hid_oid 42);init
     then
     (switch ?robo_id
      (case 1 then
@@ -159,62 +255,3 @@
     (retract ?o_state)
 )
 
-(defrule waitforfinish_machine; does not fire why? if state is variable it fires exactly once, but too early
-;wron machine bound conection with line 100
-?machine_s <- (machine_status (name ?m_name) (task ?m_task) (order ?m_order) (pos ?m_pos))
-(test (> ?m_task 0)) 
-(machine (name ?m_name) (state READY-AT-OUTPUT))
-=>
-  (modify ?machine_s (task 0) (pos OUTPUT))
-)
-
-(defrule waitforfinish_robo
-    ;?d <- (do (id ?id) (task ?t-id))
-    ;?b <- (robo_busy (id ?id))
-    ?robo_s <- (robo_status (id ?id) (task ?robo_task) (order ?robo_order) (pos ?pos) (pos_at_waypoint ?pos_wp) (des ?des) (des_at_waypoint ?des_wp))
-    (test (> ?robo_task 0)) ;; busy check
-    ?machine_s <- (machine_status (name ?m_name) (task ?m_task) (order ?m_order));TODO ?name müsste pos für binding (update), klappt dann aber bei retrive nicht
-    (test (or (eq ?m_name ?des) (eq ?m_name ?pos)))
-    ?order_s <- (order_status (id ?order_oid) (state ?order_state))
-    (test (or (eq ?robo_order 0) (eq ?robo_order 40) (eq ?robo_order ?order_oid)))
-    (protobuf-msg (type "llsf_msgs.AgentTask") (msg-type ?msg-type) (client-type PEER) (ptr ?msg))
-=>
-    (bind ?robo_id (pb-field-value ?msg "robot_id"))
-    (bind ?task_id (pb-field-value ?msg "task_id"))
-    (bind ?success (pb-field-value ?msg "successful"))
-    (if (and (eq ?robo_id ?id) (eq ?task_id ?robo_task) (eq ?success TRUE)) ;(eq ?task_id ?t-id)
-    then
-        ;(retract ?d)
-        ;(retract ?b)
-        ;(assert (done (done_t_id ?t-id)))
-        (if (not (eq ?des EMPTY));; aka was movment
-            then
-                (modify ?robo_s (pos ?des) (pos_at_waypoint ?des_wp) (des EMPTY) (des_at_waypoint EMPTY)) ;pos = des; pos_wp =des_wp, des, des_wp = ""
-            else ; NO MOVEMENT
-                (if (eq ?robo_order 0);; aka was retrive
-                    then
-                        (if (not (eq ?m_order 0))
-                            then (modify ?robo_s (order ?m_order))
-                            else (modify ?robo_s (order 40))
-                        )
-                        (modify ?machine_s (order 0))
-                        (modify ?machine_s (pos empty))
-                        ;update order status
-                
-                    else ; was deliver        
-                        (modify ?machine_s (order ?robo_order))
-                        (modify ?robo_s (order 0))
-                        (modify ?order_s (state ?pos))
-
-                )     
-        )
-        (modify ?robo_s (task 0))
-        (assert (request_task (id ?id) (last_task ?robo_task) (robo_order ?robo_order)(machine_order ?m_order)))
-
-        ;(assert (done (done_t_id ?task))) still needed?
-        ;(printout green "TASK DONE"  crlf)
-        ;else
-        ;    (printout green ?robo_id ?task_id ?success  crlf)
-        ;    (printout green ?id ?t-id  crlf)
-        )
-    )
