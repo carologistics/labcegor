@@ -1,6 +1,7 @@
 (defrule init_all
 (init_moves)
 =>
+    (assert (order_status (id 0) (prio 0)))
     (assert (order_status (id 42) (prio 0)))
     (assert (order_status (id 40) (state NONE) (prio 0) (complexity C0)))
     (assert (init_it (id 1) (iteration 1)))
@@ -9,6 +10,9 @@
     (assert (request_task (id 3) (last_task 3000)))
     (assert (request_task (id 2) (last_task 2000)))
     (assert (request_task (id 1) (last_task 1000)))
+    (assert (order_colors (id 0)))
+    (assert (order_colors (id 42)))
+    (assert (order_colors (id 40)))
 )
 
 (defrule waitforfinish_machine; does not fire why? if state is variable it fires exactly once, but too early
@@ -153,7 +157,8 @@
 ?robo_s <- (robo_status (id ?robo_id) (task ?r_task) (order ?r_order) (pos ?pos) (pos_at_waypoint ?pos_wp) (des ?des))
 (test (or (eq ?m_name ?pos) (eq ?m_name ?des) (eq ?pos START)))
 ;(test (or (not (and (eq ?m_name ?pos) (eq ?m_pos OUTPUT))) (and (eq ?pos_wp OUTPUT) (eq ?m_name ?pos)))) ;robo not at a output, but if the coresponding machine is ready;;;;error weil worng match.... seach for differet solution
-;?r_o <-(order_status (id ?last_robo_order)(state ?r_ostate) (next_step ?r_next) (start_d_time ?r_start) (last_d_time ?r_last) (prio ?r_prio))
+?r_o <-(order_status (id ?last_robo_order) (state ?r_ostate) (next_step ?r_next))
+?order_colors <- (order_colors (id ?last_robo_order) (base ?order_base) (ring_1 ?order_r1) (ring_2 ?order_r2) (ring_3 ?order_r2) (cap ?order_cap))
 ;?m_o <-(order_status (id ?last_machine_order)(state ?m_ostate) (next_step ?m_next) (start_d_time ?m_start) (last_d_time ?m_last) (prio ?m_prio))
 =>
 (retract ?rt)
@@ -166,7 +171,7 @@
                 (assert (instruct (machine M-BS) (operation OUTPUT) (color ?hp_base) (task_id  1) (oder_id ?hp_oid)));;adapt to order
                 (assert (action (a_type "m") (id 1) (machine M-BS) (io OUTPUT) (task_id (+ ?last_robo_task 1))))
                 (modify ?init_it (iteration 8))
-                (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-BS) (des_at_waypoint OUTPUT))
+                (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-BS) (des_at_waypoint OUTPUT) (order ?hp_oid))
         )
      )
      (case (oneof ?robo_id 2 3) then ;;TODO schöner frage Tarki
@@ -221,12 +226,33 @@
     else
     (switch ?robo_id
         (case 1 then
-            (if (and (eq ?m_task 0) (eq ?m_pos OUTPUT))
-                    then
-                        (assert (action (id ?robo_id) (a_type "r") (machine ?m_name) (io OUTPUT) (task_id (+ ?last_robo_task 1))));needs finish of machine - if machine status task 0 pos out for the machine the robo is sanding
-                        (modify ?robo_s (task (+ ?last_robo_task 1)))
-                    else
-                        (assert (request_task (id ?robo_id) (last_task ?last_robo_task) (robo_order ?last_robo_order)))
+            (if (and (eq ?m_task 0) (eq ?m_pos OUTPUT)); machine ready
+            then
+                (if (eq ?r_order 0) ; robo has no order
+                then
+                    (assert (action (id ?robo_id) (a_type "r") (machine ?m_name) (io OUTPUT) (task_id (+ ?last_robo_task 1))));needs finish of machine - if machine status task 0 pos out for the machine the robo is sanding
+                    (modify ?robo_s (task (+ ?last_robo_task 1)))
+                )
+            else
+                (if (eq ?r_order 0) ;robo ready but machitne not
+                then
+                    (assert (request_task (id ?robo_id) (last_task ?last_robo_task) (robo_order ?last_robo_order)))
+
+                else ;machine not ready (anymore) - robo has retrived
+                    (if (eq ?r_ostate DONE)
+                        then 
+                        ;grab new order (TODO)
+                        else
+                        (if (and (eq ?pos OUTPUT) (not (eq ?last_robo_order 0)))
+                        then
+                            (assert (action (id ?robo_id) (a_type "m") (machine M-CS2) (io INPUT) (task_id (+ ?last_robo_task 1))))
+                            (modify ?robo_s (task (+ ?last_robo_task 1)))
+                        )
+                        ;finish current order
+
+                    )
+                )
+
             )
         )
         (case 2 then

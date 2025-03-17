@@ -31,11 +31,11 @@
 )
 (deftemplate order_colors
 (slot id (type INTEGER))
-(slot base (type SYMBOL))
-(slot ring_1 (type SYMBOL))
-(slot ring_2 (type SYMBOL))
-(slot ring_3 (type SYMBOL))
-(slot cap (type SYMBOL))
+(slot base (type SYMBOL) (default EMPTY))
+(slot ring_1 (type SYMBOL) (default EMPTY))
+(slot ring_2 (type SYMBOL) (default EMPTY) )
+(slot ring_3 (type SYMBOL) (default EMPTY) )
+(slot cap (type SYMBOL)(default EMPTY) )
 )
 (deftemplate perprocess_ring_colors 
 (slot id (type INTEGER))
