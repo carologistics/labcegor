@@ -93,6 +93,7 @@
   (order (id ?id) (name ?name) (workpiece ?workpiece) (complexity ?complexity) (base-color ?base-color) (ring-colors ?ring-colors) (cap-color ?cap-color) (quantity-requested ?quantity-requested) (quantity-delivered ?quantity-delivered) (quantity-delivered-other ?quantity-delivered-other) (delivery-begin ?delivery-begin) (delivery-end ?delivery-end))
   (not (adjustable_order (id ?id)))
   => 
+    (printout yellow "assign order " ?id crlf)
   (assert (adjustable_order (id ?id) (name ?name) (workpiece ?workpiece) (complexity ?complexity) (base-color ?base-color) (ring-colors ?ring-colors) (cap-color ?cap-color) (quantity-requested ?quantity-requested) (quantity-delivered ?quantity-delivered) (quantity-delivered-other ?quantity-delivered-other) (delivery-begin ?delivery-begin) (delivery-end ?delivery-end)))
   ; ?adjustable_order <- ((id ?adjustable_id) (name ?adjustable_name) (workpiece ?adjustable_workpiece) (complexity ?adjustable_complexity) (base-color ?adjustable_base-color) (ring-colors ?adjustable_ring-colors) (cap-color ?adjustable_cap-color) (quantity-requested ?adjustable_quantity-requested) (quantity-delivered ?adjustable_quantity-delivered) (quantity-delivered-other ?adjustable_quantity-delivered-other) (delivery-begin ?adjustable_delivery-begin) (delivery-end ?adjustable_delivery-end) (competitiv ?adjustable_competitiv))
 )
