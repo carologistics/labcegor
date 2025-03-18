@@ -161,4 +161,20 @@
     (modify ?tasks_overview (state IDLE))
     ; (printout green "where should it go now? " ?target " " ?m_one " " ?m_two " soooo?: " (check_payment ?m_one ?m_two) crlf)
   )
+  (if (and (eq ?robot_id ?rid) (eq ?task_id ?tid) (eq ?successful FALSE) (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cd FALSE)) then 
+    ; TODO check ?target == "NONE" and do something else if thats the case
+    (modify ?machine_task_overview (machine_task NOT-SET))
+    (modify ?tasks_overview (can_move TRUE))
+    (modify ?tasks_overview (can_retrieve FALSE))
+    (modify ?tasks_overview (can_deliver TRUE))
+    (printout yellow "Robot " ?rid " has probably a cap carrier in its claw " ?robot_state " " ?mot " " ?mat " " ?mounted " " crlf)
+    (printout green "This is hacky af Payment where should it move? " ?target " "  crlf)
+    (if (or (not (or (eq ?mot M-CS1) (eq ?mot M-CS2))) (eq ?mounted TRUE) )then
+      (modify ?tasks_overview (move_target ?target))
+      (modify ?tasks_overview (machine_target "Slide"))
+    )
+    (modify ?tasks_overview (task_id (+ ?task_id 1)))
+    (modify ?tasks_overview (state HOLDING))
+    (modify ?check_robot (did_something FALSE))
+  )
 )
