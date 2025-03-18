@@ -172,6 +172,11 @@
                 (assert (action (a_type "m") (id 1) (machine M-BS) (io OUTPUT) (task_id (+ ?last_robo_task 1))))
                 (modify ?init_it (iteration 8))
                 (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-BS) (des_at_waypoint OUTPUT) (order ?hp_oid))
+                (if (not (eq ring_1 empty)) 
+                 then (modify ?hp_o (next_step RING_1))
+                 else
+                 (modify ?hp_o (next_step CAP))
+                )
         )
      )
      (case (oneof ?robo_id 2 3) then ;;TODO schöner frage Tarki
@@ -228,13 +233,13 @@
         (case 1 then
             (if (and (eq ?m_task 0) (eq ?m_pos OUTPUT)); machine ready
             then
-                (if (eq ?r_order 0) ; robo has no order
+                (if (eq ?r_task 0) ; robo has no order
                 then
                     (assert (action (id ?robo_id) (a_type "r") (machine ?m_name) (io OUTPUT) (task_id (+ ?last_robo_task 1))));needs finish of machine - if machine status task 0 pos out for the machine the robo is sanding
                     (modify ?robo_s (task (+ ?last_robo_task 1)))
                 )
             else
-                (if (eq ?r_order 0) ;robo ready but machitne not
+                (if (eq ?r_task 0) ;robo ready but machitne not
                 then
                     (assert (request_task (id ?robo_id) (last_task ?last_robo_task) (robo_order ?last_robo_order)))
 
@@ -245,7 +250,7 @@
                         else
                         (if (and (eq ?pos OUTPUT) (not (eq ?last_robo_order 0)))
                         then
-                            (assert (action (id ?robo_id) (a_type "m") (machine M-CS2) (io INPUT) (task_id (+ ?last_robo_task 1))))
+                            (assert (action (id ?robo_id) (a_type "m") (machine M-DS2) (io INPUT) (task_id (+ ?last_robo_task 1))))
                             (modify ?robo_s (task (+ ?last_robo_task 1)))
                         )
                         ;finish current order
