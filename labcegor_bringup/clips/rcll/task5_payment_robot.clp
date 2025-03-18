@@ -1,7 +1,7 @@
 ; ==================================================================================
 ; Manage ROBOTS 3 for Payment
 ; ==================================================================================
-(defrule send-robot-three-to-pickup
+(defrule send-robot-payment-to-pickup
   (game-state (phase PRODUCTION))
   ?tasks_overview <- (tasks_overview (robot_id ?rid) (robot_type PAYMENT) (task_id ?tid) (can_move TRUE) (can_retrieve FALSE) (can_deliver ?cd) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE))
@@ -30,7 +30,7 @@
   )
 )
 
-(defrule robot-three-pickup-base
+(defrule robot-payment-pickup-base
   (game-state (phase PRODUCTION))
   ?tasks_overview <- (tasks_overview (robot_id ?rid) (robot_type PAYMENT) (task_id ?tid) (can_move FALSE) (can_retrieve TRUE) (can_deliver FALSE) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE))
@@ -54,7 +54,7 @@
   )
 )
 
-(defrule robot-three-deliver-base
+(defrule robot-payment-deliver-base
   (game-state (phase PRODUCTION))
   ?tasks_overview <- (tasks_overview (robot_id ?rid) (robot_type PAYMENT) (task_id ?tid) (can_move FALSE) (can_retrieve FALSE) (can_deliver TRUE) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE))
@@ -74,7 +74,7 @@
 ; ==========
 ; ROBOT 3 for Payment
 ; ==========
-(defrule check-robot_three
+(defrule check-robot_payment
   (game-state (phase PRODUCTION))
   ?tasks_overview <- (tasks_overview (robot_id ?rid) (robot_type PAYMENT) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?mpi_one <- (machine_task_overview (machine_id M-RS1) (payment ?m_one))
@@ -151,7 +151,7 @@
       )
       (if (eq ?target NONE) then
         (modify ?tasks_overview (robot_type HELPER))
-        ; (printout red "Robot Three should start something different now." crlf)
+        ; (printout red "Robot payment should start something different now." crlf)
       )
       (modify ?tasks_overview (move_target M-BS))
     )
