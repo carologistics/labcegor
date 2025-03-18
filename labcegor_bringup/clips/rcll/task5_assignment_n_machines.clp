@@ -20,7 +20,7 @@
 
 
 (defrule make_orders_change_again
-  (adjustable_order (id ?oid) (name NOT-SET))
+  ?adjustable_order <- (adjustable_order (id ?oid) (name NOT-SET))
   (order (id ?oid) (name ?name) (workpiece ?workpiece) (complexity ?complexity) (base-color ?base-color) (ring-colors ?ring-colors) (cap-color ?cap-color) (quantity-requested ?quantity-requested) (quantity-delivered ?quantity-delivered) (quantity-delivered-other ?quantity-delivered-other) (delivery-begin ?delivery-begin) (delivery-end ?delivery-end))
   => 
   (printout yellow "assign order " ?oid " " crlf)
