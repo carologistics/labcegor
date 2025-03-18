@@ -163,7 +163,7 @@
       (bind ?cap-color "Bring_it_home") ; next delivery point should be the DS
       ; (setf (?order:cap-color) ?cap-color)
 
-      (modify ?order (cap-colors ?cap-colors))
+      (modify ?order (cap-color ?cap-color))
     )
 
     (if (> (length$ ?ring-colors) 0) then 
@@ -176,7 +176,7 @@
       )
       ; (modify (?order:ring-colors) ?ring-colors)
 
-      (modify ?order (ring-color ?ring-color))
+      (modify ?order (ring-colors ?ring-colors))
     )
     return ?target_color
   )
