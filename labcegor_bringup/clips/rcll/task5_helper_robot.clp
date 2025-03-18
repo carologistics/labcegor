@@ -36,7 +36,7 @@
   ?machine_task_overview <- (machine_task_overview (machine_id ?mot) (machine_task ?task) (payment ?payment) (mounted ?mounted))
   (not (order_from_machine (robot_id ?rid) ))
   =>
-  (printout red "ROBOT Pickup " ?rid " " ?robot_state " " ?mot " " ?mat " " ?s ?peer-id crlf)
+  (printout red "ROBOT Pickup " ?rid " " ?robot_state " " ?mot " " ?mat " " ?s " " ?mounted ?peer-id crlf)
   (if (and (or (eq ?mot M-CS1) (eq ?mot M-CS2)) (eq ?mounted FALSE)) then
     (printout green "helper retrieve" crlf)
     (send_retrieve_from_cmd ?rid ?mot "Shelf" ?peer-id ?tid)
@@ -87,7 +87,7 @@
   (bind ?successful (pb-field-value ?msg "successful"))
   (bind ?target (check_payment ?m_one ?m_two))
   
-  ; (printout red "robot helper did something " ?task_id " " ?tid " " ?cm  " " ?cr  " " ?cd  " " ?mot  " " ?mat  " " ?robot_state " " ?target crlf)
+  (printout red "robot helper did something " ?task_id " " ?tid " " ?cm  " " ?cr  " " ?cd  " " ?mot  " " ?mat  " " ?robot_state " " ?target crlf)
   ; It has moved
   (if (and (eq ?robot_id ?rid) (eq ?task_id ?tid) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE)) then 
     (modify ?tasks_overview (can_move FALSE))
