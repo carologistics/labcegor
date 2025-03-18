@@ -115,7 +115,7 @@
     (printout green "Helper where should it move? " ?target " "  crlf)
     (if (or (not (or (eq ?mot M-CS1) (eq ?mot M-CS2))) (eq ?mounted TRUE) )then
       (printout green "should move know to:" ?target crlf)
-      (modify ?tasks_overview (move_target M-RS1))
+      (modify ?tasks_overview (move_target M-RS2))
       (modify ?tasks_overview (machine_target "Slide"))
     )
     (if (and (or (eq ?mot M-CS1) (eq ?mot M-CS2)) (eq ?mounted FALSE) )then
