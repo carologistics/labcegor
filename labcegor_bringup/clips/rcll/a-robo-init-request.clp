@@ -153,12 +153,12 @@
 (order (id ?hp_oid) (base-color ?hp_base) (ring-colors $?hp_colors) (cap-color ?hp_cap))
 ?hid_o <- (order_status (id ?hid_oid) (state ?hid_ostate) (prio ?hid_prio));order with highest id
 (not (order_status (id ?id_1&:(< ?hid_oid ?id_1))))
-?machine_s <- (machine_status (name ?m_name) (task ?m_task) (pos ?m_pos))
+?machine_s <- (machine_status (name ?m_name) (task ?m_task) (order ?m_order) (pos ?m_pos))
 ?robo_s <- (robo_status (id ?robo_id) (task ?r_task) (order ?r_order) (pos ?pos) (pos_at_waypoint ?pos_wp) (des ?des))
 (test (or (eq ?m_name ?pos) (eq ?m_name ?des) (eq ?pos START)))
 ;(test (or (not (and (eq ?m_name ?pos) (eq ?m_pos OUTPUT))) (and (eq ?pos_wp OUTPUT) (eq ?m_name ?pos)))) ;robo not at a output, but if the coresponding machine is ready;;;;error weil worng match.... seach for differet solution
-?r_o <-(order_status (id ?last_robo_order) (state ?r_ostate) (next_step ?r_next))
-?order_colors <- (order_colors (id ?last_robo_order) (base ?order_base) (ring_1 ?order_r1) (ring_2 ?order_r2) (ring_3 ?order_r2) (cap ?order_cap))
+?r_o <-(order_status (id ?last_robo_order) (state ?r_ostate) (next_step ?r_next));;matched z.t. auf order 0 - after retrive activate the machine order matching and ubdate runnig
+?r_order_colors <- (order_colors (id ?last_robo_order) (base ?order_base) (ring_1 ?order_r1) (ring_2 ?order_r2) (ring_3 ?order_r2) (cap ?order_cap))
 ;?m_o <-(order_status (id ?last_machine_order)(state ?m_ostate) (next_step ?m_next) (start_d_time ?m_start) (last_d_time ?m_last) (prio ?m_prio))
 =>
 (retract ?rt)
@@ -172,7 +172,7 @@
                 (assert (action (a_type "m") (id 1) (machine M-BS) (io OUTPUT) (task_id (+ ?last_robo_task 1))))
                 (modify ?init_it (iteration 8))
                 (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-BS) (des_at_waypoint OUTPUT) (order ?hp_oid))
-                (if (not (eq ring_1 empty)) 
+                (if (not (eq ring_1 EMPTY)) 
                  then (modify ?hp_o (next_step RING_1))
                  else
                  (modify ?hp_o (next_step CAP))
@@ -236,10 +236,10 @@
                 (if (eq ?r_task 0) ; robo has no order
                 then
                     (assert (action (id ?robo_id) (a_type "r") (machine ?m_name) (io OUTPUT) (task_id (+ ?last_robo_task 1))));needs finish of machine - if machine status task 0 pos out for the machine the robo is sanding
-                    (modify ?robo_s (task (+ ?last_robo_task 1)))
+                    (modify ?robo_s (task (+ ?last_robo_task 1))(order 0))
                 )
             else
-                (if (eq ?r_task 0) ;robo ready but machitne not
+                (if (eq ?r_order 0) ;robo ready but machitne not
                 then
                     (assert (request_task (id ?robo_id) (last_task ?last_robo_task) (robo_order ?last_robo_order)))
 
@@ -248,9 +248,9 @@
                         then 
                         ;grab new order (TODO)
                         else
-                        (if (and (eq ?pos OUTPUT) (not (eq ?last_robo_order 0)))
+                        (if (and (eq ?pos_wp OUTPUT) (not (eq ?last_robo_order 0)))
                         then
-                            (assert (action (id ?robo_id) (a_type "m") (machine M-DS2) (io INPUT) (task_id (+ ?last_robo_task 1))))
+                            (assert (action (id ?robo_id) (a_type "m") (machine M-DS) (io INPUT) (task_id (+ ?last_robo_task 1))))
                             (modify ?robo_s (task (+ ?last_robo_task 1)))
                         )
                         ;finish current order
