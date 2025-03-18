@@ -176,7 +176,7 @@
       )
       ; (modify (?order:ring-colors) ?ring-colors)
 
-      (modify ?order (ring-colors ?ring-colors))
+      (modify ?order (ring-color ?ring-color))
     )
     return ?target_color
   )
