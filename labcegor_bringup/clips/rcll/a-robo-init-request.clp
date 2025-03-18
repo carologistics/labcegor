@@ -144,7 +144,7 @@
       else (not ?v)))
 
 (defrule request_task
-?rt <- (request_task (id ?robo_id) (last_task ?last_robo_task) (robo_order ?last_robo_order)) ;(machine_order ?last_machine_order)
+?rt <- (request_task (id ?robo_id) (last_task ?last_robo_task) (robo_order ?last_robo_order) (machine_order ?last_machine_order)) ;(machine_order ?last_machine_order)
 ?init_it <- (init_it (id ?robo_id) (iteration ?it))
 ;(test (<= ?it 7))
 ;(not (newOrder)) ;;think of new check
@@ -157,9 +157,9 @@
 ?robo_s <- (robo_status (id ?robo_id) (task ?r_task) (order ?r_order) (pos ?pos) (pos_at_waypoint ?pos_wp) (des ?des))
 (test (or (eq ?m_name ?pos) (eq ?m_name ?des) (eq ?pos START)))
 ;(test (or (not (and (eq ?m_name ?pos) (eq ?m_pos OUTPUT))) (and (eq ?pos_wp OUTPUT) (eq ?m_name ?pos)))) ;robo not at a output, but if the coresponding machine is ready;;;;error weil worng match.... seach for differet solution
-?r_o <-(order_status (id ?last_robo_order) (state ?r_ostate) (next_step ?r_next));;matched z.t. auf order 0 - after retrive activate the machine order matching and ubdate runnig
+?r_o <-(order_status (id ?last_robo_order) (state ?r_ostate) (next_step ?r_next) (next_color ?r_next_c))
 ?r_order_colors <- (order_colors (id ?last_robo_order) (base ?order_base) (ring_1 ?order_r1) (ring_2 ?order_r2) (ring_3 ?order_r2) (cap ?order_cap))
-;?m_o <-(order_status (id ?last_machine_order)(state ?m_ostate) (next_step ?m_next) (start_d_time ?m_start) (last_d_time ?m_last) (prio ?m_prio))
+?m_o <-(order_status (id ?last_machine_order)(state ?m_ostate) (next_step ?m_next)(next_color ?m_next_c))
 =>
 (retract ?rt)
 (if (< ?it 8); (eq ?hid_oid 42);init
@@ -172,10 +172,10 @@
                 (assert (action (a_type "m") (id 1) (machine M-BS) (io OUTPUT) (task_id (+ ?last_robo_task 1))))
                 (modify ?init_it (iteration 8))
                 (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-BS) (des_at_waypoint OUTPUT) (order ?hp_oid))
-                (if (not (eq ring_1 EMPTY)) 
-                 then (modify ?hp_o (next_step RING_1))
+                (if (not (eq ?order_r1 EMPTY)) ;richtig gematchedt? nur weil init?
+                 then (modify ?hp_o (next_step RING_1) (next_color ?order_r1))
                  else
-                 (modify ?hp_o (next_step CAP))
+                 (modify ?hp_o (next_step CAP) (next_color ?order_cap))
                 )
         )
      )
@@ -248,10 +248,29 @@
                         then 
                         ;grab new order (TODO)
                         else
-                        (if (and (eq ?pos_wp OUTPUT) (not (eq ?last_robo_order 0)))
+                        (if (and (eq ?pos_wp OUTPUT) (not (eq ?last_machine_order 0))) ;target decition not succesfull TODO maybe wrongly set line 175
                         then
-                            (assert (action (id ?robo_id) (a_type "m") (machine M-DS) (io INPUT) (task_id (+ ?last_robo_task 1))))
-                            (modify ?robo_s (task (+ ?last_robo_task 1)))
+                            (if (or (eq ?m_next RING_1) (eq ?m_next RING_2) (eq ?m_next RING_3))
+                                then
+                                (if (or (eq ?m_next_c RING_ORANGE) (eq ?m_next_c RING_GREEN))
+                                 then
+                                    (assert (action (id ?robo_id) (a_type "m") (machine M-RS1) (io INPUT) (task_id (+ ?last_robo_task 1))))
+                                    (modify ?robo_s (task (+ ?last_robo_task 1)))
+                                else 
+                                    (assert (action (id ?robo_id) (a_type "m") (machine M-RS2) (io INPUT) (task_id (+ ?last_robo_task 1))))
+                                    (modify ?robo_s (task (+ ?last_robo_task 1)))
+                                )
+                            )
+                        else ;next is cap
+                            then
+                                (if (eq ?m_next_c CAP_GRAY)
+                                 then
+                                    (assert (action (id ?robo_id) (a_type "m") (machine M-CS1) (io INPUT) (task_id (+ ?last_robo_task 1))))
+                                    (modify ?robo_s (task (+ ?last_robo_task 1)))
+                                else 
+                                    (assert (action (id ?robo_id) (a_type "m") (machine M-CS2) (io INPUT) (task_id (+ ?last_robo_task 1))))
+                                    (modify ?robo_s (task (+ ?last_robo_task 1)))
+                                )
                         )
                         ;finish current order
 

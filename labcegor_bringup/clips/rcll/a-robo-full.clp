@@ -3,6 +3,7 @@
   (slot state (type SYMBOL)); (allowed-values RC BS RS1 RS2 CS1 CS2 DE))
   (slot next_step (type SYMBOL) (allowed-values BASE RING_1 RING_2 RING_3 CAP DELIVER NONE))
   (slot complexity (type SYMBOL))
+  (slot next_color (type SYMBOL) (default EMPTY))
   (slot start_d_time (type INTEGER))
   (slot last_d_time (type INTEGER))
   (slot prio (type INTEGER))
