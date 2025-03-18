@@ -87,7 +87,7 @@
   (bind ?successful (pb-field-value ?msg "successful"))
   (bind ?target (check_payment ?m_one ?m_two))
   
-  (printout red "robot helper did something " ?task_id " " ?tid " " ?cm  " " ?cr  " " ?cd  " " ?mot  " " ?mat  " " ?robot_state " " ?target crlf)
+  (printout red "robot helper did something " ?task_id " " ?tid " " ?cm  " " ?cr  " " ?cd  " " ?mot  " " ?mat  " " ?robot_state " " ?target " " (or (not (or (eq ?mot M-CS1) (eq ?mot M-CS2))) (eq ?mounted TRUE) ) " CS?:" (or (eq ?mot M-CS1) (eq ?mot M-CS2)) " mounted?: " (eq ?mounted TRUE) crlf)
   ; It has moved
   (if (and (eq ?robot_id ?rid) (eq ?task_id ?tid) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE)) then 
     (modify ?tasks_overview (can_move FALSE))
