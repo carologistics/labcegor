@@ -42,6 +42,7 @@
   (printout red "ROBOT Pickup " ?rid " " ?robot_state " " ?mot " " ?mat " " ?s ?peer-id crlf)
 
   (if (and (or (eq ?mot M-CS1) (eq ?mot M-CS2)) (eq ?mounted FALSE)) then
+    (printout green "payment retrieve" crlf)
     (send_retrieve_from_cmd ?rid ?mot "Shelf" ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
     (modify ?tasks_overview (state HOLDING))

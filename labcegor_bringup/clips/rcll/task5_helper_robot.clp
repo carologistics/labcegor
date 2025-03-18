@@ -38,6 +38,7 @@
   =>
   (printout red "ROBOT Pickup " ?rid " " ?robot_state " " ?mot " " ?mat " " ?s ?peer-id crlf)
   (if (and (or (eq ?mot M-CS1) (eq ?mot M-CS2)) (eq ?mounted FALSE)) then
+    (printout green "helper retrieve" crlf)
     (send_retrieve_from_cmd ?rid ?mot "Shelf" ?peer-id ?tid)
     (modify ?tasks_overview (machine_target "Input"))
     (modify ?check_robot (did_something TRUE))
