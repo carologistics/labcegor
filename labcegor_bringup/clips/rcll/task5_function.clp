@@ -181,7 +181,6 @@
     )
   )
   (printout yellow " Color" (nth$ 1 ?ring-colors) " " (length$ ?ring-colors) " " (eq (nth$ 1 ?ring-colors) nil) crlf)
-  (modify ?order (ring-colors ?ring-colors))
   return ?target_color
 )
 
