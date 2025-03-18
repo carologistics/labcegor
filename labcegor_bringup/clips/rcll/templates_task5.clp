@@ -47,6 +47,26 @@
   (slot operation (type SYMBOL))
 )
 
+
+(deftemplate adjustable_order
+  (slot id (type INTEGER))
+  (slot name (type SYMBOL))
+  (slot workpiece (type SYMBOL))
+  (slot complexity (type SYMBOL))
+
+  (slot base-color (type SYMBOL))
+  (multislot ring-colors (type SYMBOL))
+  (slot cap-color (type SYMBOL))
+
+  (slot quantity-requested (type INTEGER))
+  (slot quantity-delivered (type INTEGER))
+  (slot quantity-delivered-other (type INTEGER))
+
+  (slot delivery-begin (type INTEGER))
+  (slot delivery-end (type INTEGER))
+  (slot competitive (type SYMBOL))
+)
+
 ; facts
 (deffacts robottasks
   (tasks_overview (robot_id 1) (robot_type PRODUCTION) (task_id 1) (can_move TRUE) (can_retrieve FALSE) (can_deliver FALSE) (state IDLE) (move_target M-BS) (machine_target "Input" ))

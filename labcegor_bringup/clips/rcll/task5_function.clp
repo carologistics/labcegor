@@ -147,12 +147,8 @@
 
 ; check order for next step
 (deffunction get_next_order_color (?oid)
-  (bind ?base-color "")
-  (bind ?ring-colors "")
-  (bind ?cap-color "")
-  (bind ?target_color "")
   (do-for-fact
-    ((?order order))
+    ((?order adjustable_order))
     (eq ?order:id ?oid)
     (bind ?name ?order:name)
     (bind ?base-color ?order:base-color)
@@ -180,7 +176,6 @@
 
     )
   )
-  (printout yellow " Color" (nth$ 1 ?ring-colors) " " (length$ ?ring-colors) " " (eq (nth$ 1 ?ring-colors) nil) crlf)
   return ?target_color
 )
 
