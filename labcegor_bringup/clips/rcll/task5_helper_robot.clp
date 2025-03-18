@@ -115,7 +115,7 @@
     (printout green "Helper where should it move? " ?target " "  crlf)
     (if (or (not (or (eq ?mot M-CS1) (eq ?mot M-CS2))) (eq ?mounted TRUE) )then
       (printout green "should move know to:" ?target crlf)
-      (modify ?tasks_overview (move_target ?target))
+      (modify ?tasks_overview (move_target M-RS1))
       (modify ?tasks_overview (machine_target "Slide"))
     )
     (if (and (or (eq ?mot M-CS1) (eq ?mot M-CS2)) (eq ?mounted FALSE) )then
@@ -155,6 +155,7 @@
     (modify ?tasks_overview (state IDLE))
     ; (printout green "where should it go now? " ?target " " ?m_one " " ?m_two " soooo?: " (check_payment ?m_one ?m_two) crlf)
   )
+  ; hacky shit
   (if (and (eq ?robot_id ?rid) (eq ?task_id ?tid) (eq ?successful FALSE) (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cd FALSE)) then 
     ; TODO check ?target == "NONE" and do something else if thats the case
     (modify ?machine_task_overview (machine_task NOT-SET))
@@ -170,5 +171,15 @@
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (modify ?tasks_overview (state HOLDING))
     (modify ?check_robot (did_something FALSE))
+  )
+  ; FALSE FALSE FALSE TRUE M-RS2 Slide IDLE
+  (if (and (eq ?robot_id ?rid) (eq ?task_id ?tid) (eq ?successful FALSE) (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE) (eq ?robot_state IDLE) (eq ?machine_target Slide)) then
+    (modify ?tasks_overview (can_move TRUE))
+    (modify ?tasks_overview (can_retrieve FALSE))
+    (modify ?tasks_overview (can_deliver FALSE))
+    (modify ?tasks_overview (task_id (+ ?task_id 1)))
+    (modify ?tasks_overview (state IDLE))
+    (modify ?check_robot (did_something FALSE))
+    (modify ?tasks_overview (move_target M-SS))
   )
 )

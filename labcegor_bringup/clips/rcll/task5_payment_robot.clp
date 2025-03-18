@@ -177,4 +177,14 @@
     (modify ?tasks_overview (state HOLDING))
     (modify ?check_robot (did_something FALSE))
   )
+  ; FALSE FALSE FALSE TRUE M-RS2 Slide IDLE
+  (if (and (eq ?robot_id ?rid) (eq ?task_id ?tid) (eq ?successful FALSE) (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE) (eq ?robot_state IDLE) (eq ?machine_target Slide)) then
+    (modify ?tasks_overview (can_move TRUE))
+    (modify ?tasks_overview (can_retrieve FALSE))
+    (modify ?tasks_overview (can_deliver FALSE))
+    (modify ?tasks_overview (task_id (+ ?task_id 1)))
+    (modify ?tasks_overview (state IDLE))
+    (modify ?check_robot (did_something FALSE))
+    (modify ?tasks_overview (move_target C-SS))
+  )
 )
