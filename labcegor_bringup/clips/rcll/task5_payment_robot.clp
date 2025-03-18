@@ -32,7 +32,7 @@
 
 (defrule robot-three-pickup-base
   (game-state (phase PRODUCTION))
-  ?tasks_overview <- (tasks_overview (robot_id ?rid) (task_id ?tid) (can_move FALSE) (can_retrieve TRUE) (can_deliver FALSE) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
+  ?tasks_overview <- (tasks_overview (robot_id ?rid) (robot_type PAYMENT) (task_id ?tid) (can_move FALSE) (can_retrieve TRUE) (can_deliver FALSE) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE))
   (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
   (machine (name ?mot) (state ?s))
@@ -56,7 +56,7 @@
 
 (defrule robot-three-deliver-base
   (game-state (phase PRODUCTION))
-  ?tasks_overview <- (tasks_overview (robot_id ?rid) (task_id ?tid) (can_move FALSE) (can_retrieve FALSE) (can_deliver TRUE) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
+  ?tasks_overview <- (tasks_overview (robot_id ?rid) (robot_type PAYMENT) (task_id ?tid) (can_move FALSE) (can_retrieve FALSE) (can_deliver TRUE) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE))
   (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
   =>

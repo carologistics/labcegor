@@ -29,7 +29,7 @@
 
 (defrule robot-helper-pickup-base
   (game-state (phase PRODUCTION))
-  ?tasks_overview <- (tasks_overview (robot_id ?rid) (task_id ?tid) (can_move FALSE) (can_retrieve TRUE) (can_deliver FALSE) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
+  ?tasks_overview <- (tasks_overview (robot_id ?rid) (robot_type HELPER) (task_id ?tid) (can_move FALSE) (can_retrieve TRUE) (can_deliver FALSE) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE))
   (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
   (machine (name ?mot) (state ?s))
@@ -53,7 +53,7 @@
 
 (defrule robot-helper-deliver-base
   (game-state (phase PRODUCTION))
-  ?tasks_overview <- (tasks_overview (robot_id ?rid) (task_id ?tid) (can_move FALSE) (can_retrieve FALSE) (can_deliver TRUE) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
+  ?tasks_overview <- (tasks_overview (robot_id ?rid) (robot_type HELPER) (task_id ?tid) (can_move FALSE) (can_retrieve FALSE) (can_deliver TRUE) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE))
   (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
   =>
@@ -112,6 +112,7 @@
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_deliver TRUE))
 
+    (printout green "where should it move? " ?target " "  crlf)
     (if (or (not (or (eq ?mot M-CS1) (eq ?mot M-CS2))) (eq ?mounted TRUE) )then
       (printout green "should move know to:" ?target crlf)
       (modify ?tasks_overview (move_target ?target))
