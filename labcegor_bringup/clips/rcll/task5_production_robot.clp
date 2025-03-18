@@ -47,7 +47,7 @@
                                       (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE) (is_assigned TRUE))
   (assigned_order (order_id ?oid) (robot_id ?rid))
-  ?order <- (adjustable_order (id ?oid) (name ?order-name) (base-color ?base-color))
+  ?order <- (order (id ?oid) (name ?order-name) (base-color ?base-color))
   (not (order_from_machine (robot_id ?rid)))
   ; TODO make machine name dependent on move_target
   (machine (name ?machine-name&:(eq ?machine-name (sym-cat ?mot))) (state ?s))
@@ -70,7 +70,7 @@
                           (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE) (is_assigned TRUE))
   (assigned_order (order_id ?oid) (robot_id ?rid))
-  ?order <- (adjustable_order (id ?oid) (name ?order-name) (base-color ?base-color))
+  ?order <- (order (id ?oid) (name ?order-name) (base-color ?base-color))
   (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
   =>
   ; (bind ?color (get_next_order_color ?oid))
@@ -93,7 +93,7 @@
   ?tasks_overview <- (tasks_overview (robot_id ?rid) (robot_type PRODUCTION) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id ?rid) (did_something TRUE) (is_assigned TRUE))
   (assigned_order (order_id ?oid) (robot_id ?rid))
-  ?order <- (adjustable_order (id ?oid) (name ?order-name) (base-color ?base-color) (ring-colors $?ring-colors)); 
+  ?order <- (order (id ?oid) (name ?order-name) (base-color ?base-color) (ring-colors $?ring-colors)); 
   ?mpi_one <- (machine_payment_info (machine_id M-RS1) (money ?m_one))
   ?mpi_two <- (machine_payment_info (machine_id M-RS2) (money ?m_two))
   (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id ?rid) (ptr ?msg))
