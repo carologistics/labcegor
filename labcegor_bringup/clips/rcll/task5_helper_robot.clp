@@ -113,6 +113,7 @@
     (modify ?tasks_overview (can_deliver TRUE))
 
     (if (or (not (or (eq ?mot M-CS1) (eq ?mot M-CS2))) (eq ?mounted TRUE) )then
+      (printout green "should move know to:" ?target crlf)
       (modify ?tasks_overview (move_target ?target))
       (modify ?tasks_overview (machine_target "Slide"))
     )
