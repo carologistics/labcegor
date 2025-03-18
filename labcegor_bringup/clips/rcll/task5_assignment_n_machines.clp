@@ -21,7 +21,7 @@
 
 (defrule make_orders_change_again
   (order (id ?id) (name ?name) (workpiece ?workpiece) (complexity ?complexity) (base-color ?base-color) (ring-colors ?ring-colors) (cap-color ?cap-color) (quantity-requested ?quantity-requested) (quantity-delivered ?quantity-delivered) (quantity-delivered-other ?quantity-delivered-other) (delivery-begin ?delivery-begin) (delivery-end ?delivery-end))
-  ?adjustable_order <- (adjustable_order (id ?id) (name ?adj_name)))
+  ?adjustable_order <- (adjustable_order (id ?id) (name ?adj_name))
   => 
   (printout yellow "assign order " ?id " " ?adj_name crlf)
   ; (retract ?adjustable_order)
