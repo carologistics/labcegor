@@ -112,7 +112,7 @@
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_deliver TRUE))
 
-    (printout green "where should it move? " ?target " "  crlf)
+    (printout green "Helper where should it move? " ?target " "  crlf)
     (if (or (not (or (eq ?mot M-CS1) (eq ?mot M-CS2))) (eq ?mounted TRUE) )then
       (printout green "should move know to:" ?target crlf)
       (modify ?tasks_overview (move_target ?target))
