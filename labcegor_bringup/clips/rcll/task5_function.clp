@@ -164,7 +164,7 @@
       (printout yellow "Cap color should be " ?cap-color crlf)
       (bind ?target_color ?cap-color)
       (bind ?cap-color "Bring_it_home") ; next delivery point should be the DS
-      (modify order (cap-color ?cap-color))
+      (modify ?order (cap-color ?cap-color))
     )
 
     (if (> (length$ ?ring-colors) 0) then 
@@ -175,12 +175,13 @@
       (if (eq (length$ ?ring-colors) 0) then 
         (bind ?ring-colors nil)
       )
+      (modify ?order (ring-colors ?ring-colors))
       ; (modify (?order:ring-colors) ?ring-colors)
 
     )
   )
   (printout yellow " Color" (nth$ 1 ?ring-colors) " " (length$ ?ring-colors) " " (eq (nth$ 1 ?ring-colors) nil) crlf)
-  (modify order (ring-colors ?ring-colors))
+  (modify ?order (ring-colors ?ring-colors))
   return ?target_color
 )
 
