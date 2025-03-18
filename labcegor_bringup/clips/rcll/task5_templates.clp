@@ -75,7 +75,7 @@
   (check_robot (robot_id 1) (did_something FALSE) (is_assigned TRUE) (go_to_next_step TRUE))
   (check_robot (robot_id 2) (did_something FALSE) (is_assigned TRUE) (go_to_next_step TRUE))
   (check_robot (robot_id 3) (did_something FALSE) (is_assigned FALSE) (go_to_next_step TRUE))
-  (assigned_order (order_id 2) (robot_id 1) (ready_for_next_step FALSE))
+  (assigned_order (order_id 1) (robot_id 1) (ready_for_next_step FALSE))
   (assigned_order (order_id 0) (robot_id 2) (ready_for_next_step FALSE));
   (assigned_order (order_id 0) (robot_id 3) (ready_for_next_step FALSE))
 )
