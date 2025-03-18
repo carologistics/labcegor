@@ -147,6 +147,10 @@
 
 ; check order for next step
 (deffunction get_next_order_color (?oid)
+  (bind ?base-color "")
+  (bind ?ring-colors "")
+  (bind ?cap-color "")
+  (bind ?target_color "")
   (do-for-fact
     ((?order order))
     (eq ?order:id ?oid)
@@ -154,16 +158,13 @@
     (bind ?base-color ?order:base-color)
     (bind ?ring-colors ?order:ring-colors)
     (bind ?cap-color ?order:cap-color)
-    (bind ?target_color "")
     (printout green "Order is as follows " ?oid " " ?name " " ?base-color " " ?cap-color " number of rings_left: " (length$ ?ring-colors)  crlf)
 
     (if (or (eq (length$ ?ring-colors) 0) (eq (nth$ 1 ?ring-colors) nil)) then
       (printout yellow "Cap color should be " ?cap-color crlf)
       (bind ?target_color ?cap-color)
       (bind ?cap-color "Bring_it_home") ; next delivery point should be the DS
-      ; (setf (?order:cap-color) ?cap-color)
-
-      (modify ?order (cap-color ?cap-color))
+      (modify order (cap-color ?cap-color))
     )
 
     (if (> (length$ ?ring-colors) 0) then 
@@ -176,10 +177,11 @@
       )
       ; (modify (?order:ring-colors) ?ring-colors)
 
-      (modify ?order (ring-colors ?ring-colors))
     )
-    return ?target_color
   )
+  (printout yellow " Color" (nth$ 1 ?ring-colors) " " (length$ ?ring-colors) " " (eq (nth$ 1 ?ring-colors) nil) crlf)
+  (modify order (ring-colors ?ring-colors))
+  return ?target_color
 )
 
 (deffunction check_order (?oid)
@@ -196,7 +198,6 @@
       (case BASE_SILVER then M-BS)
       (default M-DS)
     ))
-    (printout yellow "Target is " ?target_machine " because of " ?color crlf)
-    
-    (return ?target_machine)
+  (printout yellow "Target is " ?target_machine " because of " ?color crlf)
+  return ?target_machine
 )
