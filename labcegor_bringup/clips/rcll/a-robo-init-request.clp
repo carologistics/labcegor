@@ -9,7 +9,7 @@
     (assert (init_it (id 3) (iteration 1)))
     (assert (request_task (id 3) (last_task 3000)))
     (assert (request_task (id 2) (last_task 2000)))
-    (assert (request_task (id 1) (last_task 1000)))
+    (assert (request_task (id 1) (last_task 1000) (machine_order 1)))
     (assert (order_colors (id 0)))
     (assert (order_colors (id 42)))
     (assert (order_colors (id 40)))
@@ -158,8 +158,9 @@
 (test (or (eq ?m_name ?pos) (eq ?m_name ?des) (eq ?pos START)))
 ;(test (or (not (and (eq ?m_name ?pos) (eq ?m_pos OUTPUT))) (and (eq ?pos_wp OUTPUT) (eq ?m_name ?pos)))) ;robo not at a output, but if the coresponding machine is ready;;;;error weil worng match.... seach for differet solution
 ?r_o <-(order_status (id ?last_robo_order) (state ?r_ostate) (next_step ?r_next) (next_color ?r_next_c))
-?r_order_colors <- (order_colors (id ?last_robo_order) (base ?order_base) (ring_1 ?order_r1) (ring_2 ?order_r2) (ring_3 ?order_r2) (cap ?order_cap))
+?r_order_colors <- (order_colors (id ?last_robo_order) (base ?r_order_base) (ring_1 ?r_order_r1) (ring_2 ?r_order_r2) (ring_3 ?r_order_r2) (cap ?r_order_cap))
 ?m_o <-(order_status (id ?last_machine_order)(state ?m_ostate) (next_step ?m_next)(next_color ?m_next_c))
+?m_order_colors <- (order_colors (id ?last_machine_order) (base ?m_order_base) (ring_1 ?m_order_r1) (ring_2 ?m_order_r2) (ring_3 ?m_order_r2) (cap ?m_order_cap))
 =>
 (retract ?rt)
 (if (< ?it 8); (eq ?hid_oid 42);init
@@ -172,10 +173,10 @@
                 (assert (action (a_type "m") (id 1) (machine M-BS) (io OUTPUT) (task_id (+ ?last_robo_task 1))))
                 (modify ?init_it (iteration 8))
                 (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-BS) (des_at_waypoint OUTPUT) (order ?hp_oid))
-                (if (not (eq ?order_r1 EMPTY)) ;richtig gematchedt? nur weil init?
-                 then (modify ?hp_o (next_step RING_1) (next_color ?order_r1))
+                (if (not (eq ?m_order_r1 EMPTY)) ;richtig gematchedt? nur weil init?
+                 then (modify ?hp_o (next_step RING_1) (next_color ?m_order_r1))
                  else
-                 (modify ?hp_o (next_step CAP) (next_color ?order_cap))
+                 (modify ?hp_o (next_step CAP) (next_color ?m_order_cap))
                 )
         )
      )
@@ -251,28 +252,55 @@
                         (if (and (eq ?pos_wp OUTPUT) (not (eq ?last_machine_order 0))) ;target decition not succesfull TODO maybe wrongly set line 175
                         then
                             (if (or (eq ?m_next RING_1) (eq ?m_next RING_2) (eq ?m_next RING_3))
-                                then
+                            then
                                 (if (or (eq ?m_next_c RING_ORANGE) (eq ?m_next_c RING_GREEN))
                                  then
                                     (assert (action (id ?robo_id) (a_type "m") (machine M-RS1) (io INPUT) (task_id (+ ?last_robo_task 1))))
-                                    (modify ?robo_s (task (+ ?last_robo_task 1)))
+                                    (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-RS1) (des_at_waypoint INPUT))
                                 else 
                                     (assert (action (id ?robo_id) (a_type "m") (machine M-RS2) (io INPUT) (task_id (+ ?last_robo_task 1))))
-                                    (modify ?robo_s (task (+ ?last_robo_task 1)))
+                                    (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-RS2) (des_at_waypoint INPUT))
                                 )
-                            )
-                        else ;next is cap
-                            then
+                            else ;next is cap
+                            
                                 (if (eq ?m_next_c CAP_GRAY)
                                  then
                                     (assert (action (id ?robo_id) (a_type "m") (machine M-CS1) (io INPUT) (task_id (+ ?last_robo_task 1))))
-                                    (modify ?robo_s (task (+ ?last_robo_task 1)))
+                                    (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-CS1) (des_at_waypoint INPUT))
                                 else 
                                     (assert (action (id ?robo_id) (a_type "m") (machine M-CS2) (io INPUT) (task_id (+ ?last_robo_task 1))))
-                                    (modify ?robo_s (task (+ ?last_robo_task 1)))
+                                    (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-CS2) (des_at_waypoint INPUT))
                                 )
-                        )
+                            )
+                        else ;deliver then drive to out
+                            (if (> ?r_order 0)
+                            then
+                            (assert (action (id ?robo_id) (a_type "d") (machine ?pos) (io INPUT) (task_id (+ ?last_robo_task 1))))
+                            (modify ?robo_s (task (+ ?last_robo_task 1)))
+                            ;(printout green "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" crlf);Deliver a
+                            else
+                            (if(or (eq ?pos M-RS1) (eq ?pos M-RS2))
+                                then
+                                    (assert (instruct (machine ?pos) (operation RING) (color ?next_color) (task_id  42)))
+                                else ;CS or DS
+                                    if(eq ?pos DS)
+                                    then
+                                    (assert (instruct (machine M-DS) (operation DELIVER) (task_id 42)))
+                                    else
+                                    (assert (instruct (machine ?pos) (operation MOUNT_CAP) (task_id  42)))
+                            ) 
+                            ;;needs finish of robo - easy do together with next m
+
+                            (assert (action (id ?robo_id) (a_type "m") (machine ?pos) (io OUTPUT) (task_id (+ ?last_robo_task 1))))
+                            (modify ?robo_s (task (+ ?last_robo_task 1)))
+                            ;(printout green "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB" crlf);instruct! (implement payment check in machine instruct DONE) and move to out
+
+                            )
+                        
+                        
                         ;finish current order
+
+                        )
 
                     )
                 )
@@ -283,16 +311,17 @@
             ;noop
         )
 
-    )
+        )
 
     ;else ;init done
     ;switch by robot seee notes
-)
+    )
     ;assigning new tasks to robos
     ;handeling priority
     ;staring (restricted) machine instruction when robo deliver
     ;in machine_instruct add payment check for RS - sollte to test. sonst 2 regeln
-)
+    )
+
 
 (defrule complete_init
     (init_it (id 1) (iteration 8))
