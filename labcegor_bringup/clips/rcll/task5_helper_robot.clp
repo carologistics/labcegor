@@ -13,9 +13,9 @@
 
   ;Prepare Basestation PrepareMachine
   (if (eq ?robot_state IDLE) then 
-    (if (or (eq ?mot M-CS1) (eq ?mot M-CS2)) then
-      (modify ?tasks_overview (machine_target "INPUT"))
-    )
+    ; (if (or (eq ?mot M-CS1) (eq ?mot M-CS2)) then
+    ;   (modify ?tasks_overview (machine_target "Input"))
+    ; )
     (send_move_to_cmd ?rid ?mot ?mat ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
     (modify ?tasks_overview (state MOVING))

@@ -16,9 +16,9 @@
     (if (eq ?mot M-BS) then
       (assert (order_from_machine (machine_id ?mot) (order_id 0) (robot_id ?rid) (color BASE_BLACK) (position OUTPUT)))
     )
-    (if (or (eq ?mot M-CS1) (eq ?mot M-CS2)) then
-      (modify ?tasks_overview (machine_target "INPUT"))
-    )
+    ; (if (or (eq ?mot M-CS1) (eq ?mot M-CS2)) then
+    ;   (modify ?tasks_overview (machine_target "Input"))
+    ; )
     (send_move_to_cmd ?rid ?mot ?mat ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
     (modify ?tasks_overview (state MOVING))
