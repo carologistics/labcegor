@@ -186,7 +186,7 @@
 )
 
 (deffunction check_order (?oid)
-  (bind ?color (get_next_order_color ?oid TRUE))
+  (bind ?color (get_next_order_color ?oid FALSE))
   (bind ?target_machine (switch ?color
       (case RING_GREEN then M-RS1)
       (case RING_ORANGE then M-RS1)
