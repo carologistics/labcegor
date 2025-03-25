@@ -40,8 +40,8 @@
   ?machine_task_overview <- (machine_task_overview (machine_id M-BS) (machine_task ?task))
   =>
   (if (and (eq ?s IDLE) (not (eq ?task WORK))) then
-    (prepare_machine_BS "M-BS" ?pos ?color ?refbox-id)
     (printout blue "prepare for order: " ?incomming-oid " color: " ?color " at: " ?pos " for robot: " ?rid crlf)
+    ; (prepare_machine_BS "M-BS" ?pos ?color ?refbox-id)
     (modify ?machine_task_overview (machine_task WORK))
     (retract ?machine_order)
   )
