@@ -167,7 +167,7 @@
       (printout yellow "Ring color should be " (nth$ 1 ?ring-colors) " " (length$ ?ring-colors) crlf)
       (bind ?target_color (nth$ 1 ?ring-colors))
       (bind ?ring-colors (rest$ ?ring-colors))
-      (printout yellow "nexT color should be " (nth$ 1 ?ring-colors) " " (length$ ?ring-colors) " " (eq (nth$ 1 ?ring-colors) nil) crlf)
+      (printout yellow "nexT color should be " (nth$ 1 ?ring-colors) " " (length$ ?ring-colors) " " crlf)
       ; (if (eq (length$ ?ring-colors) 0) then 
       ;   (bind ?ring-colors )
       ; )
