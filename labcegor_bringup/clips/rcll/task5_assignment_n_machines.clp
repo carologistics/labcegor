@@ -91,9 +91,9 @@
   ?machine_task_overview <- (machine_task_overview (machine_id ?machine_id) (machine_task ?task))
   =>
   (printout red "M-CS " ?machine_id " " ?operation " " ?task " " ?s " order id " ?incomming-oid crlf)
-  (if (and (eq ?s IDLE) (not (eq ?task WORK))) then
+  ; (if (and (eq ?s IDLE) (not (eq ?task WORK))) then
     (prepare_machine_CS ?machine_id ?operation ?refbox-id)
     (modify ?machine_task_overview (machine_task WORK))
     (retract ?machine_order)
-  )
+  ; )
 )
