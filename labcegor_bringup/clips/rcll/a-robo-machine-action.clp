@@ -88,7 +88,7 @@
 
 (defrule machine-instruct
   (protobuf-peer (name refbox-private) (peer-id ?peer-id))
-  ?inst <- (instruct (machine ?m) (operation ?op) (color ?c) (task_id ?t-id) (wait ?w) (oder_id ?o_id))
+  ?inst <- (instruct (machine ?m) (operation ?op) (color ?c) (task_id ?t-id) (wait ?w) (order_id ?o_id))
   ;(test (member$ ?m (create$ M-BS M-CS1 M-CS2 M-BS) ))
   ?m_sate <- (machine_status (name ?m) (slide_shelf ?pay_in))
   (ring-spec (color ?ca) (cost ?ring_cost))
@@ -121,13 +121,15 @@
   )
   (if (eq ?op RING)
     then
-      (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionBS")) 
+      (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionRS")) 
       (pb-set-field ?prep-msg "ring_color" ?c)
+      (pb-set-field ?msg "instruction_rs" ?prep-msg)
   )
   (if (eq ?op DELIVER)
     then
       (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionDS")) 
       (pb-set-field ?prep-msg "order_id" ?o_id)
+      (pb-set-field ?msg "instruction_ds" ?prep-msg)
   )
   (pb-broadcast ?peer-id ?msg)
   (pb-destroy ?msg)

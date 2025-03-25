@@ -32,7 +32,7 @@
     (test (> ?robo_task 0)) ;; busy check
     ?machine_s <- (machine_status (name ?m_name) (task ?m_task) (order ?m_order));TODO ?name müsste pos für binding (update), klappt dann aber bei retrive nicht
     (test (or (eq ?m_name ?des) (eq ?m_name ?pos)))
-    ?order_s <- (order_status (id ?order_oid) (state ?order_state) (complexity ?complexity))
+    ?order_s <- (order_status (id ?order_oid) (state ?order_state) (complexity ?complexity)(next_step ?next_step))
     (test (or (eq ?robo_order 0) (eq ?robo_order 40) (eq ?robo_order ?order_oid)))
     (protobuf-msg (type "llsf_msgs.AgentTask") (msg-type ?msg-type) (client-type PEER) (ptr ?msg))
 =>
@@ -64,8 +64,10 @@
                         (modify ?order_s (state ?pos))
                         (switch ?pos  ;Update next step
                             (case M-BS then (if (eq ?complexity C0) then (modify ?order_s (next_step DELIVER)) else (modify ?order_s (next_step RING_1))))
-                            (case M-RS1 then (if (eq ?complexity C1) then (modify ?order_s (next_step DELIVER)) else (modify ?order_s (next_step RING_2))))
-                            (case M-RS2 then (if (eq ?complexity C2) then (modify ?order_s (next_step DELIVER)) else (modify ?order_s (next_step RING_3))))
+                            (case M-RS1 then (if (eq ?complexity C1) then (modify ?order_s (next_step DELIVER)) else 
+                                            (switch ?next_step (case RING_1 then (modify ?order_s (next_step RING_2))) (case RING_2 then (modify ?order_s (next_step RING_3))) (case RING_3 then (modify ?order_s (next_step DELIVER))))))
+                            (case M-RS2 then (if (eq ?complexity C1) then (modify ?order_s (next_step DELIVER)) else 
+                                            (switch ?next_step (case RING_1 then (modify ?order_s (next_step RING_2))) (case RING_2 then (modify ?order_s (next_step RING_3))) (case RING_3 then (modify ?order_s (next_step DELIVER))))))
                             (case M-CS1 then (modify ?order_s (next_step DELIVER)))
                             (case M-CS2 then (modify ?order_s (next_step DELIVER)))
                             (case M-DS then (modify ?order_s (next_step NONE)))
@@ -169,7 +171,7 @@
      (case 1 then
         (if (eq ?it 1)
             then
-                (assert (instruct (machine M-BS) (operation OUTPUT) (color ?hp_base) (task_id  1) (oder_id ?hp_oid)));;adapt to order
+                (assert (instruct (machine M-BS) (operation OUTPUT) (color ?hp_base) (task_id  1) (order_id ?hp_oid)));;adapt to order
                 (assert (action (a_type "m") (id 1) (machine M-BS) (io OUTPUT) (task_id (+ ?last_robo_task 1))))
                 (modify ?init_it (iteration 8))
                 (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-BS) (des_at_waypoint OUTPUT) (order ?hp_oid))
@@ -281,25 +283,24 @@
                             else
                             (if(or (eq ?pos M-RS1) (eq ?pos M-RS2))
                                 then
-                                    (assert (instruct (machine ?pos) (operation RING) (color ?m_next_c) (task_id 42)))
+                                    (assert (instruct (machine ?pos) (operation RING) (color ?r_next_c) (task_id 42) (order_id ?m_order)))
                                 else ;CS or DS
-                                    if(eq ?pos DS)
+                                    (if(eq ?pos DS)
                                     then
-                                    (assert (instruct (machine M-DS) (operation DELIVER) (task_id 42)))
+                                    (assert (instruct (machine M-DS) (operation DELIVER) (task_id 42) (order_id ?m_order)))
                                     else
-                                    (assert (instruct (machine ?pos) (operation MOUNT_CAP) (task_id  42)))
+                                    (assert (instruct (machine ?pos) (operation MOUNT_CAP) (task_id  42) (order_id ?m_order)))
+                                    )
                             ) 
                             ;;needs finish of robo - easy do together with next m
 
                             (assert (action (id ?robo_id) (a_type "m") (machine ?pos) (io OUTPUT) (task_id (+ ?last_robo_task 1))))
-                            (modify ?robo_s (task (+ ?last_robo_task 1)))
+                            (modify ?robo_s (task (+ ?last_robo_task 1)) (des ?pos) (des_at_waypoint OUTPUT) (order ?m_order))
                             ;(printout green "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB" crlf);instruct! (implement payment check in machine instruct DONE) and move to out
 
                             )
                         
-                        
-                        ;finish current order
-
+                    
                         )
 
                     )
