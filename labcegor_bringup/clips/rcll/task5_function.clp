@@ -91,7 +91,7 @@
   (pb-set-field ?msg "instruction_bs" ?prep-msg)
   (pb-broadcast ?peer-id ?msg)
   (pb-destroy ?msg)
-  (printout red ?m_id " " ?side " " ?color " " ?peer-id crlf)
+  (printout red "prepare_machine_BS " ?m_id " " ?side " " ?color " " ?peer-id crlf)
 )
 
 (deffunction prepare_machine_RS (?m_id ?color ?peer-id)
@@ -104,7 +104,7 @@
   (pb-set-field ?msg "instruction_rs" ?prep-msg)
   (pb-broadcast ?peer-id ?msg)
   (pb-destroy ?msg)
-  (printout red ?m_id " " ?color " " ?peer-id crlf)
+  (printout red "prepare_machine_RS " ?m_id " " ?color " " ?peer-id crlf)
 )
 
 (deffunction prepare_machine_CS (?m_id ?operation ?peer-id)
@@ -117,7 +117,7 @@
   (pb-set-field ?msg "instruction_cs" ?prep-msg)
   (pb-broadcast ?peer-id ?msg)
   (pb-destroy ?msg)
-  (printout red ?m_id " " ?operation " " ?peer-id crlf)
+  (printout red "prepare_machine_CS " ?m_id " " ?operation " " ?peer-id crlf)
 )
 
 (deffunction prepare_machine_DS (?m_id ?order_id ?peer-id)
@@ -130,7 +130,7 @@
   (pb-set-field ?msg "instruction_ds" ?prep-msg)
   (pb-broadcast ?peer-id ?msg)
   (pb-destroy ?msg)
-  (printout red ?m_id " " ?order_id " " ?peer-id crlf)
+  (printout red "prepare_machine_DS " ?m_id " " ?order_id " " ?peer-id crlf)
 )
 
 ; Which Machine to bribe?
