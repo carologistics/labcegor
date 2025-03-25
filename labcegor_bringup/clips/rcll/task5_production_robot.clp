@@ -157,13 +157,15 @@
     (if (and (eq ?mot M-DS) (eq ?color "bring it home")) then 
     ; TODO Assign new order
       (printout green "now go home" crlf)
-    ; else
+      (modify ?assigned_order (order_id (+ ?order_id 2)))
+      (modify ?tasks_overview (machine_target "Input"))
+    else
+      (modify ?tasks_overview (machine_target "Output"))
     )
       (modify ?tasks_overview (can_move TRUE))
       (modify ?tasks_overview (can_retrieve FALSE))
       (modify ?tasks_overview (can_deliver FALSE))
       (modify ?tasks_overview (task_id (+ ?task_id 1)))
-      (modify ?tasks_overview (machine_target "Output"))
       (modify ?check_robot (did_something FALSE))
       (modify ?tasks_overview (state IDLE))
      (printout red "robot " ?rid " should move to " ?mot " output " ?color crlf)
