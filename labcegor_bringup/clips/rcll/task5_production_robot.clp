@@ -154,7 +154,7 @@
     (bind ?color (get_next_order_color ?oid TRUE))
     (printout green "whoooooooooooo " ?mot " " ?oid " " ?color crlf)
     (assert (order_from_machine (machine_id ?mot) (order_id ?oid) (robot_id ?rid) (color ?color) (operation MOUNT_CAP) (position ?mat)))
-    (if (and (eq ?mot M-DS) (eq ?color "bring it home")) then 
+    (if (and (eq ?mot M-DS) (eq ?color "Bring_it_home")) then 
     ; TODO Assign new order
       (printout green "now go home" crlf)
       (modify ?assigned_order (order_id (+ ?order_id 2)))

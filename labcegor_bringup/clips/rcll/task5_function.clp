@@ -209,3 +209,9 @@
   (printout yellow "Target is " ?target_machine " because of " ?color crlf)
   return ?target_machine
 )
+
+
+
+; TODOs 
+; 1. Payment reduzieren, wenn kostenpflichtige ringe verwendet wurden. 
+; 2. Wenn Order Fertig, oder kein payment nötig, dann neu zu ordnung des Roboters. 

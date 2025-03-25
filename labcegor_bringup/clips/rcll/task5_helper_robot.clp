@@ -9,7 +9,7 @@
   (test (or (eq ?robot_state IDLE) (eq ?robot_state HOLDING)))
   =>
 
-   (printout red "ROBOT Move " ?rid " " ?robot_state " " ?mot " " ?mat " " ?peer-id crlf)
+  ;  (printout red "ROBOT Move " ?rid " " ?robot_state " " ?mot " " ?mat " " ?peer-id crlf)
 
   ;Prepare Basestation PrepareMachine
   (if (eq ?robot_state IDLE) then 
@@ -36,9 +36,9 @@
   ?machine_task_overview <- (machine_task_overview (machine_id ?mot) (machine_task ?task) (payment ?payment) (mounted ?mounted))
   (not (order_from_machine (robot_id ?rid) ))
   =>
-   (printout red "ROBOT Pickup " ?rid " " ?robot_state " " ?mot " " ?mat " " ?s " " ?mounted ?peer-id crlf)
+  ;  (printout red "ROBOT Pickup " ?rid " " ?robot_state " " ?mot " " ?mat " " ?s " " ?mounted ?peer-id crlf)
   (if (and (or (eq ?mot M-CS1) (eq ?mot M-CS2)) (eq ?mounted FALSE)) then
-     (printout green "helper retrieve" crlf)
+    ;  (printout green "helper retrieve" crlf)
     (send_retrieve_from_cmd ?rid ?mot "Shelf" ?peer-id ?tid)
     (modify ?tasks_overview (machine_target "Input"))
     (modify ?check_robot (did_something TRUE))
@@ -58,7 +58,7 @@
   (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
   =>
 
-   (printout red "ROBOT Delevery " ?rid " " ?robot_state " " ?mot " " ?mat " " ?peer-id crlf)
+  ;  (printout red "ROBOT Delevery " ?rid " " ?robot_state " " ?mot " " ?mat " " ?peer-id crlf)
   (send_deliver_to_cmd ?rid ?mot ?mat ?peer-id ?tid)
   (modify ?check_robot (did_something TRUE))
   (modify ?tasks_overview (state IDLE))
@@ -88,7 +88,7 @@
   (bind ?successful (pb-field-value ?msg "successful"))
   (bind ?target (check_payment ?m_one ?m_two))
   
-   (printout blue "robot helper did something " ?task_id " " ?tid " " ?successful " " ?cm  " " ?cr  " " ?cd  " " ?mot  " " ?mat  " " ?robot_state " " ?target " " (or (not (or (eq ?mot M-CS1) (eq ?mot M-CS2))) (eq ?mounted TRUE) ) " CS?:" (or (eq ?mot M-CS1) (eq ?mot M-CS2)) " mounted?: " (eq ?mounted TRUE) crlf)
+  ;  (printout blue "robot helper did something " ?task_id " " ?tid " " ?successful " " ?cm  " " ?cr  " " ?cd  " " ?mot  " " ?mat  " " ?robot_state " " ?target " " (or (not (or (eq ?mot M-CS1) (eq ?mot M-CS2))) (eq ?mounted TRUE) ) " CS?:" (or (eq ?mot M-CS1) (eq ?mot M-CS2)) " mounted?: " (eq ?mounted TRUE) crlf)
   ; It has moved
   (if (and (eq ?robot_id ?rid) (eq ?task_id ?tid) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE)) then 
     (modify ?tasks_overview (can_move FALSE))
@@ -113,9 +113,9 @@
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_deliver TRUE))
 
-     (printout green "Helper where should it move? " ?target " "  crlf)
+    ;  (printout green "Helper where should it move? " ?target " "  crlf)
     (if (or (not (or (eq ?mot M-CS1) (eq ?mot M-CS2))) (eq ?mounted TRUE) )then
-       (printout green "should move know to:" ?target crlf)
+      ;  (printout green "should move know to:" ?target crlf)
       (modify ?tasks_overview (move_target M-RS2))
       (modify ?tasks_overview (machine_target "Slide"))
     )
@@ -147,14 +147,14 @@
       )
         (if (eq ?target NONE) then
           (modify ?tasks_overview (robot_type HELPER))
-           (printout red "Robot helper should start something different now." crlf)
+          ;  (printout red "Robot helper should start something different now." crlf)
         )
       )
     (modify ?tasks_overview (machine_target "Output"))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (modify ?check_robot (did_something FALSE))
     (modify ?tasks_overview (state IDLE))
-     (printout green "where should it go now? " ?target " " ?m_one " " ?m_two " soooo?: " (check_payment ?m_one ?m_two) crlf)
+    ;  (printout green "where should it go now? " ?target " " ?m_one " " ?m_two " soooo?: " (check_payment ?m_one ?m_two) crlf)
   )
   ; hacky shit
   (if (and (eq ?robot_id ?rid) (eq ?task_id ?tid) (eq ?successful FALSE) (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cd FALSE)) then 
@@ -163,8 +163,8 @@
     (modify ?tasks_overview (can_move TRUE))
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_deliver TRUE))
-     (printout yellow "Robot " ?rid " has probably a cap carrier in its claw " ?robot_state " " ?mot " " ?mat " " ?mounted " " crlf)
-     (printout green "This is hacky af Helper where should it move? " ?target " "  crlf)
+    ;  (printout yellow "Robot " ?rid " has probably a cap carrier in its claw " ?robot_state " " ?mot " " ?mat " " ?mounted " " crlf)
+    ;  (printout green "This is hacky af Helper where should it move? " ?target " "  crlf)
     (if (or (not (or (eq ?mot M-CS1) (eq ?mot M-CS2))) (eq ?mounted TRUE) )then
       (modify ?tasks_overview (move_target ?target))
       (modify ?tasks_overview (machine_target "Slide"))
@@ -175,7 +175,7 @@
   )
   ; FALSE FALSE FALSE TRUE M-RS2 Slide IDLE
   (if (and (eq ?robot_id ?rid) (eq ?task_id ?tid) (eq ?successful FALSE) (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE) (eq ?robot_state IDLE)) then
-     (printout yellow "Helper Super hacky stuff"  crlf)
+    ;  (printout yellow "Helper Super hacky stuff"  crlf)
     (modify ?tasks_overview (can_move TRUE))
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_deliver FALSE))
