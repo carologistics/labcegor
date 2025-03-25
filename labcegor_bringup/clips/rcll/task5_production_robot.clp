@@ -8,11 +8,11 @@
                                       (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE) (is_assigned TRUE))
   (assigned_order (order_id ?oid) (robot_id ?rid))
-  ?order <- (adjustable_order (id ?oid) (name ?order-name) (base-color ?base-color)); 
+  ?order <- (order (id ?oid) (name ?order-name) (base-color ?base-color)); 
   (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
   ?machine_task_overview <- (machine_task_overview (machine_id ?mot) (machine_task ?task) (payment ?payment) (mounted ?mounted))
   =>
-  (printout blue "Robot " ?peer-name " robot-id " ?rid crlf)
+  (printout blue "Robot " ?peer-name " robot-id " ?rid ?base-color crlf)
   ; Get Order
   ; Prepare Basestation PrepareMachine
   (if (and (eq ?robot_state IDLE) (eq ?cd FALSE) (eq ?mot M-BS)) then 
