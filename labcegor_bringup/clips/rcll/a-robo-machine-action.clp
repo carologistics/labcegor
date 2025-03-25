@@ -107,7 +107,6 @@
   (pb-set-field ?msg "machine" ?m)
   (if (or (eq ?m M-CS1) (eq ?m M-CS2))
     then
-      ;
       (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionCS")) 
       (pb-set-field ?prep-msg "operation" ?op)
       (pb-set-field ?msg "instruction_cs" ?prep-msg)
@@ -119,6 +118,16 @@
       (pb-set-field ?prep-msg "side" ?op)
       (pb-set-field ?prep-msg "color" ?c)
       (pb-set-field ?msg "instruction_bs" ?prep-msg)
+  )
+  (if (eq ?op RING)
+    then
+      (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionBS")) 
+      (pb-set-field ?prep-msg "ring_color" ?c)
+  )
+  (if (eq ?op DELIVER)
+    then
+      (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionDS")) 
+      (pb-set-field ?prep-msg "order_id" ?o_id)
   )
   (pb-broadcast ?peer-id ?msg)
   (pb-destroy ?msg)

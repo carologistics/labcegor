@@ -59,7 +59,7 @@
                         ;update order status
                 
                     else ; was deliver        
-                        (modify ?machine_s (order ?robo_order))
+                        (modify ?machine_s (order ?robo_order) (task 42) );task 42 (pos INPUT)
                         (modify ?robo_s (order 0))
                         (modify ?order_s (state ?pos))
                         (switch ?pos  ;Update next step
@@ -240,7 +240,7 @@
                     (modify ?robo_s (task (+ ?last_robo_task 1))(order 0))
                 )
             else
-                (if (eq ?r_order 0) ;robo ready but machitne not
+                (if (and (eq ?r_order 0) (eq ?m_pos INPUT)) ;robo ready but machitne not
                 then
                     (assert (request_task (id ?robo_id) (last_task ?last_robo_task) (robo_order ?last_robo_order)))
 
@@ -281,7 +281,7 @@
                             else
                             (if(or (eq ?pos M-RS1) (eq ?pos M-RS2))
                                 then
-                                    (assert (instruct (machine ?pos) (operation RING) (color ?next_color) (task_id  42)))
+                                    (assert (instruct (machine ?pos) (operation RING) (color ?m_next_c) (task_id 42)))
                                 else ;CS or DS
                                     if(eq ?pos DS)
                                     then
