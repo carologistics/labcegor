@@ -146,7 +146,7 @@
 )
 
 ; check order for next step
-(deffunction get_next_order_color (?oid)
+(deffunction get_next_order_color (?oid ?delete_last_stage)
   (do-for-fact
     ((?order adjustable_order))
     (eq ?order:id ?oid)
@@ -159,19 +159,25 @@
     (if (eq (length$ ?ring-colors) 0) then
       (printout yellow "Cap color should be " ?cap-color crlf)
       (bind ?target_color ?cap-color)
-      (bind ?cap-color "Bring_it_home") ; next delivery point should be the DS
-      (modify ?order (cap-color ?cap-color))
+      (if (eq ?delete_last_stage TRUE) then
+        (printout yellow "color deleted" ?target_color crlf)
+        (bind ?cap-color "Bring_it_home") ; next delivery point should be the DS
+        (modify ?order (cap-color ?cap-color))
+      )
     )
 
     (if (> (length$ ?ring-colors) 0) then 
       (printout yellow "Ring color should be " (nth$ 1 ?ring-colors) " " (length$ ?ring-colors) crlf)
       (bind ?target_color (nth$ 1 ?ring-colors))
-      (bind ?ring-colors (rest$ ?ring-colors))
+      (if (eq ?delete_last_stage TRUE) then
+        (printout yellow "color deleted" ?target_color crlf)
+        (bind ?ring-colors (rest$ ?ring-colors))
+        (modify ?order (ring-colors ?ring-colors))
+      )
       (printout yellow "nexT color should be " (nth$ 1 ?ring-colors) " " (length$ ?ring-colors) " " crlf)
       ; (if (eq (length$ ?ring-colors) 0) then 
       ;   (bind ?ring-colors )
       ; )
-      (modify ?order (ring-colors ?ring-colors))
       ; (modify (?order:ring-colors) ?ring-colors)
 
     )
