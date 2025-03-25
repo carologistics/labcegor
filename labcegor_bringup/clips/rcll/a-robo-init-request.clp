@@ -34,6 +34,8 @@
     (test (or (eq ?m_name ?des) (eq ?m_name ?pos)))
     ?order_s <- (order_status (id ?order_oid) (state ?order_state) (complexity ?complexity)(next_step ?next_step))
     (test (or (eq ?robo_order 0) (eq ?robo_order 40) (eq ?robo_order ?order_oid)))
+    (order_status (id ?m_order) (next_step ?m_next_step))
+    (order_colors (id ?m_order) (base ?order_base) (ring_1 ?order_r1) (ring_2 ?order_r2) (ring_3 ?order_r3) (cap ?order_cap))
     (protobuf-msg (type "llsf_msgs.AgentTask") (msg-type ?msg-type) (client-type PEER) (ptr ?msg))
 =>
     (bind ?robo_id (pb-field-value ?msg "robot_id"))
@@ -56,22 +58,31 @@
                         )
                         (modify ?machine_s (order 0))
                         (modify ?machine_s (pos empty))
+                        (if (eq ?id 1)
+                            then (switch ?m_next_step
+                                (case RING_1 then (modify ?order_s (next_color ?order_r1)))
+                                (case RING_2 then (modify ?order_s (next_color ?order_r2)))
+                                (case RING_3 then (modify ?order_s (next_color ?order_r3)))
+                                (case CAP then (modify ?order_s (next_color ?order_cap)))
+                            )
+                        )
                         ;update order status
                 
                     else ; was deliver        
-                        (modify ?machine_s (order ?robo_order) (task 42) );task 42 (pos INPUT)
+                        (modify ?machine_s (order ?robo_order) (task 42) );TODO if not DS
                         (modify ?robo_s (order 0))
                         (modify ?order_s (state ?pos))
-                        (switch ?pos  ;Update next step
+                        (if (eq ?id 1)
+                            then (switch ?pos  ;Update next step
                             (case M-BS then (if (eq ?complexity C0) then (modify ?order_s (next_step DELIVER)) else (modify ?order_s (next_step RING_1))))
-                            (case M-RS1 then (if (eq ?complexity C1) then (modify ?order_s (next_step DELIVER)) else 
-                                            (switch ?next_step (case RING_1 then (modify ?order_s (next_step RING_2))) (case RING_2 then (modify ?order_s (next_step RING_3))) (case RING_3 then (modify ?order_s (next_step DELIVER))))))
-                            (case M-RS2 then (if (eq ?complexity C1) then (modify ?order_s (next_step DELIVER)) else 
-                                            (switch ?next_step (case RING_1 then (modify ?order_s (next_step RING_2))) (case RING_2 then (modify ?order_s (next_step RING_3))) (case RING_3 then (modify ?order_s (next_step DELIVER))))))
+                            (case M-RS1 then (if (eq (sub-string 2 2 ?complexity) (sub-string 6 6 ?next_step)) then (modify ?order_s (next_step CAP)) else (switch (sub-string 2 2 ?complexity) (case 1  then (modify ?order_s (next_step RING_2)))
+                                                    (case 2  then (modify ?order_s (next_step RING_2)))))) ;TODO
+                            (case M-RS2 then (if (eq (sub-string 2 2 ?complexity) (sub-string 6 6 ?next_step)) then (modify ?order_s (next_step CAP)) else (switch (sub-string 2 2 ?complexity) (case 1  then (modify ?order_s (next_step RING_2)))
+                                                    (case 2  then (modify ?order_s (next_step RING_2)))))) ;TODO
                             (case M-CS1 then (modify ?order_s (next_step DELIVER)))
                             (case M-CS2 then (modify ?order_s (next_step DELIVER)))
                             (case M-DS then (modify ?order_s (next_step NONE)))
-
+                        )
                         )
 
                 )     
@@ -263,16 +274,22 @@
                                     (assert (action (id ?robo_id) (a_type "m") (machine M-RS2) (io INPUT) (task_id (+ ?last_robo_task 1))))
                                     (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-RS2) (des_at_waypoint INPUT))
                                 )
-                            else ;next is cap
-                            
-                                (if (eq ?m_next_c CAP_GRAY)
-                                 then
-                                    (assert (action (id ?robo_id) (a_type "m") (machine M-CS1) (io INPUT) (task_id (+ ?last_robo_task 1))))
-                                    (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-CS1) (des_at_waypoint INPUT))
-                                else 
-                                    (assert (action (id ?robo_id) (a_type "m") (machine M-CS2) (io INPUT) (task_id (+ ?last_robo_task 1))))
-                                    (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-CS2) (des_at_waypoint INPUT))
+                            else ;next is cap or deliver
+                                (if (eq ?m_next DELIVER)
+                                    then
+                                        (assert (action (id ?robo_id) (a_type "m") (machine M-DS) (io INPUT) (task_id (+ ?last_robo_task 1))))
+                                        (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-DS) (des_at_waypoint INPUT))
+                                    else
+                                        (if (eq ?m_next_c CAP_GREY)
+                                            then
+                                                (assert (action (id ?robo_id) (a_type "m") (machine M-CS1) (io INPUT) (task_id (+ ?last_robo_task 1))))
+                                                (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-CS1) (des_at_waypoint INPUT))
+                                            else 
+                                                (assert (action (id ?robo_id) (a_type "m") (machine M-CS2) (io INPUT) (task_id (+ ?last_robo_task 1))))
+                                                (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-CS2) (des_at_waypoint INPUT))
+                                        )
                                 )
+                                
                             )
                         else ;deliver then drive to out
                             (if (> ?r_order 0)
@@ -285,7 +302,7 @@
                                 then
                                     (assert (instruct (machine ?pos) (operation RING) (color ?r_next_c) (task_id 42) (order_id ?m_order)))
                                 else ;CS or DS
-                                    (if(eq ?pos DS)
+                                    (if(eq ?pos M-DS)
                                     then
                                     (assert (instruct (machine M-DS) (operation DELIVER) (task_id 42) (order_id ?m_order)))
                                     else
