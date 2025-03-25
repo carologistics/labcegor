@@ -9,7 +9,7 @@
   (test (or (eq ?robot_state IDLE) (eq ?robot_state HOLDING)))
   =>
 
-  (printout red "ROBOT Move " ?rid " " ?robot_state " " ?mot " " ?mat " " ?peer-id crlf)
+  ; (printout red "ROBOT Move " ?rid " " ?robot_state " " ?mot " " ?mat " " ?peer-id crlf)
 
   ;Prepare Basestation PrepareMachine
   (if (eq ?robot_state IDLE) then 
@@ -39,10 +39,10 @@
   ?machine_task_overview <- (machine_task_overview (machine_id ?mot) (machine_task ?task) (payment ?payment) (mounted ?mounted))
   (not (order_from_machine (robot_id ?rid) ))
   =>
-  (printout red "ROBOT Pickup " ?rid " " ?robot_state " " ?mot " " ?mat " " ?s ?peer-id crlf)
+  ; (printout red "ROBOT Pickup " ?rid " " ?robot_state " " ?mot " " ?mat " " ?s ?peer-id crlf)
 
   (if (and (or (eq ?mot M-CS1) (eq ?mot M-CS2)) (eq ?mounted FALSE)) then
-    (printout green "payment retrieve" crlf)
+    ; (printout green "payment retrieve" crlf)
     (send_retrieve_from_cmd ?rid ?mot "Shelf" ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
     (modify ?tasks_overview (state HOLDING))
@@ -61,7 +61,7 @@
   (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
   =>
 
-  (printout red "ROBOT Delevery " ?rid " " ?robot_state " " ?mot " " ?mat " " ?peer-id crlf)
+  ; (printout red "ROBOT Delevery " ?rid " " ?robot_state " " ?mot " " ?mat " " ?peer-id crlf)
   (send_deliver_to_cmd ?rid ?mot ?mat ?peer-id ?tid)
   (modify ?check_robot (did_something TRUE))
   (modify ?tasks_overview (state IDLE))
@@ -90,7 +90,7 @@
   (bind ?successful (pb-field-value ?msg "successful"))
   (bind ?target (check_payment ?m_one ?m_two))
   
-  (printout red "robot payment did something " ?task_id " " ?tid " " ?successful " " ?cm  " " ?cr  " " ?cd  " " ?mot  " " ?mat  " " ?robot_state " " ?target crlf)
+  ; (printout red "robot payment did something " ?task_id " " ?tid " " ?successful " " ?cm  " " ?cr  " " ?cd  " " ?mot  " " ?mat  " " ?robot_state " " ?target crlf)
   ; It has moved
   (if (and (eq ?robot_id ?rid) (eq ?task_id ?tid) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE)) then 
     (modify ?tasks_overview (can_move FALSE))
@@ -114,10 +114,10 @@
     (modify ?tasks_overview (can_move TRUE))
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_deliver TRUE))
-    (printout yellow "Robot " ?rid " has probably a cap carrier in its claw " ?robot_state " " ?mot " " ?mat " " ?mounted " " crlf)
+    ; (printout yellow "Robot " ?rid " has probably a cap carrier in its claw " ?robot_state " " ?mot " " ?mat " " ?mounted " " crlf)
     
 
-    (printout green "Payment where should it move? " ?target " "  crlf)
+    ; (printout green "Payment where should it move? " ?target " "  crlf)
     (if (or (not (or (eq ?mot M-CS1) (eq ?mot M-CS2))) (eq ?mounted TRUE) )then
       (modify ?tasks_overview (move_target ?target))
       (modify ?tasks_overview (machine_target "Slide"))
@@ -167,8 +167,8 @@
     (modify ?tasks_overview (can_move TRUE))
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_deliver TRUE))
-    (printout yellow "Robot " ?rid " has probably a cap carrier in its claw " ?robot_state " " ?mot " " ?mat " " ?mounted " " crlf)
-    (printout green "This is hacky af Payment where should it move? " ?target " "  crlf)
+    ; (printout yellow "Robot " ?rid " has probably a cap carrier in its claw " ?robot_state " " ?mot " " ?mat " " ?mounted " " crlf)
+    ; (printout green "This is hacky af Payment where should it move? " ?target " "  crlf)
     (if (or (not (or (eq ?mot M-CS1) (eq ?mot M-CS2))) (eq ?mounted TRUE) )then
       (modify ?tasks_overview (move_target ?target))
       (modify ?tasks_overview (machine_target "Slide"))
@@ -179,7 +179,7 @@
   )
   ; FALSE FALSE FALSE TRUE M-RS2 Slide IDLE
   (if (and (eq ?robot_id ?rid) (eq ?task_id ?tid) (eq ?successful FALSE) (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE) (eq ?robot_state IDLE)) then
-    (printout yellow "Payment Super hacky stuff"  crlf)
+    ; (printout yellow "Payment Super hacky stuff"  crlf)
     (modify ?tasks_overview (can_move TRUE))
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_deliver FALSE))
