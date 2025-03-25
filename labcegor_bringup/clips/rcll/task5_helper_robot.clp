@@ -184,6 +184,5 @@
     (modify ?check_robot (did_something FALSE))
     (modify ?tasks_overview (move_target M-BS))
     (modify ?tasks_overview (robot_type PRODUCTION))
-    (modify ?assigned_order (order_id 2))
   )
 )

@@ -15,7 +15,7 @@
   =>
   (modify ?check_robot (is_assigned TRUE))
   (assert (assigned_order (order_id ?oid) (robot_id ?rid)))
-  (printout blue "Assigned robot" ?rid " to order " ?oid crlf)
+  (printout green "Assigned robot" ?rid " to order " ?oid crlf)
 )
 
 
