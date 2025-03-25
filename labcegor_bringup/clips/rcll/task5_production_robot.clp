@@ -104,7 +104,7 @@
   (bind ?successful (pb-field-value ?msg "successful"))
 
   ; (if (eq ?successful TRUE) then
-  ;   (printout blue "Robot " ?rid " State: " ?robot_state " " ?tid " " ?cm " " ?cr " " ?cd " " ?mot " " ?mat crlf)
+  (printout blue "Robot " ?rid " State: " ?robot_state " " ?tid " " ?cm " " ?cr " " ?cd " " ?mot " " ?mat " order id: " ?order_id crlf)
   ; )
   ; It moved
   (if (and (eq ?task_id ?tid) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE) (eq ?robot_state MOVING) (eq ?successful TRUE) (eq ?mat "Input")) then
