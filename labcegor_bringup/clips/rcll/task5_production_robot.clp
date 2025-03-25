@@ -157,7 +157,6 @@
     (if (and (eq ?mot M-DS) (eq ?mat "Output") (eq ?color "Bring_it_home")) then 
     ; TODO Assign new order
       (printout green "now go home" crlf)
-      (retract ?assigned_order)
       (modify ?check_robot (is_assigned FALSE))
       (modify ?check_robot (did_something FALSE))
       (modify ?tasks_overview (machine_target "Input"))

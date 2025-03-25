@@ -18,6 +18,17 @@
   (printout green "Assigned robot" ?rid " to order " ?oid crlf)
 )
 
+(defrule random-order-assignment
+  (game-state (phase PRODUCTION))
+  ?order <- (adjustable_order (id ?oid))
+  ?tasks_overview <- (tasks_overview (robot_id ?rid) (robot_type PRODUCTION) (state IDLE))
+  ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE) (is_assigned FALSE))
+  ((assigned_order (order_id ?oid) (robot_id ?rid)))
+  =>
+  (retract assigned_order )
+  (printout green "Delete Order " ?oid crlf)
+)
+
 
 (defrule make_orders_change_again
   ?adjustable_order <- (adjustable_order (id ?oid) (name NOT-SET))
