@@ -186,6 +186,6 @@
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (modify ?tasks_overview (state IDLE))
     (modify ?check_robot (did_something FALSE))
-    (modify ?tasks_overview (move_target C-SS))
+    (modify ?tasks_overview (move_target M-BS))
   )
 )
