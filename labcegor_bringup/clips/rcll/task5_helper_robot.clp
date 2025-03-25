@@ -80,6 +80,7 @@
   ?mcs_two <- (machine_task_overview (machine_id M-CS2) (mounted ?cs_two))
   ?check_robot <- (check_robot (robot_id ?rid) (did_something TRUE))
   ?machine_task_overview <- (machine_task_overview (machine_id ?mot) (machine_task ?task) (payment ?payment) (mounted ?mounted))
+  ?assigned_order <- (assigned_order (order_id ?oid) (robot_id ?rid))
   (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id ?rid) (ptr ?msg))
   =>
   (bind ?task_id (pb-field-value ?msg "task_id"))
@@ -183,5 +184,6 @@
     (modify ?check_robot (did_something FALSE))
     (modify ?tasks_overview (move_target M-BS))
     (modify ?tasks_overview (robot_type PRODUCTION))
+    (modify ?assigned_order (order 2))
   )
 )
