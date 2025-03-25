@@ -159,10 +159,8 @@
       (printout green "now go home" crlf)
       (modify ?check_robot (is_assigned FALSE))
       (modify ?check_robot (did_something FALSE))
-      (modify ?tasks_overview (machine_target "Input")) ; TODO check if Symbls work also...
-    else
-      (modify ?tasks_overview (machine_target "Output"))
     )
+      (modify ?tasks_overview (machine_target "Output")); TODO check if Symbls work also...
       (modify ?tasks_overview (can_move TRUE))
       (modify ?tasks_overview (can_retrieve FALSE))
       (modify ?tasks_overview (can_deliver FALSE))
