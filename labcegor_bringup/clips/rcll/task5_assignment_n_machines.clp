@@ -23,9 +23,9 @@
   ?order <- (adjustable_order (id ?oid))
   ?tasks_overview <- (tasks_overview (robot_id ?rid) (robot_type PRODUCTION) (state IDLE))
   ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE) (is_assigned FALSE))
-  ((assigned_order (order_id ?oid) (robot_id ?rid)))
+  ?assigned_order <- (assigned_order (order_id ?oid) (robot_id ?rid))
   =>
-  (retract assigned_order )
+  (retract ?assigned_order )
   (printout green "Delete Order " ?oid crlf)
 )
 
