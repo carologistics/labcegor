@@ -154,14 +154,18 @@
     (bind ?color (get_next_order_color ?oid TRUE))
     (printout green "whoooooooooooo " ?mot " " ?oid " " ?color crlf)
     (assert (order_from_machine (machine_id ?mot) (order_id ?oid) (robot_id ?rid) (color ?color) (operation MOUNT_CAP) (position ?mat)))
-    
-    (modify ?tasks_overview (can_move TRUE))
-    (modify ?tasks_overview (can_retrieve FALSE))
-    (modify ?tasks_overview (can_deliver FALSE))
-    (modify ?tasks_overview (task_id (+ ?task_id 1)))
-    (modify ?tasks_overview (machine_target "Output"))
-    (modify ?check_robot (did_something FALSE))
-    (modify ?tasks_overview (state IDLE))
-     (printout red "robot " ?rid " should move to" ?mot " output " ?color crlf)
+    (if (and (eq ?mot M-DS) (eq ?color "bring it home")) then 
+    ; TODO Assign new order
+      (printout green "now go home" crlf)
+    ; else
+    )
+      (modify ?tasks_overview (can_move TRUE))
+      (modify ?tasks_overview (can_retrieve FALSE))
+      (modify ?tasks_overview (can_deliver FALSE))
+      (modify ?tasks_overview (task_id (+ ?task_id 1)))
+      (modify ?tasks_overview (machine_target "Output"))
+      (modify ?check_robot (did_something FALSE))
+      (modify ?tasks_overview (state IDLE))
+     (printout red "robot " ?rid " should move to " ?mot " output " ?color crlf)
   )
 )
