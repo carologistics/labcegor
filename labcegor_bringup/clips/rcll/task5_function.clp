@@ -108,6 +108,7 @@
 )
 
 (deffunction prepare_machine_CS (?m_id ?operation ?peer-id)
+  (printout red "prepare_machine_CS " ?m_id " " ?operation " " ?peer-id crlf)
   (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionCS")) 
   (pb-set-field ?prep-msg "operation" ?operation)
 
@@ -117,7 +118,6 @@
   (pb-set-field ?msg "instruction_cs" ?prep-msg)
   (pb-broadcast ?peer-id ?msg)
   (pb-destroy ?msg)
-  (printout red "prepare_machine_CS " ?m_id " " ?operation " " ?peer-id crlf)
 )
 
 (deffunction prepare_machine_DS (?m_id ?order_id ?peer-id)
