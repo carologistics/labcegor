@@ -138,7 +138,7 @@
 (defrule procces_new_order
 ?new_o <- (newOrder (id ?id))
 (order (id ?id)(complexity ?complexity)(delivery-begin ?begin)(delivery-end ?end) (base-color ?base) (ring-colors ?ring-colors) (cap-color ?cap))
-(test (or (eq ?id 1) (eq ?id 0))); zwishcen Lösung, betrachte nur orders 1 und 2 !!!! UPDATE WHEN THAT IS RUNING
+(test (or (eq ?id 1) (eq ?id 2))); zwishcen Lösung, betrachte nur orders 1 und 2 !!!! UPDATE WHEN THAT IS RUNING
 (not (processed_order (id ?id)))
 =>
 (retract ?new_o)
@@ -188,6 +188,7 @@
                 (assert (action (a_type "m") (id 1) (machine M-BS) (io OUTPUT) (task_id (+ ?last_robo_task 1))))
                 (modify ?init_it (iteration 8))
                 (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-BS) (des_at_waypoint OUTPUT) (order ?hp_oid))
+                (modify ?hp_o (state BS))
                 (if (eq ?hp_compex C0) then (modify ?hp_o (next_step CAP)) else (modify ?hp_o (next_step RING_1)))
                 ;(if (not (eq ?m_order_r1 EMPTY)) ;richtig gematchedt? nur weil init?
                 ; then (modify ?hp_o (next_step RING_1) (next_color ?m_order_r1))
@@ -262,9 +263,14 @@
                     (assert (request_task (id ?robo_id) (last_task ?last_robo_task) (robo_order ?last_robo_order)))
 
                 else ;machine not ready (anymore) - robo has retrived
-                    (if (eq ?r_ostate DONE)
+                    (if (eq ?r_ostate RC)
                         then 
-                        ;grab new order (TODO)
+                            (assert (instruct (machine M-BS) (operation OUTPUT) (color ?hp_base) (task_id  1) (order_id ?hp_oid)))
+                            (assert (action (id ?robo_id) (a_type "m") (machine M-BS) (io OUTPUT) (task_id (+ ?last_robo_task 1))))
+                            (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-BS) (des_at_waypoint OUTPUT))
+                            (modify ?hp_o (state BS))
+                            (if (eq ?hp_compex C0) then (modify ?hp_o (next_step DELIVER)) else (modify ?hp_o (next_step RING_1)))
+
                         else
                         (if (and (eq ?pos_wp OUTPUT) (not (eq ?last_machine_order 0))) ;target decition not succesfull TODO maybe wrongly set line 175
                         then
@@ -310,9 +316,11 @@
                                     then
                                     (assert (instruct (machine M-DS) (operation DELIVER) (task_id 42) (order_id ?m_order)))
                                     (modify ?hp_o (state DE))
+                                    (assert (request_task (id ?robo_id) (last_task (+ ?last_robo_task 1)) (robo_order ?last_robo_order) (machine_order ?last_machine_order)));new untestet
                                     else
                                     (assert (instruct (machine ?pos) (operation MOUNT_CAP) (task_id  42) (order_id ?m_order)))
                                     )
+  
                             ) 
                             ;;needs finish of robo - easy do together with next m
                             (if (not (eq ?pos M-DS))
@@ -320,11 +328,11 @@
                             (assert (action (id ?robo_id) (a_type "m") (machine ?pos) (io OUTPUT) (task_id (+ ?last_robo_task 1))))
                             (modify ?robo_s (task (+ ?last_robo_task 1)) (des ?pos) (des_at_waypoint OUTPUT));(order ?m_order)
                             ;(printout green "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB" crlf);instruct! (implement payment check in machine instruct DONE) and move to out
-                            else ;was delivery
-                            (assert (instruct (machine M-BS) (operation OUTPUT) (color ?hp_base) (task_id  1) (order_id ?hp_oid)))
-                            (assert (action (id ?robo_id) (a_type "m") (machine M-BS) (io OUTPUT) (task_id (+ ?last_robo_task 1))))
-                            (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-BS) (des_at_waypoint OUTPUT))
-                            (if (eq ?hp_compex C0) then (modify ?hp_o (next_step DELIVER)) else (modify ?hp_o (next_step RING_1)))
+                            ;else ;was delivery
+                            ;(assert (instruct (machine M-BS) (operation OUTPUT) (color ?hp_base) (task_id  1) (order_id ?hp_oid)))
+                            ;(assert (action (id ?robo_id) (a_type "m") (machine M-BS) (io OUTPUT) (task_id (+ ?last_robo_task 1))))
+                            ;(modify ?robo_s (task (+ ?last_robo_task 1)) (des M-BS) (des_at_waypoint OUTPUT))
+                            ;(if (eq ?hp_compex C0) then (modify ?hp_o (next_step DELIVER)) else (modify ?hp_o (next_step RING_1)))
 
                             )
                             )
@@ -358,7 +366,7 @@
     (init_it (id 2) (iteration 8))
     (init_it (id 3) (iteration 8))
     ?o_state <- (order_status (id 42) (state ?order_s))
-    (test (not (eq ?order_s DONE)))
+    (test (not (eq ?order_s DE)))
 =>
     ;(modify ?o_state (state DONE))
     (retract ?o_state)
