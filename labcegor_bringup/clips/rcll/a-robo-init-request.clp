@@ -163,6 +163,7 @@
 ;(not (newOrder)) ;;think of new check
 ?hp_o <- (order_status (id ?hp_oid)(state ?hp_ostate) (next_step ?hp_next) (start_d_time ?hp_start) (last_d_time ?hp_last) (prio ?hp_prio));order with highest prio
 (not (order_status (prio ?prio_1&:(< ?hp_prio ?prio_1)))) ;; find order with highest prio
+(test (not (eq ?hp_next NONE)));new to test
 (order (id ?hp_oid) (base-color ?hp_base) (ring-colors $?hp_colors) (cap-color ?hp_cap))
 ?hid_o <- (order_status (id ?hid_oid) (state ?hid_ostate) (prio ?hid_prio));order with highest id
 (not (order_status (id ?id_1&:(< ?hid_oid ?id_1))))
@@ -310,11 +311,16 @@
                                     )
                             ) 
                             ;;needs finish of robo - easy do together with next m
-
+                            (if (not (eq ?pos M-DS))
+                            then 
                             (assert (action (id ?robo_id) (a_type "m") (machine ?pos) (io OUTPUT) (task_id (+ ?last_robo_task 1))))
-                            (modify ?robo_s (task (+ ?last_robo_task 1)) (des ?pos) (des_at_waypoint OUTPUT) (order ?m_order))
+                            (modify ?robo_s (task (+ ?last_robo_task 1)) (des ?pos) (des_at_waypoint OUTPUT));(order ?m_order)
                             ;(printout green "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB" crlf);instruct! (implement payment check in machine instruct DONE) and move to out
-
+                            else ;was delivery
+                            (assert (instruct (machine M-BS) (operation OUTPUT) (color ?hp_base) (task_id  1) (order_id ?hp_oid)))
+                            (assert (action (id ?robo_id) (a_type "m") (machine M-BS) (io OUTPUT) (task_id (+ ?last_robo_task 1))))
+                            (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-BS) (des_at_waypoint OUTPUT))
+                            )
                             )
                         
                     
