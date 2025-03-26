@@ -137,9 +137,9 @@
 
 (defrule procces_new_order
 ?new_o <- (newOrder (id ?id))
-(order (id ?id)(complexity ?complexity)(delivery-begin ?begin)(delivery-end ?end) (base-color ?base) (ring-colors ?ring-colors) (cap-color ?cap))
+(order (id ?id)(complexity ?complexity)(delivery-begin ?begin)(delivery-end ?end) (base-color ?base) (ring-colors $?ring-colors) (cap-color ?cap))
 (test (or (eq ?id 1) (eq ?id 2))); zwishcen Lösung, betrachte nur orders 1 und 2 !!!! UPDATE WHEN THAT IS RUNING
-(not (processed_order (id ?id)))
+(not (processed_order (id ?p_id&: (eq ?p_id ?id)))); (prio ?prio_1&:(< ?hp_prio ?prio_1))
 =>
 (retract ?new_o)
 (assert (processed_order (id ?id)))
@@ -147,7 +147,7 @@
 (assert (order_colors (id ?id) (base ?base) (cap ?cap)))
 (if (not (eq ?complexity C0))
  then 
- (assert (perprocess_ring_colors (id ?id) (rings ?ring-colors) (it 1)))
+ (assert (perprocess_ring_colors (id ?id) (rings $?ring-colors) (it 1)))
 )
 )
 
