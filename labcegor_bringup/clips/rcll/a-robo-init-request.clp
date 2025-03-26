@@ -33,6 +33,7 @@
     ?machine_s <- (machine_status (name ?m_name) (task ?m_task) (order ?m_order));TODO ?name müsste pos für binding (update), klappt dann aber bei retrive nicht
     (test (or (eq ?m_name ?des) (eq ?m_name ?pos)))
     ?order_s <- (order_status (id ?order_oid) (state ?order_state) (complexity ?complexity)(next_step ?next_step))
+    ?m_order_s <- (order_status (id ?m_order))
     (test (or (eq ?robo_order 0) (eq ?robo_order 40) (eq ?robo_order ?order_oid)))
     (order_status (id ?m_order) (next_step ?m_next_step))
     (order_colors (id ?m_order) (base ?order_base) (ring_1 ?order_r1) (ring_2 ?order_r2) (ring_3 ?order_r3) (cap ?order_cap))
@@ -60,10 +61,10 @@
                         (modify ?machine_s (pos empty))
                         (if (eq ?id 1)
                             then (switch ?m_next_step
-                                (case RING_1 then (modify ?order_s (next_color ?order_r1)))
-                                (case RING_2 then (modify ?order_s (next_color ?order_r2)))
-                                (case RING_3 then (modify ?order_s (next_color ?order_r3)))
-                                (case CAP then (modify ?order_s (next_color ?order_cap)))
+                                (case RING_1 then (modify ?m_order_s (next_color ?order_r1)))
+                                (case RING_2 then (modify ?m_order_s (next_color ?order_r2)))
+                                (case RING_3 then (modify ?m_order_s (next_color ?order_r3)))
+                                (case CAP then (modify ?m_order_s (next_color ?order_cap)))
                             )
                         )
                         ;update order status
@@ -74,7 +75,7 @@
                         (modify ?order_s (state ?pos))
                         (if (eq ?id 1)
                             then (switch ?pos  ;Update next step
-                            (case M-BS then (if (eq ?complexity C0) then (modify ?order_s (next_step DELIVER)) else (modify ?order_s (next_step RING_1))))
+                            ;(case M-BS then ))
                             (case M-RS1 then (if (eq (sub-string 2 2 ?complexity) (sub-string 6 6 ?next_step)) then (modify ?order_s (next_step CAP)) else (switch (sub-string 2 2 ?complexity) (case 1  then (modify ?order_s (next_step RING_2)))
                                                     (case 2  then (modify ?order_s (next_step RING_2)))))) ;TODO
                             (case M-RS2 then (if (eq (sub-string 2 2 ?complexity) (sub-string 6 6 ?next_step)) then (modify ?order_s (next_step CAP)) else (switch (sub-string 2 2 ?complexity) (case 1  then (modify ?order_s (next_step RING_2)))
@@ -161,11 +162,11 @@
 ?init_it <- (init_it (id ?robo_id) (iteration ?it))
 ;(test (<= ?it 7))
 ;(not (newOrder)) ;;think of new check
-?hp_o <- (order_status (id ?hp_oid)(state ?hp_ostate) (next_step ?hp_next) (start_d_time ?hp_start) (last_d_time ?hp_last) (prio ?hp_prio));order with highest prio
+?hp_o <- (order_status (id ?hp_oid) (state ?hp_ostate) (next_step ?hp_next) (start_d_time ?hp_start) (last_d_time ?hp_last) (prio ?hp_prio) (complexity ?hp_compex));order with highest prio
 (not (order_status (prio ?prio_1&:(< ?hp_prio ?prio_1)))) ;; find order with highest prio
-(test (not (eq ?hp_next NONE)));new to test
+(test (not (eq ?hp_ostate DE)));wird nicht beachtet
 (order (id ?hp_oid) (base-color ?hp_base) (ring-colors $?hp_colors) (cap-color ?hp_cap))
-?hid_o <- (order_status (id ?hid_oid) (state ?hid_ostate) (prio ?hid_prio));order with highest id
+?hid_o <- (order_status (id ?hid_oid) (state ?hid_ostate) (prio ?hid_prio) (complexity ?hid_compex));order with highest id
 (not (order_status (id ?id_1&:(< ?hid_oid ?id_1))))
 ?machine_s <- (machine_status (name ?m_name) (task ?m_task) (order ?m_order) (pos ?m_pos))
 ?robo_s <- (robo_status (id ?robo_id) (task ?r_task) (order ?r_order) (pos ?pos) (pos_at_waypoint ?pos_wp) (des ?des))
@@ -187,11 +188,12 @@
                 (assert (action (a_type "m") (id 1) (machine M-BS) (io OUTPUT) (task_id (+ ?last_robo_task 1))))
                 (modify ?init_it (iteration 8))
                 (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-BS) (des_at_waypoint OUTPUT) (order ?hp_oid))
-                (if (not (eq ?m_order_r1 EMPTY)) ;richtig gematchedt? nur weil init?
-                 then (modify ?hp_o (next_step RING_1) (next_color ?m_order_r1))
-                 else
-                 (modify ?hp_o (next_step CAP) (next_color ?m_order_cap))
-                )
+                (if (eq ?hp_compex C0) then (modify ?hp_o (next_step CAP)) else (modify ?hp_o (next_step RING_1)))
+                ;(if (not (eq ?m_order_r1 EMPTY)) ;richtig gematchedt? nur weil init?
+                ; then (modify ?hp_o (next_step RING_1) (next_color ?m_order_r1))
+                ; else
+                ; (modify ?hp_o (next_step CAP) (next_color ?m_order_cap))
+                ;)
         )
      )
      (case (oneof ?robo_id 2 3) then ;;TODO schöner frage Tarki
@@ -252,6 +254,7 @@
                 then
                     (assert (action (id ?robo_id) (a_type "r") (machine ?m_name) (io OUTPUT) (task_id (+ ?last_robo_task 1))));needs finish of machine - if machine status task 0 pos out for the machine the robo is sanding
                     (modify ?robo_s (task (+ ?last_robo_task 1))(order 0))
+                   
                 )
             else
                 (if (and (eq ?r_order 0) (eq ?m_pos INPUT)) ;robo ready but machitne not
@@ -281,7 +284,7 @@
                                         (assert (action (id ?robo_id) (a_type "m") (machine M-DS) (io INPUT) (task_id (+ ?last_robo_task 1))))
                                         (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-DS) (des_at_waypoint INPUT))
                                     else
-                                        (if (eq ?m_next_c CAP_GREY)
+                                        (if (eq ?r_next_c CAP_GREY)
                                             then
                                                 (assert (action (id ?robo_id) (a_type "m") (machine M-CS1) (io INPUT) (task_id (+ ?last_robo_task 1))))
                                                 (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-CS1) (des_at_waypoint INPUT))
@@ -306,6 +309,7 @@
                                     (if(eq ?pos M-DS)
                                     then
                                     (assert (instruct (machine M-DS) (operation DELIVER) (task_id 42) (order_id ?m_order)))
+                                    (modify ?hp_o (state DE))
                                     else
                                     (assert (instruct (machine ?pos) (operation MOUNT_CAP) (task_id  42) (order_id ?m_order)))
                                     )
@@ -320,6 +324,8 @@
                             (assert (instruct (machine M-BS) (operation OUTPUT) (color ?hp_base) (task_id  1) (order_id ?hp_oid)))
                             (assert (action (id ?robo_id) (a_type "m") (machine M-BS) (io OUTPUT) (task_id (+ ?last_robo_task 1))))
                             (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-BS) (des_at_waypoint OUTPUT))
+                            (if (eq ?hp_compex C0) then (modify ?hp_o (next_step DELIVER)) else (modify ?hp_o (next_step RING_1)))
+
                             )
                             )
                         
