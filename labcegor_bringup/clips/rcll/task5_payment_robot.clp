@@ -88,7 +88,9 @@
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
   (bind ?successful (pb-field-value ?msg "successful"))
-  (bind ?target (check_payment ?m_one ?m_two))
+  ; (bind ?target (check_payment ?m_one ?m_two))
+  (bind ?target (get_target_for_payment ?m_one ?m_two ?cs_one ?cs_two))
+  (printout blue "new target: " ?target crlf)
   
   ; (printout red "robot payment did something " ?task_id " " ?tid " " ?successful " " ?cm  " " ?cr  " " ?cd  " " ?mot  " " ?mat  " " ?robot_state " " ?target crlf)
   ; It has moved
@@ -146,13 +148,14 @@
           (modify ?mpi_one (payment (+ ?m_one 1)))
         )
         (if (eq ?target M-RS2) then
+
           (modify ?mpi_two (payment (+ ?m_two 1)))
         )
       )
-      (if (eq ?target NONE) then
-        (modify ?tasks_overview (robot_type HELPER))
-        ;  (printout red "Robot payment should start something different now." crlf)
-      )
+      ; (if (eq ?target NONE) then
+      ;   (modify ?tasks_overview (robot_type HELPER))
+      ;   ;  (printout red "Robot payment should start something different now." crlf)
+      ; )
       (modify ?tasks_overview (move_target M-BS))
     )
     (modify ?tasks_overview (machine_target "Output"))
@@ -186,6 +189,10 @@
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (modify ?tasks_overview (state IDLE))
     (modify ?check_robot (did_something FALSE))
-    (modify ?tasks_overview (move_target M-BS))
+    (if (or (eq ?cs_one FALSE) (eq cs_two FALSE)) then
+      (modify ?tasks_overview (move_target ?target))
+      else
+      (modify ?tasks_overview (move_target M-BS))
+    )
   )
 )

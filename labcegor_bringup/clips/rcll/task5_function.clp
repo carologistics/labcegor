@@ -145,6 +145,31 @@
   (return NONE)
 )
 
+(deffunction get_target_for_payment (?rs1_payment ?rs2_payment ?cs1_mount ?cs2_mount)
+(printout blue "new target " ?rs1_payment " " ?rs2_payment " " ?cs1_mount " " ?cs2_mount crlf)
+  
+  (if (or (eq ?cs1_mount FALSE) (eq ?cs2_mount FALSE)) then
+    (if (eq ?cs1_mount FALSE) then
+    (return M-CS1)
+    else
+      (if (eq ?cs2_mount FALSE) then
+        (return M-CS2)
+      )
+    )
+    else
+    (if (or (< ?rs1_payment 3) (< ?rs2_payment 3)) then
+      (if(< ?rs1_payment 3) then
+        (return M-RS2)
+      )
+      (if(< ?rs2_payment 3)then
+        (return M-RS1)
+      )
+    )
+  )
+  (return NONE)
+)
+
+
 ; check order for next step
 (deffunction get_next_order_color (?oid ?delete_last_stage)
   (do-for-fact
