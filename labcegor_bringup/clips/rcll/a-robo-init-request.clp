@@ -164,7 +164,7 @@
 ;(not (newOrder)) ;;think of new check
 ?hp_o <- (order_status (id ?hp_oid) (state ?hp_ostate) (next_step ?hp_next) (start_d_time ?hp_start) (last_d_time ?hp_last) (prio ?hp_prio) (complexity ?hp_compex));order with highest prio
 (not (order_status (prio ?prio_1&:(< ?hp_prio ?prio_1)))) ;; find order with highest prio
-(test (not (eq ?hp_ostate DE)));wird nicht beachtet
+;(test (not (eq ?hp_ostate DE)));wird zu gut beachtet
 (order (id ?hp_oid) (base-color ?hp_base) (ring-colors $?hp_colors) (cap-color ?hp_cap))
 ?hid_o <- (order_status (id ?hid_oid) (state ?hid_ostate) (prio ?hid_prio) (complexity ?hid_compex));order with highest id
 (not (order_status (id ?id_1&:(< ?hid_oid ?id_1))))
@@ -290,7 +290,7 @@
                                         (assert (action (id ?robo_id) (a_type "m") (machine M-DS) (io INPUT) (task_id (+ ?last_robo_task 1))))
                                         (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-DS) (des_at_waypoint INPUT))
                                     else
-                                        (if (eq ?r_next_c CAP_GREY)
+                                        (if (eq ?m_next_c CAP_GREY)
                                             then
                                                 (assert (action (id ?robo_id) (a_type "m") (machine M-CS1) (io INPUT) (task_id (+ ?last_robo_task 1))))
                                                 (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-CS1) (des_at_waypoint INPUT))
