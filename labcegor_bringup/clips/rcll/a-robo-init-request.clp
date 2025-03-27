@@ -3,7 +3,7 @@
 =>
     (assert (order_status (id 0) (prio 0)))
     (assert (order_status (id 42) (prio 0)))
-    (assert (order_status (id 40) (state NONE) (prio 0) (complexity C0)))
+    (assert (order_status (id 40) (prio 0) (complexity C0)))
     (assert (init_it (id 1) (iteration 1)))
     (assert (init_it (id 2) (iteration 1)))
     (assert (init_it (id 3) (iteration 1)))
@@ -72,7 +72,7 @@
                     else ; was deliver        
                         (modify ?machine_s (order ?robo_order) (task 42) );TODO if not DS
                         (modify ?robo_s (order 0))
-                        (modify ?order_s (state ?pos))
+
                         (if (eq ?id 1)
                             then (switch ?pos  ;Update next step
                             ;(case M-BS then ))
@@ -83,7 +83,8 @@
                             (case M-CS1 then (modify ?order_s (next_step DELIVER)))
                             (case M-CS2 then (modify ?order_s (next_step DELIVER)))
                             (case M-DS then (modify ?order_s (next_step NONE)))
-                        )
+                            )
+                            (modify ?order_s (state ?pos))
                         )
 
                 )     
@@ -160,22 +161,21 @@
 (defrule request_task
 ?rt <- (request_task (id ?robo_id) (last_task ?last_robo_task) (robo_order ?last_robo_order) (machine_order ?last_machine_order)) ;(machine_order ?last_machine_order)
 ?init_it <- (init_it (id ?robo_id) (iteration ?it))
-;(test (<= ?it 7))
-;(not (newOrder)) ;;think of new check
 ?hp_o <- (order_status (id ?hp_oid) (state ?hp_ostate&:(not (eq ?hp_ostate DE))) (next_step ?hp_next) (start_d_time ?hp_start) (last_d_time ?hp_last) (prio ?hp_prio) (complexity ?hp_compex));order with highest prio
-(not (order_status (prio ?prio_1&:(< ?hp_prio ?prio_1)))) ;; find order with highest prio
+(not (order_status (prio ?prio_1&:(< ?hp_prio ?prio_1)) (state ?hp_ostate1&:(not (eq ?hp_ostate1 DE))) )) ;; find order with highest prio
 ;(test (not (eq ?hp_ostate DE)));wird zu gut beachtet
 (order (id ?hp_oid) (base-color ?hp_base) (ring-colors $?hp_colors) (cap-color ?hp_cap))
-?hid_o <- (order_status (id ?hid_oid) (state ?hid_ostate) (prio ?hid_prio) (complexity ?hid_compex));order with highest id
-(not (order_status (id ?id_1&:(< ?hid_oid ?id_1))))
+;?hid_o <- (order_status (id ?hid_oid) (state ?hid_ostate) (prio ?hid_prio) (complexity ?hid_compex));order with highest id
+;(not (order_status (id ?id_1&:(< ?hid_oid ?id_1))))
 ?machine_s <- (machine_status (name ?m_name) (task ?m_task) (order ?m_order) (pos ?m_pos))
 ?robo_s <- (robo_status (id ?robo_id) (task ?r_task) (order ?r_order) (pos ?pos) (pos_at_waypoint ?pos_wp) (des ?des))
 (test (or (eq ?m_name ?pos) (eq ?m_name ?des) (eq ?pos START)))
 ;(test (or (not (and (eq ?m_name ?pos) (eq ?m_pos OUTPUT))) (and (eq ?pos_wp OUTPUT) (eq ?m_name ?pos)))) ;robo not at a output, but if the coresponding machine is ready;;;;error weil worng match.... seach for differet solution
 ?r_o <-(order_status (id ?last_robo_order) (state ?r_ostate) (next_step ?r_next) (next_color ?r_next_c))
-?r_order_colors <- (order_colors (id ?last_robo_order) (base ?r_order_base) (ring_1 ?r_order_r1) (ring_2 ?r_order_r2) (ring_3 ?r_order_r2) (cap ?r_order_cap))
+?r_order_colors <- (order_colors (id ?last_robo_order) (base ?r_order_base) (ring_1 ?r_order_r1) (ring_2 ?r_order_r2) (ring_3 ?r_order_r3) (cap ?r_order_cap))
 ?m_o <-(order_status (id ?last_machine_order)(state ?m_ostate) (next_step ?m_next)(next_color ?m_next_c))
-?m_order_colors <- (order_colors (id ?last_machine_order) (base ?m_order_base) (ring_1 ?m_order_r1) (ring_2 ?m_order_r2) (ring_3 ?m_order_r2) (cap ?m_order_cap))
+?m_order_colors <- (order_colors (id ?last_machine_order) (base ?m_order_base) (ring_1 ?m_order_r1) (ring_2 ?m_order_r2) (ring_3 ?m_order_r3) (cap ?m_order_cap))
+
 =>
 (retract ?rt)
 (if (< ?it 8); (eq ?hid_oid 42);init
@@ -263,11 +263,11 @@
                     (assert (request_task (id ?robo_id) (last_task ?last_robo_task) (robo_order ?last_robo_order)))
 
                 else ;machine not ready (anymore) - robo has retrived
-                    (if (eq ?r_ostate RC)
+                    (if (eq ?hp_ostate RC)
                         then 
                             (assert (instruct (machine M-BS) (operation OUTPUT) (color ?hp_base) (task_id  1) (order_id ?hp_oid)))
                             (assert (action (id ?robo_id) (a_type "m") (machine M-BS) (io OUTPUT) (task_id (+ ?last_robo_task 1))))
-                            (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-BS) (des_at_waypoint OUTPUT))
+                            (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-BS) (des_at_waypoint OUTPUT) (order ?hp_oid))
                             (modify ?hp_o (state BS))
                             (if (eq ?hp_compex C0) then (modify ?hp_o (next_step DELIVER)) else (modify ?hp_o (next_step RING_1)))
 
@@ -346,6 +346,7 @@
             )
         )
         (case 2 then
+
             ;if CS1 not prepared and and empty prepare CS1 to RS1 if <3 else to DS
             ;if CS2 not prepared and and empty prepare CS2 to RS2 if <3 else to DS
             ;if RS1 <2 from BS to RS (check if R1 blocks BS)
