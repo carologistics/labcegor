@@ -162,7 +162,7 @@
 ?init_it <- (init_it (id ?robo_id) (iteration ?it))
 ;(test (<= ?it 7))
 ;(not (newOrder)) ;;think of new check
-?hp_o <- (order_status (id ?hp_oid) (state ?hp_ostate) (next_step ?hp_next) (start_d_time ?hp_start) (last_d_time ?hp_last) (prio ?hp_prio) (complexity ?hp_compex));order with highest prio
+?hp_o <- (order_status (id ?hp_oid) (state ?hp_ostate&:(not (eq ?hp_ostate DE))) (next_step ?hp_next) (start_d_time ?hp_start) (last_d_time ?hp_last) (prio ?hp_prio) (complexity ?hp_compex));order with highest prio
 (not (order_status (prio ?prio_1&:(< ?hp_prio ?prio_1)))) ;; find order with highest prio
 ;(test (not (eq ?hp_ostate DE)));wird zu gut beachtet
 (order (id ?hp_oid) (base-color ?hp_base) (ring-colors $?hp_colors) (cap-color ?hp_cap))
@@ -184,7 +184,7 @@
      (case 1 then
         (if (eq ?it 1)
             then
-                (assert (instruct (machine M-BS) (operation OUTPUT) (color ?hp_base) (task_id  1) (order_id ?hp_oid)));;adapt to order
+                (assert (instruct (machine M-BS) (operation OUTPUT) (color ?hp_base) (task_id  1) (order_id ?hp_oid)))
                 (assert (action (a_type "m") (id 1) (machine M-BS) (io OUTPUT) (task_id (+ ?last_robo_task 1))))
                 (modify ?init_it (iteration 8))
                 (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-BS) (des_at_waypoint OUTPUT) (order ?hp_oid))
@@ -346,8 +346,13 @@
             )
         )
         (case 2 then
-            ;noop
+            ;if CS1 not prepared and and empty prepare CS1 to RS1 if <3 else to DS
+            ;if CS2 not prepared and and empty prepare CS2 to RS2 if <3 else to DS
+            ;if RS1 <2 from BS to RS (check if R1 blocks BS)
+
+
         )
+            ;case 3             ;if RS2 <2 from BS to RS (check if R1 blocks BS)
 
         )
 
