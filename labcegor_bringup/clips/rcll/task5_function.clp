@@ -217,7 +217,7 @@
   return ?target_color
 )
 
-(deffunction check_order (?oid ?check_mounting_n_payment)
+(deffunction check_order (?oid)
   (bind ?color (get_next_order_color ?oid FALSE))
   (bind ?target_machine (switch ?color
     (case RING_GREEN then M-RS1)
@@ -231,33 +231,6 @@
     (case BASE_SILVER then M-BS)
     (default M-DS)
   ))
-  (if (eq ?check_mounting_n_payment TRUE) then
-    (bind ?price (switch ?color
-      (case RING_GREEN then 1)  ; M-RS1
-      (case RING_ORANGE then 1)  ; M-RS1
-      (case RING_YELLOW then 1)  ; M-RS2
-      (case RING_BLUE then 1)  ; M-RS2
-      (case CAP_GREY then 30)  ; M-CS1
-      (case CAP_BLACK then 30)  ; M-CS2
-      (case BASE_BLACK then 50)  ; M-BS
-      (case BASE_RED then 50)  ; M-BS
-      (case BASE_SILVER then 50)  ; M-BS
-      (default 50)  ; M-DS
-    ))
-    (do-for-fact
-      ((?mto machine_task_overview ))
-      (eq ?mto:machine_id ?target_machine)
-      (bind ?payment ?mto:payment)
-      (bind ?mounted ?mto:mounted)
-      
-      (if (eq ?price 30) then
-        (modify ?mto (mounted FALSE))
-      )
-      (if (< ?price 20) then
-        (modify ?mto (payment (- ?payment ?price)))
-      )
-    )
-  )
   (printout yellow "Target is " ?target_machine " because of " ?color crlf)
 
   return ?target_machine
