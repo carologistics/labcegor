@@ -58,6 +58,14 @@
   (slot prefix (type SYMBOL))
 )
 
+(deftemplate last_checked
+(slot id (type INTEGER))
+(slot c_time (type FLOAT)))
+
+
+(deftemplate cs-free
+(slot name (type SYMBOL)))
+
 (deffacts team_machineinit
   (team (name MAGENTA)(prefix M))
   (init_moves)
@@ -70,6 +78,11 @@
   (robo_status (id 1) (task 0) (order 0) (pos START) (pos_at_waypoint NONE));repeat for other robos
   (robo_status (id 2) (task 0) (order 0) (pos START) (pos_at_waypoint NONE))
   (robo_status (id 3) (task 0) (order 0) (pos START) (pos_at_waypoint NONE))
+  (last_checked (id 1) (c_time 0.0))
+  (last_checked (id 2) (c_time 0.0))
+  (last_checked (id 3) (c_time 0.0))
+  (cs-free (name M-CS1))
+  (cs-free (name M-CS2))
 )
 
 (deftemplate action
@@ -93,3 +106,4 @@
 )
 (deftemplate processed_order
 (slot id (type INTEGER)))
+
