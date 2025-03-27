@@ -157,7 +157,7 @@
       ;   ;  (printout red "Robot payment should start something different now." crlf)
       ; )
       
-      (?target (get_target_for_payment ?m_one ?m_two ?cs_one ?cs_two))
+      (bind ?target (get_target_for_payment ?m_one ?m_two ?cs_one ?cs_two))
       (if (eq ?target NONE) then
         (modify ?tasks_overview (move_target M-BS))
       else
