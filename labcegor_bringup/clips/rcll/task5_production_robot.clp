@@ -155,20 +155,19 @@
     (bind ?color (get_next_order_color ?oid TRUE))
     (printout green "whoooooooooooo " ?mot " " ?oid " " ?color crlf)
     (assert (order_from_machine (machine_id ?mot) (order_id ?oid) (robot_id ?rid) (color ?color) (operation MOUNT_CAP) (position ?mat)))
-    ; (if (and (eq ?mot M-DS) (eq ?mat "Output") (eq ?color "Bring_it_home")) then 
-    ; ; TODO Assign new order
-    ;   (printout green "now go home" crlf)
-    ;   ; (modify ?check_robot (is_assigned FALSE))
-    ;   ; (modify ?check_robot (did_something FALSE))
-    ;   (modify ?assigned_order (order_id 3))
-    ; )
-      (modify ?tasks_overview (machine_target "Output")); TODO check if Symbls work also...
-      (modify ?tasks_overview (can_move TRUE))
-      (modify ?tasks_overview (can_retrieve FALSE))
-      (modify ?tasks_overview (can_deliver FALSE))
-      (modify ?tasks_overview (task_id (+ ?task_id 1)))
-      (modify ?check_robot (did_something FALSE))
-      (modify ?tasks_overview (state IDLE))
+    (if (and (eq ?mot M-DS) (eq ?mat "Output") (eq ?color "Bring_it_home")) then 
+    ; TODO Assign new order
+      (printout green "Order Nr:" ?oid "finished" crlf)
+      ; (modify ?check_robot (is_assigned FALSE))
+      ; (modify ?check_robot (did_something FALSE))
+    )
+    (modify ?tasks_overview (machine_target "Output")); TODO check if Symbls work also...
+    (modify ?tasks_overview (can_move TRUE))
+    (modify ?tasks_overview (can_retrieve FALSE))
+    (modify ?tasks_overview (can_deliver FALSE))
+    (modify ?tasks_overview (task_id (+ ?task_id 1)))
+    (modify ?check_robot (did_something FALSE))
+    (modify ?tasks_overview (state IDLE))
      (printout red "robot " ?rid " should move to " ?mot " output " ?color crlf)
   )
 )
