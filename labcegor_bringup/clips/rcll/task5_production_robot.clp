@@ -153,7 +153,7 @@
     ; TODO check if difference between cm true or false for retrevial of product....
     (update_payment ?oid)
     (bind ?color (get_next_order_color ?oid TRUE))
-    (printout green "whoooooooooooo " ?mot " " ?oid " " ?color crlf)
+    (printout green "whoooooooooooo " ?mot " " ?mat " " ?oid " " ?color crlf)
     (assert (order_from_machine (machine_id ?mot) (order_id ?oid) (robot_id ?rid) (color ?color) (operation MOUNT_CAP) (position ?mat)))
     ; (if (and (eq ?mot M-DS) (eq ?mat "Output") (eq ?color "Bring_it_home")) then 
     ; ; TODO Assign new order
