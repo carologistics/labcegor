@@ -233,10 +233,10 @@
   ))
   (if (eq ?check_mounting_n_payment TRUE) then
     (bind ?price (switch ?color
-      (case RING_GREEN then 0)  ; M-RS1
-      (case RING_ORANGE then 0)  ; M-RS1
-      (case RING_YELLOW then 0)  ; M-RS2
-      (case RING_BLUE then 0)  ; M-RS2
+      (case RING_GREEN then 1)  ; M-RS1
+      (case RING_ORANGE then 1)  ; M-RS1
+      (case RING_YELLOW then 1)  ; M-RS2
+      (case RING_BLUE then 1)  ; M-RS2
       (case CAP_GREY then 30)  ; M-CS1
       (case CAP_BLACK then 30)  ; M-CS2
       (case BASE_BLACK then 50)  ; M-BS
