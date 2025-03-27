@@ -162,6 +162,10 @@
     ;   ; (modify ?check_robot (did_something FALSE))
     ;   (modify ?assigned_order (order_id 3))
     ; )
+
+    (if (and (eq ?mot M-DS) (eq ?mat "Output") (eq ?color "Bring_it_home")) then 
+    (printout green "now go home" crlf)
+    )
     (modify ?tasks_overview (machine_target "Output")); TODO check if Symbls work also...
     (modify ?tasks_overview (can_move TRUE))
     (modify ?tasks_overview (can_retrieve FALSE))
