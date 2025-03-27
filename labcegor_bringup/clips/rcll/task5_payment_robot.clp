@@ -90,7 +90,7 @@
   (bind ?successful (pb-field-value ?msg "successful"))
   (bind ?target (check_payment ?m_one ?m_two))
   ;(bind ?target (get_target_for_payment ?m_one ?m_two ?cs_one ?cs_two))
-  (printout blue "new target: " ?target crlf)
+  ; (printout blue "new target: " ?target crlf)
   
   ; (printout red "robot payment did something " ?task_id " " ?tid " " ?successful " " ?cm  " " ?cr  " " ?cd  " " ?mot  " " ?mat  " " ?robot_state " " ?target crlf)
   ; It has moved
