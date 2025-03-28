@@ -63,7 +63,7 @@
 (slot c_time (type FLOAT)))
 
 
-(deftemplate cs-free
+(deftemplate station-free
 (slot name (type SYMBOL)))
 
 (deffacts team_machineinit
@@ -81,8 +81,12 @@
   (last_checked (id 1) (c_time 0.0))
   (last_checked (id 2) (c_time 0.0))
   (last_checked (id 3) (c_time 0.0))
-  (cs-free (name M-CS1))
-  (cs-free (name M-CS2))
+  (station-free (name M-CS1))
+  (station-free (name M-CS2))
+  (station-free (name M-RS1))
+  (station-free (name M-RS2))
+  (station-free (name M-BS))
+  (station-free (name M-DS))
 )
 
 (deftemplate action

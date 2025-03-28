@@ -202,7 +202,7 @@
      (case (oneof ?robo_id 2 3) then ;;TODO schöner frage Tarki
         (switch ?it
             (case 1 then
-            (bind ?CS-free (do-for-fact ((?cs cs-free))
+            (bind ?station-free (do-for-fact ((?cs station-free))
                 (eq ?cs:name (sym-cat (str-cat "M-CS" (- ?robo_id 1))))                            
                     (assert (action (a_type "m") (id ?robo_id) (machine (sym-cat (str-cat "M-CS" (- ?robo_id 1)))) (io INPUT) (task_id (+ ?last_robo_task 1))))
                     (modify ?robo_s (task (+ ?last_robo_task 1)) (des (sym-cat (str-cat "M-CS" (- ?robo_id 1)))) (des_at_waypoint INPUT))
@@ -210,7 +210,7 @@
                     (retract ?cs)
                                 )
                     )
-                        ;(if (eq CS-free FALSE)
+                        ;(if (eq station-free FALSE)
                         ;   then
                         ;   (modify ?lc (c_time ?ros-time-float))
                         ;   (assert (request_task (id ?robo_id) (last_task ?last_robo_task) (robo_order ?last_robo_order) (machine_order ?last_machine_order)))
@@ -250,7 +250,7 @@
                 (assert (action (id ?robo_id) (a_type "m") (machine (sym-cat (str-cat "M-RS" (- ?robo_id 1)))) (io INPUT) (task_id (+ ?last_robo_task 1))))
                 (modify ?robo_s (task (+ ?last_robo_task 1)) (order 42) (des (sym-cat (str-cat "M-RS" (- ?robo_id 1)))) (des_at_waypoint INPUT))
                 (modify ?init_it (iteration (+ ?it 1)))
-                (assert (cs-free (name ?pos)))
+                (assert (station-free (name ?pos)))
 
             )
             (case 7 then
@@ -305,13 +305,13 @@
                                     then
                                         (assert (action (id ?robo_id) (a_type "m") (machine M-DS) (io INPUT) (task_id (+ ?last_robo_task 1))))
                                         (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-DS) (des_at_waypoint INPUT))
-                                        (assert (cs-free (name ?pos)))
+                                        (assert (station-free (name ?pos)))
                                     else
 
                                             
                                                     (if (eq ?m_next_c CAP_GREY)
                                                     then
-                                                        (bind ?CS-free (do-for-fact ((?cs cs-free))
+                                                        (bind ?station-free (do-for-fact ((?cs station-free))
                                                                     (eq ?cs:name M-CS1)
                                                         (assert (action (id ?robo_id) (a_type "m") (machine M-CS1) (io INPUT) (task_id (+ ?last_robo_task 1))))
                                                         (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-CS1) (des_at_waypoint INPUT))
@@ -319,7 +319,7 @@
 
                                                         ))
                                                     else 
-                                                        (bind ?CS-free (do-for-fact ((?cs cs-free))
+                                                        (bind ?station-free (do-for-fact ((?cs station-free))
                                                                     (eq ?cs:name M-CS2)
                                                                         (assert (action (id ?robo_id) (a_type "m") (machine M-CS2) (io INPUT) (task_id (+ ?last_robo_task 1))))
                                                                         (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-CS2) (des_at_waypoint INPUT))
@@ -329,7 +329,7 @@
                                                             
                                         
 
-                                         (if (eq ?CS-free FALSE)
+                                         (if (eq ?station-free FALSE)
                                             then
                                                 (modify ?lc (c_time ?ros-time-float))
                                                 (assert (request_task (id ?robo_id) (last_task ?last_robo_task) (robo_order ?last_robo_order) (machine_order ?last_machine_order)))
