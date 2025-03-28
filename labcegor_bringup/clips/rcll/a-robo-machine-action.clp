@@ -124,6 +124,7 @@
       (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionRS")) 
       (pb-set-field ?prep-msg "ring_color" ?c)
       (pb-set-field ?msg "instruction_rs" ?prep-msg)
+      (assert (update_rs (id 1) (payment (* ?ring_cost -1))))
   )
   (if (eq ?op DELIVER)
     then
