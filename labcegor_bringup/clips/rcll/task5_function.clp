@@ -261,13 +261,12 @@
     
     (printout red " price init ring color:" ?rs:color " cost:" ?rs:cost crlf)
     
-    (bind (switch ?rs:color
-    (case RING_GREEN then ?price_ring_green)  ; M-RS1
-    (case RING_ORANGE then ?price_ring_orange)  ; M-RS1
-    (case RING_YELLOW then ?price_ring_yellow)  ; M-RS2
-    (case RING_BLUE then ?price_ring_blue)  ; M-RS2
-    (default ?price_ring_green)) 1)
-    ; ) ?rs:cost)
+    (switch ?rs:color
+    (case RING_GREEN then (modify ?price_ring_green ?rs:cost))  ; M-RS1
+    (case RING_ORANGE then (modify ?price_ring_orange ?rs:cost))  ; M-RS1
+    (case RING_YELLOW then (modify ?price_ring_yellow ?rs:cost))  ; M-RS2
+    (case RING_BLUE then (modify ?price_ring_blue ?rs:cost))  ; M-RS2
+    (default (modify ?price_ring_blue 0)))
   )
   (printout yellow " price after " ?price_ring_green " " ?price_ring_orange " " ?price_ring_yellow " " ?price_ring_blue " " crlf)
 
