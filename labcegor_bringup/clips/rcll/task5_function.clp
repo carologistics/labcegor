@@ -154,20 +154,21 @@
   )
   (if (eq even TRUE) then
     (if (eq ?cs1_mount FALSE) then
-    (return M-CS1)
+      return M-CS1
     )
     (if(< ?rs1_payment 3) then
-      (return M-RS1)
+      return M-RS1
     )
   else
     (if (eq ?cs2_mount FALSE) then
-      (return M-CS2)
+      return M-CS2
     )
     (if(< ?rs2_payment 3)then
-      (return M-RS2)
+      return M-RS2
     )
   )
-  (return NONE)
+
+  return NONE
 )
 
 
