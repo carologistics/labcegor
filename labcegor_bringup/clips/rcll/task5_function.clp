@@ -147,26 +147,26 @@
 
 (deffunction get_target_for_payment (?rs1_payment ?rs2_payment ?cs1_mount ?cs2_mount ?robot_id)
 (printout blue "new target " ?rs1_payment " " ?rs2_payment " " ?cs1_mount " " ?cs2_mount crlf)
-  (if (eq (mod ?robot_id 2) 0) then
-    (bind ?even TRUE)
-    else
-    (bind ?even FALSE)
-  )
-  (if (eq ?even TRUE) then
-    (if (eq ?cs1_mount FALSE) then
-      return M-CS1
-    )
-    (if(< ?rs1_payment 3) then
-      return M-RS1
-    )
-  else
-    (if (eq ?cs2_mount FALSE) then
-      return M-CS2
-    )
-    (if(< ?rs2_payment 3)then
-      return M-RS2
-    )
-  )
+  ; (if (eq (mod ?robot_id 2) 0) then
+  ;   (bind ?even TRUE)
+  ;   else
+  ;   (bind ?even FALSE)
+  ; )
+  ; (if (eq ?even TRUE) then
+  ;   (if (eq ?cs1_mount FALSE) then
+  ;     return M-CS1
+  ;   )
+  ;   (if(< ?rs1_payment 3) then
+  ;     return M-RS1
+  ;   )
+  ; else
+  ;   (if (eq ?cs2_mount FALSE) then
+  ;     return M-CS2
+  ;   )
+  ;   (if(< ?rs2_payment 3)then
+  ;     return M-RS2
+  ;   )
+  ; )
 
   return NONE
 )

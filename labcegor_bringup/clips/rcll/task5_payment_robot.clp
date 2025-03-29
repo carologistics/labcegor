@@ -74,7 +74,7 @@
 ; ==========
 ; ROBOT 3 for Payment
 ; ==========
-(defrule check-robot_payment
+(defrule check_robot_payment
   (game-state (phase PRODUCTION))
   ?tasks_overview <- (tasks_overview (robot_id ?rid) (robot_type PAYMENT) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?mpi_one <- (machine_task_overview (machine_id M-RS1) (payment ?m_one))
