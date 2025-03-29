@@ -12,7 +12,7 @@
   (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
   ?machine_task_overview <- (machine_task_overview (machine_id ?mot) (machine_task ?task) (payment ?payment) (mounted ?mounted))
   =>
-  (printout blue "Robot " ?peer-name " robot-id " ?rid ?base-color crlf)
+  ; (printout blue "Robot " ?peer-name " robot-id " ?rid ?base-color crlf)
   ; Get Order
   ; Prepare Basestation PrepareMachine
   (if (and (eq ?robot_state IDLE) (eq ?cd FALSE) (eq ?mot M-BS)) then 
@@ -53,9 +53,9 @@
   (machine (name ?machine-name&:(eq ?machine-name (sym-cat ?mot))) (state ?s))
   (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
   =>
-  (printout green ?peer-name " " ?mot " " ?mat " is in state " ?s " " ?oid  crlf)
+  ; (printout green ?peer-name " " ?mot " " ?mat " is in state " ?s " " ?oid  crlf)
   (if (eq ?s READY-AT-OUTPUT) then
-     (printout red "just take it" crlf)
+    ;  (printout red "just take it" crlf)
     (send_retrieve_from_cmd ?rid ?mot ?mat ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
     (modify ?tasks_overview (state HOLDING))
@@ -64,9 +64,9 @@
     (modify ?tasks_overview (robot_id 1) (robot_type PRODUCTION) (can_move TRUE) (can_retrieve FALSE) (can_deliver FALSE) (state IDLE) (move_target M-BS) (machine_target "Input" ))
     (modify ?check_robot (robot_id 1) (did_something FALSE) (is_assigned TRUE) (go_to_next_step TRUE))
     (modify ?assigned_order (order_id (+ ?oid 1)) (robot_id 1) (ready_for_next_step FALSE))
-    (printout green "lets start over" crlf)
+    ; (printout green "lets start over" crlf)
   )
-  (printout green "will it work? " ?mot crlf)
+  ; (printout green "will it work? " ?mot crlf)
 )
 
 (defrule deliver_part_to_machine_order_based
@@ -113,7 +113,7 @@
   ; )
   ; It moved
   (if (and (eq ?task_id ?tid) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE) (eq ?robot_state MOVING) (eq ?successful TRUE) (eq ?mat "Input")) then
-     (printout green "robot " ?rid " can now grab the base of color: " ?base-color " from order: " ?oid crlf)
+    ;  (printout green "robot " ?rid " can now grab the base of color: " ?base-color " from order: " ?oid crlf)
     (modify ?tasks_overview (can_move FALSE))
     (modify ?tasks_overview (can_retrieve TRUE))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
@@ -141,7 +141,7 @@
     (modify ?machine_task_overview (machine_task NOT-SET))
     ; Todo get target based on order
     (modify ?tasks_overview (machine_target "Input"))
-     (printout green "Yippiiiiiiiiiieee" crlf)
+    ;  (printout green "Yippiiiiiiiiiieee" crlf)
   )
 
   ; It moved to deliver
@@ -158,18 +158,18 @@
     ; TODO check if difference between cm true or false for retrevial of product....
     (update_payment ?oid)
     (bind ?color (get_next_order_color ?oid TRUE))
-    (printout green "whoooooooooooo " ?mot " " ?mat " " ?oid " " ?color crlf)
+    ; (printout green "whoooooooooooo " ?mot " " ?mat " " ?oid " " ?color crlf)
     (assert (order_from_machine (machine_id ?mot) (order_id ?oid) (robot_id ?rid) (color ?color) (operation MOUNT_CAP) (position ?mat)))
     ; (if (and (eq ?mot M-DS) (eq ?mat "Output") (eq ?color "Bring_it_home")) then 
     ; ; TODO Assign new order
-    ;   (printout green "now go home" crlf)
+    (printout green "now go home" crlf)
     ;   ; (modify ?check_robot (is_assigned FALSE))
     ;   ; (modify ?check_robot (did_something FALSE))
     ;   (modify ?assigned_order (order_id 3))
     ; )
 
     (if (and (eq ?mot M-DS) (eq ?mat "Output") (eq ?color "Bring_it_home")) then 
-    (printout green "now go home" crlf)
+    ; (printout green "now go home" crlf)
     )
     (modify ?tasks_overview (machine_target "Output")); TODO check if Symbls work also...
     (modify ?tasks_overview (can_move TRUE))
@@ -178,6 +178,6 @@
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (modify ?check_robot (did_something FALSE))
     (modify ?tasks_overview (state IDLE))
-     (printout red "robot " ?rid " should move to " ?mot " output " ?color crlf)
+    ;  (printout red "robot " ?rid " should move to " ?mot " output " ?color crlf)
   )
 )
