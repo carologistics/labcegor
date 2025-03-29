@@ -261,12 +261,12 @@
     
     (printout red " price init ring color:" ?rs:color " cost:" ?rs:cost crlf)
     
-    (printout red "Test " (switch ?rs:color
+    (bind (switch ?rs:color
     (case RING_GREEN then ?price_ring_green)  ; M-RS1
     (case RING_ORANGE then ?price_ring_orange)  ; M-RS1
     (case RING_YELLOW then ?price_ring_yellow)  ; M-RS2
     (case RING_BLUE then ?price_ring_blue)  ; M-RS2
-    (default nil) ))
+    (default ?price_ring_green)) 1)
     ; ) ?rs:cost)
   )
   (printout yellow " price after " ?price_ring_green " " ?price_ring_orange " " ?price_ring_yellow " " ?price_ring_blue " " crlf)
