@@ -51,6 +51,10 @@
 (slot id (type INTEGER))
 (slot iteration (type INTEGER)))
 
+(deftemplate pay_it 
+(slot id (type INTEGER))
+(slot iteration (type INTEGER)))
+
 (deftemplate update_rs
   (slot id (type INTEGER)) ;; rs1/RS2
   (slot payment (type INTEGER) (allowed-values 1 0 -1 -2)) ;1 for ring is added -1, -2 für payment for ring 0 as optional

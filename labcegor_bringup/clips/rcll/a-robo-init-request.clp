@@ -14,6 +14,7 @@
     (assert (order_colors (id 42)))
     (assert (order_colors (id 40)))
     (assert (cs_it (id 2) (iteration 1)))
+    (assert (pay_it (id 3) (iteration 1)))
 )
 
 (defrule waitforfinish_machine
@@ -171,19 +172,31 @@
      (case 1 then
         (if (eq ?it 1)
             then
+            (bind ?station-free (do-for-fact ((?station station-free))
+                (eq ?station:name M-BS)  
                 (assert (instruct (machine M-BS) (operation OUTPUT) (color ?hp_base) (task_id  1) (order_id ?hp_oid)))
                 (assert (action (a_type "m") (id 1) (machine M-BS) (io OUTPUT) (task_id (+ ?last_robo_task 1))))
                 (modify ?init_it (iteration 8))
                 (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-BS) (des_at_waypoint OUTPUT) (order ?hp_oid))
                 (modify ?hp_o (state BS))
                 (if (eq ?hp_compex C0) then (modify ?hp_o (next_step CAP)) else (modify ?hp_o (next_step RING_1)))
+            retract ?station)
+                                )
+                    )
+            (if (eq ?station-free FALSE)
+            then
+                (modify ?lc (c_time ?ros-time-float))
+                (assert (request_task (id ?robo_id) (last_task ?last_robo_task) (robo_order ?last_robo_order) (machine_order ?last_machine_order)))
+                (bind ?station-free TRUE)
+
+        )         
                 ;(if (not (eq ?m_order_r1 EMPTY)) ;richtig gematchedt? nur weil init?
                 ; then (modify ?hp_o (next_step RING_1) (next_color ?m_order_r1))
                 ; else
                 ; (modify ?hp_o (next_step CAP) (next_color ?m_order_cap))
                 ;)
         )
-     )
+
      (case (oneof ?robo_id 2 3) then ;;TODO schöner frage Tarki
         (switch ?it
             (case 1 then
@@ -225,7 +238,8 @@
                         (modify ?robo_s (task (+ ?last_robo_task 1)))
                         (modify ?init_it (iteration (+ ?it 1)))
                     else
-                        (modify ?init_it (iteration 5)) ; loop untill if true
+                        ;(modify ?init_it (iteration 5)); loop untill if true
+                        (modify ?lc (c_time ?ros-time-float))
                         (assert (request_task (id ?robo_id) (last_task ?last_robo_task) (robo_order ?last_robo_order)))
                 )
             )
@@ -267,11 +281,23 @@
                 else ;machine not ready (anymore) - robo has retrived
                     (if (eq ?hp_ostate RC)
                         then 
+                        (bind ?station-free (do-for-fact ((?station station-free))
+                            (eq ?station:name M-BS)  
                             (assert (instruct (machine M-BS) (operation OUTPUT) (color ?hp_base) (task_id  1) (order_id ?hp_oid)))
                             (assert (action (id ?robo_id) (a_type "m") (machine M-BS) (io OUTPUT) (task_id (+ ?last_robo_task 1))))
                             (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-BS) (des_at_waypoint OUTPUT) (order ?hp_oid))
                             (modify ?hp_o (state BS))
                             (if (eq ?hp_compex C0) then (modify ?hp_o (next_step DELIVER)) else (modify ?hp_o (next_step RING_1)))
+                            (retract ?station)
+                                        )
+                        )
+                            (if (eq ?station-free FALSE)
+                                then
+                                    (modify ?lc (c_time ?ros-time-float))
+                                    (assert (request_task (id ?robo_id) (last_task ?last_robo_task) (robo_order ?last_robo_order) (machine_order ?last_machine_order)))
+                                    (bind ?station-free TRUE)
+
+                            )  
 
                         else
                         (if (and (eq ?pos_wp OUTPUT) (not (eq ?last_machine_order 0))) ;target decition not succesfull TODO maybe wrongly set line 175
@@ -280,12 +306,28 @@
                             then
                                 (if (or (eq ?m_next_c RING_ORANGE) (eq ?m_next_c RING_GREEN))
                                  then
+                                 (bind ?station-free (do-for-fact ((?station station-free))
+                                    (eq ?station:name M-RS1)
                                     (assert (action (id ?robo_id) (a_type "m") (machine M-RS1) (io INPUT) (task_id (+ ?last_robo_task 1))))
                                     (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-RS1) (des_at_waypoint INPUT))
+                                    (retract ?station)
+                                                        ))
                                 else 
+                                     (bind ?station-free (do-for-fact ((?station station-free))
+                                    (eq ?station:name M-RS1)
                                     (assert (action (id ?robo_id) (a_type "m") (machine M-RS2) (io INPUT) (task_id (+ ?last_robo_task 1))))
                                     (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-RS2) (des_at_waypoint INPUT))
+                                    (retract ?station)
+
+                                                        ))
                                 )
+                                (if (eq ?station-free FALSE)
+                                            then
+                                                (modify ?lc (c_time ?ros-time-float))
+                                                (assert (request_task (id ?robo_id) (last_task ?last_robo_task) (robo_order ?last_robo_order) (machine_order ?last_machine_order)))
+                                                (bind ?station-free TRUE)
+
+                                        ) 
                             else ;next is cap or deliver
                                 (if (eq ?m_next DELIVER)
                                     then
@@ -321,6 +363,7 @@
                                             then
                                                 (modify ?lc (c_time ?ros-time-float))
                                                 (assert (request_task (id ?robo_id) (last_task ?last_robo_task) (robo_order ?last_robo_order) (machine_order ?last_machine_order)))
+                                                (bind ?station-free TRUE)
                                         ) 
                                 )
                             )
@@ -370,6 +413,8 @@
 (defrule request_task_CS1_refill
 ?rt <- (request_task (id 2) (last_task ?last_robo_task) (robo_order ?last_robo_order) (machine_order ?last_machine_order)) ;(machine_order ?last_machine_order)
 ?lc <- (last_checked (id 2) (c_time ?check_time))
+(init_it (id 2) (iteration ?init_it))
+(test (eq ?init_it 8))
 (time ?ros-time-float)
 (test (> (- ?ros-time-float ?check_time) 1))
 ?prep <- (prepare-CS1)
@@ -419,7 +464,8 @@
                         (modify ?robo_s (task (+ ?last_robo_task 1)))
                         (modify ?CS_it (iteration (+ ?it 1)))
                     else
-                        (modify ?CS_it (iteration 5)) ; loop untill if true
+                        ;(modify ?CS_it (iteration 5)) ; loop untill if true
+                        (modify ?lc (c_time ?ros-time-float))
                         (assert (request_task (id 2) (last_task ?last_robo_task) (robo_order ?last_robo_order)))
                 )
             )
@@ -451,9 +497,11 @@
                 (if (eq ?pos M-CS1)
                 then
                     (assert (action (id 2) (a_type "d") (machine M-RS1) (io SLIDE) (task_id (+ ?last_robo_task 1))))
+                    (modify ?robo_s (task (+ ?last_robo_task 1)))
                     (modify ?CS_it (iteration (+ ?it 1)))
                 else
                     (assert (action (id 2) (a_type "d") (machine M-DS) (io INPUT) (task_id (+ ?last_robo_task 1))))
+                    (modify ?robo_s (task (+ ?last_robo_task 1)))
                     (modify ?CS_it (iteration (+ ?it 1)))
                 )
             )
@@ -477,6 +525,8 @@
 (time ?ros-time-float)
 (test (> (- ?ros-time-float ?check_time) 1))
 ?prep <- (prepare-CS2)
+(init_it (id 2) (iteration ?init_it))
+(test (eq ?init_it 8))
 ?robo_s <- (robo_status (id 2) (task ?r_task) (order ?r_order) (pos ?pos) (pos_at_waypoint ?pos_wp) (des ?des))
 ?machine_s <- (machine_status (name ?m_name) (task ?m_task) (order ?m_order) (pos ?m_pos))
 ?CS_it <- (cs_it (id 2) (iteration ?it))
@@ -523,7 +573,8 @@
                         (modify ?robo_s (task (+ ?last_robo_task 1)))
                         (modify ?CS_it (iteration (+ ?it 1)))
                     else
-                        (modify ?CS_it (iteration 5)) ; loop untill if true
+                        (modify ?lc (c_time ?ros-time-float))
+                        ;(modify ?CS_it (iteration 5)) ; loop untill if true
                         (assert (request_task (id 2) (last_task ?last_robo_task) (robo_order ?last_robo_order)))
                 )
             )
@@ -555,10 +606,12 @@
                 (if (eq ?pos M-CS2)
                 then
                     (assert (action (id 2) (a_type "d") (machine M-RS2) (io SLIDE) (task_id (+ ?last_robo_task 1))))
+                    (modify ?robo_s (task (+ ?last_robo_task 1)))
                     (modify ?CS_it (iteration (+ ?it 1)))
 
                 else
                     (assert (action (id 2) (a_type "d") (machine M-DS) (io INPUT) (task_id (+ ?last_robo_task 1))))
+                    (modify ?robo_s (task (+ ?last_robo_task 1)))
                     (modify ?CS_it (iteration (+ ?it 1)))
                 )
             )
@@ -575,6 +628,102 @@
  )
 )
 )
+
+(defrule request_task_payment
+?rt <- (request_task (id 3) (last_task ?last_robo_task) (robo_order ?last_robo_order) (machine_order ?last_machine_order)) ;(machine_order ?last_machine_order)
+?lc <- (last_checked (id 3) (c_time ?check_time))
+(time ?ros-time-float)
+(test (> (- ?ros-time-float ?check_time) 1))
+(init_it (id 3) (iteration ?init_it))
+(test (eq ?init_it 8))
+?robo_s <- (robo_status (id 3) (task ?r_task) (order ?r_order) (pos ?pos) (pos_at_waypoint ?pos_wp) (des ?des))
+?machine_s <- (machine_status (name ?m_name) (task ?m_task) (order ?m_order) (pos ?m_pos))
+?pay_it <- (pay_it (id 3) (iteration ?it))
+(machine_status (name M-RS1) (slide_shelf ?rs1_slide))
+(machine_status (name M-RS2) (slide_shelf ?rs2_slide))
+=>
+(retract ?rt)
+(switch ?it
+            (case 1 then
+            (bind ?station-free (do-for-fact ((?station station-free))
+                (eq ?station:name M-BS)
+                    (retract ?station)
+                    (assert (instruct (machine M-BS) (operation OUTPUT) (color BASE_BLACK) (task_id  1) (order_id 40)))
+                    (assert (action (a_type "m") (id 3) (machine M-BS) (io OUTPUT) (task_id (+ ?last_robo_task 1))))
+                    (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-BS) (des_at_waypoint OUTPUT))
+                    (modify ?pay_it (iteration (+ ?it 1)))
+                                )
+                    )
+                    (if (eq station-free FALSE)
+                        then
+                        (modify ?lc (c_time ?ros-time-float))
+                        (assert (request_task (id 3) (last_task ?last_robo_task) (robo_order ?last_robo_order) (machine_order ?last_machine_order)))
+                    )    
+            )
+            (case 2 then
+                (if (and (eq ?m_task 0) (eq ?m_pos OUTPUT))
+                    then
+                        (assert (action (id 3) (a_type "r") (machine M-BS) (io OUTPUT) (task_id (+ ?last_robo_task 1))));needs finish of machine - if machine status task 0 pos out for the machine the robo is sanding
+                        (modify ?robo_s (task (+ ?last_robo_task 1))(order 0))
+                        (modify ?pay_it (iteration (+ ?it 1)))            
+                    else
+                    (modify ?lc (c_time ?ros-time-float))
+                    (assert (request_task (id 3) (last_task ?last_robo_task) (robo_order ?last_robo_order)))
+                )
+
+            )
+            (case 3 then
+                    (assert (action (a_type "m") (id 3) (machine M-BS) (io INPUT) (task_id (+ ?last_robo_task 1))))
+                    (modify ?robo_s (task (+ ?last_robo_task 1)) (order 42) (des M-BS) (des_at_waypoint INPUT))
+                    (modify ?pay_it (iteration (+ ?it 1)))            
+                    (assert (station-free (name M-BS)))
+            )
+            (case 4 then
+                (if (< ?rs1_slide 2)
+                    then
+                    (bind ?station-free (do-for-fact ((?station station-free))
+                        (eq ?station:name M-RS1)
+                        (assert (action (id 3) (a_type "m") (machine M-RS1) (io INPUT) (task_id (+ ?last_robo_task 1))))
+                        (modify ?robo_s (task (+ ?last_robo_task 1)) (order 42) (des M-RS1) (des_at_waypoint INPUT))
+                        (modify ?pay_it (iteration (+ ?it 1)))
+                        (assert (station-free (name ?pos)))
+                        (retract ?station)
+                        )
+                    )
+                    else
+                    (if (< ?rs2_slide 2)
+                    then
+                    (bind ?station-free (do-for-fact ((?station station-free))
+                        (eq ?station:name M-RS2)
+                        (assert (action (id 3) (a_type "m") (machine M-RS2) (io INPUT) (task_id (+ ?last_robo_task 1))))
+                        (modify ?robo_s (task (+ ?last_robo_task 1)) (order 42) (des M-RS2) (des_at_waypoint INPUT))
+                        (modify ?pay_it (iteration (+ ?it 1)))
+                        (assert (station-free (name ?pos)))
+                        (retract ?station)
+                        )
+                    )
+                    else
+                        (modify ?lc (c_time ?ros-time-float))
+                        (assert (request_task (id 3) (last_task ?last_robo_task) (robo_order ?last_robo_order)))
+                    )
+                     )
+                    (if (eq station-free FALSE)
+                        then
+                        (modify ?lc (c_time ?ros-time-float))
+                        (assert (request_task (id 3) (last_task ?last_robo_task) (robo_order ?last_robo_order) (machine_order ?last_machine_order)))
+                    )    
+                )
+
+            (case 5 then
+                ;deliver to slide
+            )
+            (case 6 then
+                ;move BS in; free RS
+            )
+)
+)
+
+
 (defrule complete_init
     (init_it (id 1) (iteration 8))
     (init_it (id 2) (iteration 8))
