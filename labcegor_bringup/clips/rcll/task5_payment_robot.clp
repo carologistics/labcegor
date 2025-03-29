@@ -140,6 +140,11 @@
     (if (and (or (eq ?mot M-CS1) (eq ?mot M-CS2)) (eq ?mounted FALSE) ) then
       (assert (order_from_machine (machine_id ?mot) (order_id 0) (robot_id ?rid) (operation RETRIEVE_CAP)))
       (modify ?machine_task_overview (mounted TRUE))
+      (modify ?tasks_overview (machine_target "Output"))
+    )
+
+    (if (eq ?mot M-BS) then 
+      (modify ?tasks_overview (machine_target "Output"))
     )
     
     (if (not (or (eq ?mot M-CS1) (eq ?mot M-CS2))) then
@@ -152,11 +157,6 @@
           (modify ?mpi_two (payment (+ ?m_two 1)))
         )
       )
-      ; (if (eq ?target NONE) then
-      ;   (modify ?tasks_overview (robot_type HELPER))
-      ;   ;  (printout red "Robot payment should start something different now." crlf)
-      ; )
-      
       ; (bind ?target (get_target_for_payment ?m_one ?m_two ?cs_one ?cs_two))
       (if (eq ?target NONE) then
         (modify ?tasks_overview (move_target M-BS))
@@ -164,7 +164,6 @@
         (modify ?tasks_overview (move_target ?target))
       )
     )
-    (modify ?tasks_overview (machine_target "Output"))
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (modify ?check_robot (did_something FALSE))
     (modify ?tasks_overview (state IDLE))
