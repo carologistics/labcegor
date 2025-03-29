@@ -53,7 +53,7 @@
   (machine (name ?machine-name&:(eq ?machine-name (sym-cat ?mot))) (state ?s))
   (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
   =>
-  (printout green ?peer-name " " ?mot" is in state " ?s " " ?oid " " crlf)
+  (printout green ?peer-name " " ?mot " " ?mat " is in state " ?s " " ?oid " " crlf)
   (if (eq ?s READY-AT-OUTPUT) then
      (printout red "just take it" crlf)
     (send_retrieve_from_cmd ?rid ?mot ?mat ?peer-id ?tid)
@@ -61,8 +61,9 @@
     (modify ?tasks_overview (state HOLDING))
   )
   (if (and (eq ?mot "M-DS") (eq ?mat "Output") (eq ?s "IDLE")) then
-
-    (modify ?assigned_order (order_id (+ ?oid 1)))
+    (modify ?tasks_overview (tasks_overview (robot_id 1) (robot_type PRODUCTION) (can_move TRUE) (can_retrieve FALSE) (can_deliver FALSE) (state IDLE) (move_target M-BS) (machine_target "Input" )))
+    (modify ?check_robot (check_robot (robot_id 1) (did_something FALSE) (is_assigned TRUE) (go_to_next_step TRUE)))
+    (modify ?assigned_order (assigned_order (order_id (+ ?oid 1)) (robot_id 1) (ready_for_next_step FALSE)))
     (printout green "lets start over" crlf)
   )
   (printout green "will it work? " ?mot crlf)
