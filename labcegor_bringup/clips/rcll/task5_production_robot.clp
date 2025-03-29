@@ -53,7 +53,7 @@
   (machine (name ?machine-name&:(eq ?machine-name (sym-cat ?mot))) (state ?s))
   (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
   =>
-  (printout green ?peer-name " " ?mot " " ?mat " is in state " ?s " " ?oid " " crlf)
+  (printout green ?peer-name " " ?mot " " ?mat " is in state " ?s " " ?oid " " (and (eq ?mot "M-DS") (eq ?mat "Output") (eq ?s "IDLE")) (eq ?mot "M-DS")  (eq ?mat "Output") (eq ?s "IDLE") crlf)
   (if (eq ?s READY-AT-OUTPUT) then
      (printout red "just take it" crlf)
     (send_retrieve_from_cmd ?rid ?mot ?mat ?peer-id ?tid)
