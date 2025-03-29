@@ -61,8 +61,7 @@
     (modify ?tasks_overview (state HOLDING))
   )
   (if (and (eq ?mot "M-DS") (eq ?mat "Output") (eq ?s "IDLE")) then
-    (reset ?check_robot)
-    (reset ?tasks_overview)
+
     (modify ?assigned_order (order_id (+ ?oid 1)))
     (printout green "lets start over" crlf)
   )
