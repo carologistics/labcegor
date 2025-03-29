@@ -150,7 +150,7 @@
   (if (eq (mod ?robot_id 2) 0) then
     (bind ?even TRUE)
   )
-  (printout blue "new target " ?even " " ?robot_id ".. " ?rs1_payment " " ?rs2_payment " " ?cs1_mount " " ?cs2_mount crlf)
+  ;(printout blue "new target " ?even " " ?robot_id ".. " ?rs1_payment " " ?rs2_payment " " ?cs1_mount " " ?cs2_mount crlf)
   (if (eq ?even TRUE) then
     (if (eq ?cs1_mount FALSE) then
       return M-CS1
