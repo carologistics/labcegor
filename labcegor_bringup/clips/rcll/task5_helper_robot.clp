@@ -88,7 +88,7 @@
   (bind ?successful (pb-field-value ?msg "successful"))
   (bind ?target (check_payment ?m_one ?m_two))
   
-   (printout blue "robot helper did something " ?task_id " " ?tid " " ?successful " " ?cm  " " ?cr  " " ?cd  " " ?mot  " " ?mat  " " ?robot_state " " ?target " " (or (not (or (eq ?mot M-CS1) (eq ?mot M-CS2))) (eq ?mounted TRUE) ) " CS?:" (or (eq ?mot M-CS1) (eq ?mot M-CS2)) " mounted?: " (eq ?mounted TRUE) crlf)
+  ;  (printout blue "robot helper did something " ?task_id " " ?tid " " ?successful " " ?cm  " " ?cr  " " ?cd  " " ?mot  " " ?mat  " " ?robot_state " " ?target " " (or (not (or (eq ?mot M-CS1) (eq ?mot M-CS2))) (eq ?mounted TRUE) ) " CS?:" (or (eq ?mot M-CS1) (eq ?mot M-CS2)) " mounted?: " (eq ?mounted TRUE) crlf)
   ; It has moved
   (if (and (eq ?robot_id ?rid) (eq ?task_id ?tid) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE)) then 
     (modify ?tasks_overview (can_move FALSE))
@@ -150,15 +150,15 @@
           (modify ?mpi_two (payment (+ ?m_two 1)))
         )
       )
-        (if (eq ?target NONE) then
-          (modify ?tasks_overview (robot_type HELPER))
-           (printout red "Robot helper should start something different now." crlf)
-        )
+      (if (eq ?target NONE) then
+        (modify ?tasks_overview (robot_type HELPER))
       )
+      (printout red ?target " Robot helper should start something different now." crlf)
+    )
     (modify ?tasks_overview (task_id (+ ?task_id 1)))
     (modify ?check_robot (did_something FALSE))
     (modify ?tasks_overview (state IDLE))
-     (printout green "where should it go now? " ?target " " ?m_one " " ?m_two " soooo?: " (check_payment ?m_one ?m_two) crlf)
+    (printout green "where should it go now? " ?target " " ?m_one " " ?m_two " soooo?: " (check_payment ?m_one ?m_two) crlf)
   )
   ; hacky shit
   (if (and (eq ?robot_id ?rid) (eq ?task_id ?tid) (eq ?successful FALSE) (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cd FALSE)) then 
