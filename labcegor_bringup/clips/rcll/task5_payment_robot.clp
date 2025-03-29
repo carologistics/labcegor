@@ -9,7 +9,7 @@
   (test (or (eq ?robot_state IDLE) (eq ?robot_state HOLDING)))
   =>
 
-  ;  (printout red "ROBOT Move " ?rid " " ?robot_state " " ?mot " " ?mat " " ?peer-id crlf)
+  (printout red ?peer-name " Move " ?rid " " ?robot_state " " ?mot " " ?mat " " ?peer-id crlf)
 
   ;Prepare Basestation PrepareMachine
   (if (eq ?robot_state IDLE) then 
@@ -39,7 +39,7 @@
   ?machine_task_overview <- (machine_task_overview (machine_id ?mot) (machine_task ?task) (payment ?payment) (mounted ?mounted))
   (not (order_from_machine (robot_id ?rid) ))
   =>
-  ;  (printout red "ROBOT Pickup " ?rid " " ?robot_state " " ?mot " " ?mat " " ?s ?peer-id crlf)
+  (printout red ?peer-name " Pickup " ?rid " " ?robot_state " " ?mot " " ?mat " " ?s ?peer-id crlf)
 
   (if (and (or (eq ?mot M-CS1) (eq ?mot M-CS2)) (eq ?mounted FALSE)) then
     ;  (printout green "payment retrieve" crlf)
@@ -61,7 +61,7 @@
   (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
   =>
 
-  ;  (printout red "ROBOT Delevery " ?rid " " ?robot_state " " ?mot " " ?mat " " ?peer-id crlf)
+  (printout red ?peer-name " Delevery " ?rid " " ?robot_state " " ?mot " " ?mat " " ?peer-id crlf)
   (send_deliver_to_cmd ?rid ?mot ?mat ?peer-id ?tid)
   (modify ?check_robot (did_something TRUE))
   (modify ?tasks_overview (state IDLE))
