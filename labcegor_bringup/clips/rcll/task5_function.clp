@@ -153,21 +153,20 @@
   ;(printout blue "new target " ?even " " ?robot_id ".. " ?rs1_payment " " ?rs2_payment " " ?cs1_mount " " ?cs2_mount crlf)
   (if (eq ?even TRUE) then
     (if (eq ?cs1_mount FALSE) then
-      return M-CS1
+      (return M-CS1)
     )
     (if(< ?rs1_payment 3) then
-      return M-RS1
+      (return M-RS1)
     )
   else
     (if (eq ?cs2_mount FALSE) then
-      return M-CS2
+      (return M-CS2)
     )
     (if(< ?rs2_payment 3)then
-      return M-RS2
+      (return M-RS2)
     )
   )
-
-  return NONE
+  (return NONE)
 )
 
 
@@ -185,7 +184,7 @@
     (if (eq ?cap-color "Bring_it_home") then
       (bind ?target_color ?cap-color)
       (printout green "should finish now " ?target_color crlf)
-      return ?target_color
+      (return ?target_color)
     )
 
     (if (eq (length$ ?ring-colors) 0) then
@@ -196,7 +195,7 @@
         (bind ?cap-color "Bring_it_home") ; next delivery point should be the DS
         (modify ?order (cap-color ?cap-color))
       )
-      return ?target_color
+      (return ?target_color)
     )
 
     (if (> (length$ ?ring-colors) 0) then 
@@ -215,7 +214,7 @@
 
     )
   )
-  return ?target_color
+  (return ?target_color)
 )
 
 (deffunction check_order (?oid)
@@ -234,7 +233,7 @@
   ))
   (printout yellow "Target is " ?target_machine " because of " ?color crlf)
 
-  return ?target_machine
+  (return ?target_machine)
 )
 
 
