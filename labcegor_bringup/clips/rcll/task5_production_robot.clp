@@ -46,7 +46,7 @@
                                       (can_move FALSE) (can_retrieve TRUE) (robot_type PRODUCTION) 
                                       (state ?robot_state) (move_target ?mot) (machine_target ?mat))
   ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE) (is_assigned TRUE))
-  (assigned_order (order_id ?oid) (robot_id ?rid))
+  ?assigned_order <- (assigned_order (order_id ?oid) (robot_id ?rid))
   ?order <- (order (id ?oid) (name ?order-name) (base-color ?base-color))
   (not (order_from_machine (robot_id ?rid)))
   ; TODO make machine name dependent on move_target
@@ -59,6 +59,12 @@
     (send_retrieve_from_cmd ?rid ?mot ?mat ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
     (modify ?tasks_overview (state HOLDING))
+  )
+  (if (and (eq ?mot "M-DS") (eq ?mat "Output") (eq ?s "IDLE")) then
+    (reset ?check_robot)
+    (reset ?tasks_overview)
+    (modify ?assigned_order (order_id (+ ?oid 1)))
+    (printout green "lets start over" crlf)
   )
   (printout green "will it work? " ?mot crlf)
 )
