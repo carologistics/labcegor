@@ -177,18 +177,18 @@
     (modify ?check_robot (did_something FALSE))
   )
   ; FALSE FALSE FALSE TRUE M-RS2 Slide IDLE
-  (if (and (eq ?robot_id ?rid) (eq ?task_id ?tid) (eq ?successful FALSE) (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE) (eq ?robot_state IDLE)) then
-    (printout yellow "Payment Super hacky stuff " ?rid  crlf)
-    (modify ?tasks_overview (can_move TRUE))
-    (modify ?tasks_overview (can_retrieve FALSE))
-    (modify ?tasks_overview (can_deliver FALSE))
-    (modify ?tasks_overview (task_id (+ ?task_id 1)))
-    (modify ?tasks_overview (state IDLE))
-    (modify ?check_robot (did_something FALSE))
-    (if (or (eq ?cs_one FALSE) (eq cs_two FALSE)) then
-      (modify ?tasks_overview (move_target ?target))
-      else
-      (modify ?tasks_overview (move_target M-BS))
-    )
-  )
+  ; (if (and (eq ?robot_id ?rid) (eq ?task_id ?tid) (eq ?successful FALSE) (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE) (eq ?robot_state IDLE)) then
+  ;   (printout yellow "Payment Super hacky stuff " ?rid  crlf)
+  ;   (modify ?tasks_overview (can_move TRUE))
+  ;   (modify ?tasks_overview (can_retrieve FALSE))
+  ;   (modify ?tasks_overview (can_deliver FALSE))
+  ;   (modify ?tasks_overview (task_id (+ ?task_id 1)))
+  ;   (modify ?tasks_overview (state IDLE))
+  ;   (modify ?check_robot (did_something FALSE))
+  ;   (if (or (eq ?cs_one FALSE) (eq cs_two FALSE)) then
+  ;     (modify ?tasks_overview (move_target ?target))
+  ;     else
+  ;     (modify ?tasks_overview (move_target M-BS))
+  ;   )
+  ; )
 )
