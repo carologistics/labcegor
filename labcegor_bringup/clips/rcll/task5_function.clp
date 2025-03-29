@@ -147,7 +147,7 @@
 
 (deffunction get_target_for_payment (?rs1_payment ?rs2_payment ?cs1_mount ?cs2_mount ?robot_id)
 (printout blue "new target " ?rs1_payment " " ?rs2_payment " " ?cs1_mount " " ?cs2_mount crlf)
-  (if (eq (% ?robot_id 2) 0) then
+  (if (eq (mod ?robot_id 2) 0) then
     (bind even TRUE)
     else
     (bind even FALSE)
