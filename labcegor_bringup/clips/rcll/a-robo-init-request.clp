@@ -311,6 +311,7 @@
                                     (assert (action (id ?robo_id) (a_type "m") (machine M-RS1) (io INPUT) (task_id (+ ?last_robo_task 1))))
                                     (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-RS1) (des_at_waypoint INPUT))
                                     (retract ?station)
+                                    (assert (station-free (name ?pos)))
                                                         ))
                                 else 
                                      (bind ?station-free (do-for-fact ((?station station-free))
@@ -318,14 +319,29 @@
                                     (assert (action (id ?robo_id) (a_type "m") (machine M-RS2) (io INPUT) (task_id (+ ?last_robo_task 1))))
                                     (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-RS2) (des_at_waypoint INPUT))
                                     (retract ?station)
+                                    (assert (station-free (name ?pos)))
 
                                                         ))
                                 )
                                 (if (eq ?station-free FALSE)
                                             then
-                                                (modify ?lc (c_time ?ros-time-float))
-                                                (assert (request_task (id ?robo_id) (last_task ?last_robo_task) (robo_order ?last_robo_order) (machine_order ?last_machine_order)))
-                                                (bind ?station-free TRUE)
+                                            (if (and (eq ?pos M-RS1) (or (eq ?m_next_c RING_ORANGE) (eq ?m_next_c RING_GREEN))) ;blocking myself at RS1- moveanyway; no need to retract free fact as it does not exists
+                                                then 
+                                                    (assert (action (id ?robo_id) (a_type "m") (machine M-RS1) (io INPUT) (task_id (+ ?last_robo_task 1))))
+                                                    (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-RS1) (des_at_waypoint INPUT))
+                                                else
+                                                (if (and (eq ?pos M-RS2) (or (eq ?m_next_c RING_BLUE) (eq ?m_next_c RING_YELLOW)));blocking myself at RS2- moveanyway
+                                                    then
+                                                        (assert (action (id ?robo_id) (a_type "m") (machine M-RS2) (io INPUT) (task_id (+ ?last_robo_task 1))))
+                                                        (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-RS2) (des_at_waypoint INPUT))
+                                                    else ;wait
+                                                    (modify ?lc (c_time ?ros-time-float))
+                                                    (assert (request_task (id ?robo_id) (last_task ?last_robo_task) (robo_order ?last_robo_order) (machine_order ?last_machine_order)))
+                                                    (bind ?station-free TRUE)
+                                                )
+                                            )
+
+                                                
 
                                         ) 
                             else ;next is cap or deliver
@@ -652,6 +668,11 @@
                     (assert (action (a_type "m") (id 3) (machine M-BS) (io OUTPUT) (task_id (+ ?last_robo_task 1))))
                     (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-BS) (des_at_waypoint OUTPUT))
                     (modify ?pay_it (iteration (+ ?it 1)))
+                    (if 
+                    (eq ?pos M-RS2)
+                    then
+                        (assert (station-free (name M-RS2)))
+                    )
                                 )
                     )
                     (if (eq station-free FALSE)
@@ -715,10 +736,16 @@
                 )
 
             (case 5 then
-                ;deliver to slide
+                (assert (action (id 3) (a_type "d") (machine ?pos) (io SLIDE) (task_id (+ ?last_robo_task 1))))
+                (modify ?pay_it (iteration (+ ?it 1)))
+                (modify ?robo_s (task (+ ?last_robo_task 1)))
             )
-            (case 6 then
-                ;move BS in; free RS
+            (case 6 then ;move away "park" at M-BS input - no check need as this does not block anything else
+                (assert (action (id 3) (a_type "m") (machine M-BS) (io INPUT) (task_id (+ ?last_robo_task 1))))
+                (modify ?robo_s (task (+ ?last_robo_task 1)) (order 42) (des M-BS) (des_at_waypoint INPUT))
+                (modify ?pay_it (iteration (+ ?it 1)))
+                (assert (station-free (name ?pos))); free current RS
+                (modify ?pay_it (iteration 1)) ;reset pay_itterations
             )
 )
 )
