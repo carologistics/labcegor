@@ -151,7 +151,7 @@
     else
     (bind ?even FALSE)
   )
-  (printout blue "new target " ?even ".. " ?rs1_payment " " ?rs2_payment " " ?cs1_mount " " ?cs2_mount crlf)
+  ; (printout blue "new target " ?even ".. " ?rs1_payment " " ?rs2_payment " " ?cs1_mount " " ?cs2_mount crlf)
   (if (eq ?even TRUE) then
     (if (eq ?cs1_mount FALSE) then
       return M-CS1
