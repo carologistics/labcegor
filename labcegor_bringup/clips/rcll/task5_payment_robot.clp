@@ -133,7 +133,7 @@
     (modify ?tasks_overview (can_retrieve FALSE))
     (modify ?tasks_overview (can_deliver FALSE))
     
-    (if (and (or (eq ?mot M-CS1) (eq ?mot M-CS2))) then
+    (if (or (eq ?mot M-CS1) (eq ?mot M-CS2)) then
       (if (eq ?mounted FALSE) then 
         (assert (order_from_machine (machine_id ?mot) (order_id 0) (robot_id ?rid) (operation RETRIEVE_CAP)))
         (modify ?machine_task_overview (mounted TRUE))
