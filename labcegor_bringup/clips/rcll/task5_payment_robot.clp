@@ -88,10 +88,10 @@
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
   (bind ?successful (pb-field-value ?msg "successful"))
-  (bind ?target (check_payment ?m_one ?m_two))
+  (bind ?target (get_target_for_payment ?mpi_one ?mpi_two ?mcs_one ?mcs_two ?rid))
   ;(bind ?target (get_target_for_payment ?m_one ?m_two ?cs_one ?cs_two))
-  ; (printout blue "new target: " ?target crlf)
-  (printout red "robot payment did something " ?task_id " " ?tid " " ?successful " " ?cm  " " ?cr  " " ?cd  " " ?mot  " " ?mat  " " ?robot_state " " ?target crlf)
+  (printout blue "Robot" ?rid " new target: " ?target crlf)
+  (printout red "Robot" ?rid " payment did something " ?task_id " " ?tid " " ?successful " " ?cm  " " ?cr  " " ?cd  " " ?mot  " " ?mat  " " ?robot_state " " ?target crlf)
   ; It has moved
   (if (and (eq ?robot_id ?rid) (eq ?task_id ?tid) (eq ?successful TRUE) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE)) then 
     (modify ?tasks_overview (can_move FALSE))
