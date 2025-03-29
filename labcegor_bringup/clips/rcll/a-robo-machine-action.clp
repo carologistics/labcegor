@@ -100,8 +100,6 @@
   =>
   (retract ?inst)
   (modify ?m_sate (task 97) (order ?o_id) (pos INPUT)) ;task 97 is hotfix maybe change later, should not be needed else where apart form wait for check
-  ; OLD (assert (machine_busy (id ?m)))
-  ;Old (modify ?lt (l_task_id ?t-id))
   (bind ?msg (pb-create "llsf_msgs.PrepareMachine"))
   (pb-set-field ?msg "team_color" MAGENTA)
   (pb-set-field ?msg "machine" ?m)
@@ -113,7 +111,7 @@
   )
   (if(eq ?m M-BS)
     then
-      ;(printout green "reached if in machine instruct" crlf)
+      (printout green "reached if in machine instruct" crlf)
       (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionBS")) 
       (pb-set-field ?prep-msg "side" ?op)
       (pb-set-field ?prep-msg "color" ?c)
