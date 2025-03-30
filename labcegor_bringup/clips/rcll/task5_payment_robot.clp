@@ -11,10 +11,10 @@
   ; (printout red "ROBOT" ?rid " is in line 13 and should move to " ?mot " " ?mat " " ?robot_state crlf)
   (bind ?target (get_target_for_payment ?rid))
   ;Prepare Basestation PrepareMachine
-  (if (eq ?robot_state IDLE) then 
+  (if (eq ?robot_state IDLE) then
     ; if (or (eq ?target M-RS1) (eq ?target M-RS2)) => then mounted == False
     (if (eq ?mot M-BS) then
-      (if (not (eq ?target (sym-cat M-RS (- ?rid 1)))) then
+      (if (not (or (eq ?target M-RS1) (eq ?target M-RS2))) then
         (assert (order_from_machine (machine_id ?mot) (order_id 0) (robot_id ?rid) (color BASE_BLACK) (position OUTPUT)))
         else
         (modify ?tasks_overview (move_target ?target))
@@ -137,10 +137,10 @@
             (modify ?machine_task_overview (mounted TRUE))
           )
           else
-          (if (and (eq ?mot (sym-cat M-RS (- ?rid 1))) (eq ?mat "Slide")) then
+          (if (and (or (eq ?mot M-RS1) (eq ?mot M-RS2)) (eq ?mat "Slide")) then
             (modify ?machine_task_overview (payment (+ ?payment 1)))
           )
-          (if (or (eq ?mot (sym-cat M-RS (- ?rid 1)) ) (eq ?target NONE)) then
+          (if (or (eq ?mot M-RS1) (eq ?mot M-RS2) (eq ?target NONE)) then
             (modify ?tasks_overview (move_target M-BS))
           else
             (modify ?tasks_overview (move_target ?target))
