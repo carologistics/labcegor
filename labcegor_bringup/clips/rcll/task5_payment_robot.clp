@@ -34,7 +34,7 @@
   (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
   (machine (name ?mot) (state ?s))
   ?machine_task_overview <- (machine_task_overview (machine_id ?mot) (machine_task ?task) (payment ?payment) (mounted ?mounted))
-  (not (order_from_machine (robot_id ?rid) ))
+  ; (not (order_from_machine (robot_id ?rid) ))
   =>
   (printout red "ROBOT" ?rid " is in line 44 and should pickup at " ?mot " " ?mat " mounted:" ?mounted " " ?s crlf)
 
