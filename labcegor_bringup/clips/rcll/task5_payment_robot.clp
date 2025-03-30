@@ -16,7 +16,7 @@
     (if (eq ?mot M-BS) then
         (assert (order_from_machine (machine_id ?mot) (order_id 0) (robot_id ?rid) (color BASE_BLACK) (position OUTPUT)))
     )
-    
+
     (send_move_to_cmd ?rid ?mot ?mat ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
     (modify ?tasks_overview (state MOVING))
@@ -153,37 +153,4 @@
       )
     )
   )
-
-  ; (if (and (eq ?robot_id ?rid) (eq ?task_id ?tid) (eq ?successful FALSE) (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cd FALSE)) then 
-  ;   (printout red "ROBOT" ?rid " is in line 159 and should picked up something")
-  ;   ; TODO check ?target == "NONE" and do something else if thats the case
-  ;   (modify ?machine_task_overview (machine_task NOT-SET))
-  ;   (modify ?tasks_overview (can_move TRUE))
-  ;   (modify ?tasks_overview (can_retrieve FALSE))
-  ;   (modify ?tasks_overview (can_deliver TRUE))
-  ;   ;  (printout yellow "Robot " ?rid " has probably a cap carrier in its claw " ?robot_state " " ?mot " " ?mat " " ?mounted " " crlf)
-  ;   ;  (printout green "This is hacky af Payment where should it move? " ?target " "  crlf)
-  ;   (if (or (not (or (eq ?mot M-CS1) (eq ?mot M-CS2))) (eq ?mounted TRUE) )then
-  ;     (modify ?tasks_overview (move_target ?target))
-  ;     (modify ?tasks_overview (machine_target "Slide"))
-  ;   )
-  ;   (modify ?tasks_overview (task_id (+ ?task_id 1)))
-  ;   (modify ?tasks_overview (state HOLDING))
-  ;   (modify ?check_robot (did_something FALSE))
-  ; )
-  ; FALSE FALSE FALSE TRUE M-RS2 Slide IDLE
-  ; (if (and (eq ?robot_id ?rid) (eq ?task_id ?tid) (eq ?successful FALSE) (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE) (eq ?robot_state IDLE)) then
-  ;   (printout yellow "Payment Super hacky stuff " ?rid  crlf)
-  ;   (modify ?tasks_overview (can_move TRUE))
-  ;   (modify ?tasks_overview (can_retrieve FALSE))
-  ;   (modify ?tasks_overview (can_deliver FALSE))
-  ;   (modify ?tasks_overview (task_id (+ ?task_id 1)))
-  ;   (modify ?tasks_overview (state IDLE))
-  ;   (modify ?check_robot (did_something FALSE))
-  ;   (if (or (eq ?cs_one FALSE) (eq cs_two FALSE)) then
-  ;     (modify ?tasks_overview (move_target ?target))
-  ;     else
-  ;     (modify ?tasks_overview (move_target M-BS))
-  ;   )
-  ; )
 )
