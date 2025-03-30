@@ -155,8 +155,6 @@
       (bind ?even TRUE)
     )
 
-    (printout red "payment_status" ?m_cs1:payment " " ?m_cs2:payment " " ?m_cs1:mounted " " ?m_cs2:mounted crlf)
-
     (if (eq ?even TRUE) then
       (if (eq ?m_cs1:mounted FALSE) then
         (return M-CS1)
