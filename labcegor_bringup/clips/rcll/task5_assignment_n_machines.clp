@@ -1,33 +1,6 @@
-; (defrule deliver_order_based
-; (game-state (phase PRODUCTION))
-; )
-
 ; ==================================================================================
 ; MOVE ROBOTS & Do Tasks
 ; ==================================================================================
-
-; (defrule random-order-assignment
-;   (game-state (phase PRODUCTION))
-;   ?order <- (adjustable_order (id ?oid))
-;   ?tasks_overview <- (tasks_overview (robot_id ?rid) (robot_type PRODUCTION) (state IDLE))
-;   ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE) (is_assigned FALSE))
-;   (not (assigned_order (order_id ?oid)))
-;   =>
-;   (modify ?check_robot (is_assigned TRUE))
-;   (assert (assigned_order (order_id ?oid) (robot_id ?rid)))
-;   (printout green "Assigned robot" ?rid " to order " ?oid crlf)
-; )
-
-; (defrule random-order-assignment
-;   (game-state (phase PRODUCTION))
-;   ?order <- (adjustable_order (id ?oid))
-;   ?tasks_overview <- (tasks_overview (robot_id ?rid) (robot_type PRODUCTION) (state IDLE))
-;   ?check_robot <- (check_robot (robot_id ?rid) (did_something FALSE) (is_assigned FALSE))
-;   ?assigned_order <- (assigned_order (order_id ?oid) (robot_id ?rid))
-;   =>
-;   (retract ?assigned_order )
-;   (printout green "Delete Order " ?oid crlf)
-; )
 
 (defrule make_orders_change_again
   ?adjustable_order <- (adjustable_order (id ?oid) (name NOT-SET))
@@ -50,8 +23,7 @@
   ?machine_task_overview <- (machine_task_overview (machine_id M-BS) (machine_task ?task))
   =>
   (if (and (eq ?s IDLE) (not (eq ?task WORK))) then
-    (printout blue "prepare for order: " ?incomming-oid " color: " ?color " at: " ?pos " for robot: " ?rid crlf)
-    (prepare_machine_BS "M-BS" ?pos ?color ?refbox-id)
+    (prepare_machine_BS ?pos ?color ?refbox-id)
     (modify ?machine_task_overview (machine_task WORK))
     (retract ?machine_order)
   )
@@ -65,17 +37,13 @@
   ?machine_task_overview <- (machine_task_overview (machine_id ?machine_id) (machine_task ?task))
   =>
   (if (and (eq ?s IDLE) (not (eq ?task WORK))) then
-  
-    (printout red "M-RS" crlf)
     (prepare_machine_RS ?machine_id ?color ?refbox-id)
-  
-    (printout red "prepare for order: " ?incomming-oid " with machine " ?machine_id" eq " (or (eq ?machine_id M-RS1) (eq ?machine_id M-RS2)) " color: " ?color " at: " ?pos " for robot: " ?rid crlf)
     (modify ?machine_task_overview (machine_task WORK))
     (retract ?machine_order)
   )
 )
 
-(defrule manage_ordered_Delivery
+(defrule manage_ordered_delivery
   (game-state (phase PRODUCTION))
   ?machine_order <- (order_from_machine (machine_id M-DS) (order_id ?incomming-oid) (robot_id ?rid) (color ?color) (position ?pos) (operation ?operation))
   (protobuf-peer (name refbox-private) (peer-id ?refbox-id))
@@ -83,11 +51,7 @@
   ?machine_task_overview <- (machine_task_overview (machine_id M-DS) (machine_task ?task))
   =>
   (if (and (eq ?s IDLE) (not (eq ?task WORK))) then
-    
-    (printout red "M-DS" crlf)
-    (prepare_machine_DS M-DS ?incomming-oid ?refbox-id)
-
-    (printout red "prepare for order: " ?incomming-oid " with machine DS color: " ?color " at: " ?pos " for robot: " ?rid crlf)
+    (prepare_machine_DS ?incomming-oid ?refbox-id)
     (modify ?machine_task_overview (machine_task WORK))
     (retract ?machine_order)
   )
@@ -100,7 +64,6 @@
   (machine (name ?machine_id) (state ?s))
   ?machine_task_overview <- (machine_task_overview (machine_id ?machine_id) (machine_task ?task))
   =>
-  (printout red "M-CS " ?machine_id " " ?operation " " ?task " " ?s " order id " ?incomming-oid crlf)
   (prepare_machine_CS ?machine_id ?operation ?refbox-id)
   (modify ?machine_task_overview (machine_task WORK))
   (retract ?machine_order)

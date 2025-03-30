@@ -50,24 +50,8 @@
   (printout blue "delivery: robot: " ?r_id " task " ?task_id crlf)
 )
 
-; BufferStation
-(deffunction send_robot_to_bufferStation (?r_id ?r_target ?peer-id ?task_id)
-  (bind ?buffer_msg (pb-create "llsf_msgs.BufferStation"))
-  (pb-set-field ?buffer_msg "machine_id" ?r_target)
-  (pb-set-field ?buffer_msg "shelf_number" 1)
-  
-  (bind ?msg (pb-create "llsf_msgs.AgentTask"))
-  (pb-set-field ?msg "team_color" MAGENTA)
-  (pb-set-field ?msg "task_id" ?task_id)
-  (pb-set-field ?msg "robot_id" ?r_id)
-  (pb-set-field ?msg "buffer" ?buffer_msg)
-  (pb-broadcast ?peer-id ?msg)
-  (pb-destroy ?msg)
-  (printout blue "BufferStation: robot: " ?r_id " task " ?task_id crlf)
-)
-
 ; Prepare Machine
-(deffunction prepare_machine_BS (?m_id ?side ?color ?peer-id)
+(deffunction prepare_machine_BS (?side ?color ?peer-id)
   (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionBS")) 
   (pb-set-field ?prep-msg "side" ?side)
   (pb-set-field ?prep-msg "color" ?color)
@@ -78,7 +62,7 @@
   (pb-set-field ?msg "instruction_bs" ?prep-msg)
   (pb-broadcast ?peer-id ?msg)
   (pb-destroy ?msg)
-  (printout red "prepare_machine_BS " ?m_id " " ?side " " ?color " " ?peer-id crlf)
+  (printout red "prepare_machine_BS " ?side " " ?color " " ?peer-id crlf)
 )
 
 (deffunction prepare_machine_RS (?m_id ?color ?peer-id)
@@ -107,39 +91,20 @@
   (pb-destroy ?msg)
 )
 
-(deffunction prepare_machine_DS (?m_id ?order_id ?peer-id)
+(deffunction prepare_machine_DS (?order_id ?peer-id)
   (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionDS")) 
   (pb-set-field ?prep-msg "order_id" ?order_id)
 
   (bind ?msg (pb-create "llsf_msgs.PrepareMachine"))
   (pb-set-field ?msg "team_color" MAGENTA)
-  (pb-set-field ?msg "machine" ?m_id)
+  (pb-set-field ?msg "machine" M-DS)
   (pb-set-field ?msg "instruction_ds" ?prep-msg)
   (pb-broadcast ?peer-id ?msg)
   (pb-destroy ?msg)
-  (printout red "prepare_machine_DS " ?m_id " " ?order_id " " ?peer-id crlf)
+  (printout red "prepare_machine_DS " ?order_id " " ?peer-id crlf)
 )
 
 ; Which Machine to bribe?
-(deffunction check_payment (?rs1_payment ?rs2_payment ?robot_id)
-  ;(printout green "The Ring-stations should have " ?m_one " and " ?m_two crlf)
-  (bind ?even FALSE)
-  (if (eq (mod ?robot_id 2) 0) then
-    (bind ?even TRUE)
-  )
-  ;(printout blue "new target " ?even " " ?robot_id ".. " ?rs1_payment " " ?rs2_payment " " ?cs1_mount " " ?cs2_mount crlf)
-  (if (eq ?even TRUE) then
-    (if(< ?rs1_payment 3) then
-      (return M-RS1)
-    )
-  else
-    (if(< ?rs2_payment 3)then
-      (return M-RS2)
-    )
-  )
-  (return NONE)
-)
-
 (deffunction get_target_for_payment (?robot_id)
   (do-for-fact ((?m_cs1 machine_task_overview)
                  (?m_cs2 machine_task_overview)
@@ -154,7 +119,7 @@
     (if (eq (mod ?robot_id 2) 0) then
       (bind ?even TRUE)
     )
-    
+
     (if (eq ?even TRUE) then
       (if (eq ?m_cs1:mounted FALSE) then
         (return M-CS1)
@@ -173,7 +138,6 @@
     (return NONE)
   )
 )
-
 
 ; check order for next step
 (deffunction get_next_order_color (?oid ?delete_last_stage)
@@ -196,6 +160,7 @@
       (if (eq ?delete_last_stage TRUE) then
         (bind ?cap-color "Bring_it_home") ; next delivery point should be the DS
         (modify ?order (cap-color ?cap-color))
+        (return "Bring_it_home")
       )
       (return ?target_color)
     )
