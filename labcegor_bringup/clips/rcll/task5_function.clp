@@ -257,9 +257,6 @@
   (bind ?price_ring_blue 0)
   
   (do-for-all-facts ((?rs ring-spec)) TRUE
-    (bind ?price_ring_blue 0)
-    (printout red " price init ring color:" ?rs:color " cost:" ?rs:cost crlf)
-    
     (switch ?rs:color
     (case RING_GREEN then (bind ?price_ring_green ?rs:cost))  ; M-RS1
     (case RING_ORANGE then (bind ?price_ring_orange ?rs:cost))  ; M-RS1
