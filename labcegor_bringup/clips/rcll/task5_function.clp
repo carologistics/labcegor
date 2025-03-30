@@ -134,13 +134,21 @@
 )
 
 ; Which Machine to bribe?
-(deffunction check_payment (?m_one ?m_two)
+(deffunction check_payment (?m_one ?m_two ?robot_id)
   ;(printout green "The Ring-stations should have " ?m_one " and " ?m_two crlf)
-  (if(< ?m_two 3) then
-    (return M-RS2)
+  (bind ?even FALSE)
+  (if (eq (mod ?robot_id 2) 0) then
+    (bind ?even TRUE)
   )
-  (if(< ?m_one 3)then
-    (return M-RS1)
+  ;(printout blue "new target " ?even " " ?robot_id ".. " ?rs1_payment " " ?rs2_payment " " ?cs1_mount " " ?cs2_mount crlf)
+  (if (eq ?even TRUE) then
+    (if(< ?rs1_payment 3) then
+      (return M-RS1)
+    )
+  else
+    (if(< ?rs2_payment 3)then
+      (return M-RS2)
+    )
   )
   (return NONE)
 )
