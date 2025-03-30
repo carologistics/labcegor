@@ -179,19 +179,19 @@
     (bind ?base-color ?order:base-color)
     (bind ?ring-colors ?order:ring-colors)
     (bind ?cap-color ?order:cap-color)
-    ; (printout green "Order is as follows " ?oid " " ?name " " ?base-color " " ?cap-color " number of rings_left: " (length$ ?ring-colors)  crlf)
+    (printout green "Order is as follows " ?oid " " ?name " " ?base-color " " ?cap-color " number of rings_left: " (length$ ?ring-colors)  crlf)
 
     (if (eq ?cap-color "Bring_it_home") then
       (bind ?target_color ?cap-color)
-      ; (printout green "should finish now " ?target_color crlf)
+      (printout green "should finish now " ?target_color crlf)
       (return ?target_color)
     )
 
     (if (eq (length$ ?ring-colors) 0) then
-      ; (printout yellow "Cap color should be " ?cap-color crlf)
+      (printout yellow "Cap color should be " ?cap-color crlf)
       (bind ?target_color ?cap-color)
       (if (eq ?delete_last_stage TRUE) then
-        ; (printout yellow "color deleted" ?target_color crlf)
+        (printout yellow "color deleted" ?target_color crlf)
         (bind ?cap-color "Bring_it_home") ; next delivery point should be the DS
         (modify ?order (cap-color ?cap-color))
       )
@@ -199,14 +199,14 @@
     )
 
     (if (> (length$ ?ring-colors) 0) then 
-      ; (printout yellow "Ring color should be " (nth$ 1 ?ring-colors) " " (length$ ?ring-colors) crlf)
+      (printout yellow "Ring color should be " (nth$ 1 ?ring-colors) " " (length$ ?ring-colors) crlf)
       (bind ?target_color (nth$ 1 ?ring-colors))
       (if (eq ?delete_last_stage TRUE) then
-        ; (printout yellow "color deleted" ?target_color crlf)
+        (printout yellow "color deleted" ?target_color crlf)
         (bind ?ring-colors (rest$ ?ring-colors))
         (modify ?order (ring-colors ?ring-colors))
       )
-      ; (printout yellow "nexT color should be " (nth$ 1 ?ring-colors) " " (length$ ?ring-colors) " " crlf)
+      (printout yellow "nexT color should be " (nth$ 1 ?ring-colors) " " (length$ ?ring-colors) " " crlf)
       ; (if (eq (length$ ?ring-colors) 0) then 
       ;   (bind ?ring-colors )
       ; )
@@ -257,6 +257,9 @@
   (bind ?price_ring_blue 0)
   
   (do-for-all-facts ((?rs ring-spec))
+    (bind ?price_ring_blue 0)
+    (printout red " price init ring color:" ?rs:color " cost:" ?rs:cost crlf)
+    
     (switch ?rs:color
     (case RING_GREEN then (bind ?price_ring_green ?rs:cost))  ; M-RS1
     (case RING_ORANGE then (bind ?price_ring_orange ?rs:cost))  ; M-RS1
@@ -291,7 +294,7 @@
       (modify ?mto (payment (- ?payment ?price)))
     )
   )
-  (printout yellow "Payment or Mounting updated "  crlf)
+  (printout yellow "Payment or mounting updated" crlf)
 )
 
 
