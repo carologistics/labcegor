@@ -158,7 +158,8 @@
   (bind ?rs2_payment 0)
   (bind ?cs1_mount FALSE)
   (bind ?cs2_mount FALSE)
-  (do-for-all-facts ((machine_task_overview ?m)) TRUE
+
+  (do-for-all-facts ((?m machine_task_overview)) TRUE
     (switch ?rs:machine_id
     (case M-CS1 then (bind ?rs1_payment ?m:payment))
     (case M-CS2 then (bind ?rs2_payment ?m:payment))
@@ -166,6 +167,7 @@
     (case M-RS2 then (bind ?cs2_mount ?m:mounted))
     (default (bind ?rs1_payment 0)))
   )
+  
   (bind ?even FALSE)
   (if (eq (mod ?robot_id 2) 0) then
     (bind ?even TRUE)
