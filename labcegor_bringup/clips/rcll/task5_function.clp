@@ -154,16 +154,16 @@
       (bind ?even TRUE)
     )
 
-    (printout red "payment_status" ?m_cs1:payment " " ?m_cs2:payment " " ?m_cs1:mount " " ?m_cs2:mount crlf)
+    (printout red "payment_status" ?m_cs1:payment " " ?m_cs2:payment " " ?m_cs1:mounted " " ?m_cs2:mounted crlf)
     (if (eq ?even TRUE) then
-      (if (eq ?m_cs1:mount FALSE) then
+      (if (eq ?m_cs1:mounted FALSE) then
         (return M-CS1)
       )
       (if(< ?m_cs1:payment 3) then
         (return M-RS1)
       )
     else
-      (if (eq ?m_cs2:mount FALSE) then
+      (if (eq ?m_cs2:mounted FALSE) then
         (return M-CS2)
       )
       (if(< ?m_cs2:payment 3)then
