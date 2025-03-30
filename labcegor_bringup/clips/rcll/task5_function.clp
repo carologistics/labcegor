@@ -146,11 +146,6 @@
     (bind ?even TRUE)
   )
 
-  (bind ?rs1_payment 0)
-  (bind ?rs2_payment 0)
-  (bind ?cs1_mount FALSE)
-  (bind ?cs2_mount FALSE)
-
   (do-for-all-facts ((?m machine_task_overview)) TRUE
     (switch ?m:machine_id
     (case M-CS1 then (bind ?rs1_payment ?m:payment))
