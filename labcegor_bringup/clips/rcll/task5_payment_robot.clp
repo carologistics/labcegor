@@ -79,7 +79,6 @@
   ?machine_task_overview <- (machine_task_overview (machine_id ?mot) (machine_task ?task) (payment ?payment) (mounted ?mounted))
   (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id ?rid) (ptr ?msg))
   =>
-  (printout yellow "successful" (pb-field-value ?msg "successful") crlf)
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
   (bind ?target (check_payment ?m_one ?m_two ?rid))
@@ -134,7 +133,7 @@
 
         ; It Delivered somthing
         (if (and (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE)) then 
-          (printout red "ROBOT" ?rid " is in line 139 and should delivered somthing to " ?mot " " ?mat " target " ?target crlf)
+          (printout red "ROBOT" ?rid " is in line 139 and should delivered something to " ?mot " " ?mat " target " ?target " mounted? " ?mounted crlf)
           (modify ?tasks_overview (can_move TRUE))
           (modify ?tasks_overview (can_retrieve FALSE))
           (modify ?tasks_overview (can_deliver FALSE))
@@ -150,13 +149,12 @@
             )
             else
             (modify ?machine_task_overview (payment (+ ?m_one 1)))
-          )
-          
-          (if (eq ?target NONE) then
-            (modify ?tasks_overview (move_target M-BS))
-          else
-            (modify ?tasks_overview (move_target ?target))
-          )
+            (if (eq ?target NONE) then
+              (modify ?tasks_overview (move_target M-BS))
+            else
+              (modify ?tasks_overview (move_target ?target))
+            )
+          )        
         )
       )
     )
