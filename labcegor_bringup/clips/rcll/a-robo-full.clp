@@ -60,7 +60,6 @@
   (slot payment (type INTEGER) (allowed-values 1 0 -1 -2)) ;1 for ring is added -1, -2 für payment for ring 0 as optional
 )
 
-
 (deftemplate team
   (slot name (type SYMBOL))
   (slot prefix (type SYMBOL))
@@ -73,6 +72,9 @@
 
 (deftemplate station-free
 (slot name (type SYMBOL)))
+
+(deftemplate block-bs
+(slot block_time (type FLOAT)))
 
 (deffacts team_machineinit
   (team (name MAGENTA)(prefix M))

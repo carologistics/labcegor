@@ -1,4 +1,3 @@
-;----WARNING --- WIP------
 (defrule robo_move
   ?ac <- (action (a_type "m") (id ?id) (machine ?wp) (io ?io) (task_id ?t-id) (wait ?w))
   ;(done (done_t_id ?w))
@@ -122,7 +121,13 @@
       (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionRS")) 
       (pb-set-field ?prep-msg "ring_color" ?c)
       (pb-set-field ?msg "instruction_rs" ?prep-msg)
-      (assert (update_rs (id 1) (payment (* ?ring_cost -1))))
+      (if (eq ?m M-RS1)
+        then
+          (assert (update_rs (id 1) (payment (- 0 ?ring_cost))))
+        else
+          (assert (update_rs (id 2) (payment (- 0 ?ring_cost))))
+      )
+      
   )
   (if (eq ?op DELIVER)
     then
