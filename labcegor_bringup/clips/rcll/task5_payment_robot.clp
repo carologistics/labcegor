@@ -78,9 +78,9 @@
   =>
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
-  (bind ?target (check_payment ?m_one ?m_two ?rid))
   (bind ?successful (pb-field-value ?msg "successful"))
-  ; (bind ?target (get_target_for_payment ?m_one ?m_two ?cs_one ?cs_two ?rid))
+  ; (bind ?target (check_payment ?m_one ?m_two ?rid))
+  (bind ?target (get_target_for_payment ?m_one ?m_two ?cs_one ?cs_two ?rid))
 
   (if (and (eq ?robot_id ?rid) (eq ?task_id ?tid)) then
     (printout green "ROBOT" ?rid " task " ?tid " " ?cm " " ?cr " " ?cd " " ?mot " " ?mat " " ?target crlf)
