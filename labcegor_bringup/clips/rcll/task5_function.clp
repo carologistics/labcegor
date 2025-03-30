@@ -154,6 +154,11 @@
 )
 
 (deffunction get_target_for_payment (?robot_id)
+  (bind ?even FALSE)
+  (if (eq (mod ?robot_id 2) 0) then
+    (bind ?even TRUE)
+  )
+
   (bind ?rs1_payment 0)
   (bind ?rs2_payment 0)
   (bind ?cs1_mount FALSE)
@@ -165,12 +170,7 @@
     (case M-CS2 then (bind ?rs2_payment ?m:payment))
     (case M-RS1 then (bind ?cs1_mount ?m:mounted))
     (case M-RS2 then (bind ?cs2_mount ?m:mounted))
-    (default (bind ?rs1_payment 0)))
-  )
-  
-  (bind ?even FALSE)
-  (if (eq (mod ?robot_id 2) 0) then
-    (bind ?even TRUE)
+    (default))
   )
   ;(printout blue "new target " ?even " " ?robot_id ".. " ?rs1_payment " " ?rs2_payment " " ?cs1_mount " " ?cs2_mount crlf)
   (if (eq ?even TRUE) then
