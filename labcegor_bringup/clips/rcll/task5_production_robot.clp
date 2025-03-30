@@ -94,9 +94,9 @@
   =>
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
+  (bind ?successful (pb-field-value ?msg "successful"))
 
-  (if (and (eq ?task_id ?tid) (eq ?robot_id ?rid) (not (eq (pb-field-value ?msg "successful") NOT-SET)) )then
-    (bind ?successful (pb-field-value ?msg "successful"))
+  (if (and (eq ?task_id ?tid) (eq ?robot_id ?rid))then
     ; It moved
     (if (eq ?successful TRUE) then
       (if (and (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE) (eq ?robot_state MOVING) (eq ?mat "Input")) then
