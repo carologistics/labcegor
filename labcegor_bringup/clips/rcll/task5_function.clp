@@ -141,43 +141,35 @@
 )
 
 (deffunction get_target_for_payment (?robot_id)
-  (bind ?even FALSE)
-  (if (eq (mod ?robot_id 2) 0) then
-    (bind ?even TRUE)
-  )
-
-  (assert ?rs1_payment 0)
-  (assert ?rs2_payment 0)
-  (assert ?cs1_mount FALSE)
-  (assert ?cs2_mount FALSE)
-
-  (do-for-all-facts ((?m machine_task_overview)) TRUE
+  (do-for-fact ((?m_cs1 machine_task_overview (machine_id M-CS1)) (?m_cs2 machine_task_overview (machine_id M-CS2)) (?m_rs1 machine_task_overview (machine_id M-RS1)) (?m_rs2 machine_task_overview (machine_id M-RS2))) TRUE
+    (bind ?even FALSE)
+    (if (eq (mod ?robot_id 2) 0) then
+      (bind ?even TRUE)
+    )
     (printout green "machine" ?m:machine_id " " ?m:payment " " ?m:mounted  crlf)
-    
-    (switch ?m:machine_id
-    (case M-CS1 then (modify ?rs1_payment ?m:payment))
-    (case M-CS2 then (modify ?rs2_payment ?m:payment))
-    (case M-RS1 then (modify ?cs1_mount ?m:mounted))
-    (case M-RS2 then (modify ?cs2_mount ?m:mounted))
-    (default (bind ?zero 0)))
+    (bind ?rs1_payment ?m:payment)
+    (bind ?rs2_payment ?m:payment)
+    (bind ?cs1_mount ?m:mounted)
+    (bind ?cs2_mount ?m:mounted)
+
+    (printout red "payment_status" ?rs1_payment " " ?rs2_payment " " ?cs1_mount " " ?cs2_mount crlf)
+    (if (eq ?even TRUE) then
+      (if (eq ?cs1_mount FALSE) then
+        (return M-CS1)
+      )
+      (if(< ?rs1_payment 3) then
+        (return M-RS1)
+      )
+    else
+      (if (eq ?cs2_mount FALSE) then
+        (return M-CS2)
+      )
+      (if(< ?rs2_payment 3)then
+        (return M-RS2)
+      )
+    )
+    (return NONE)
   )
-  (printout red "payment_status" ?rs1_payment " " ?rs2_payment " " ?cs1_mount " " ?cs2_mount crlf)
-  (if (eq ?even TRUE) then
-    (if (eq ?cs1_mount FALSE) then
-      (return M-CS1)
-    )
-    (if(< ?rs1_payment 3) then
-      (return M-RS1)
-    )
-  else
-    (if (eq ?cs2_mount FALSE) then
-      (return M-CS2)
-    )
-    (if(< ?rs2_payment 3)then
-      (return M-RS2)
-    )
-  )
-  (return NONE)
 )
 
 
