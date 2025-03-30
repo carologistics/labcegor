@@ -144,11 +144,11 @@
   (do-for-fact ((?m_cs1 machine_task_overview)
                  (?m_cs2 machine_task_overview)
                  (?m_rs1 machine_task_overview)
-                 (?m_rs2 machine_task_overview)
-                ) (and (eq ?m_cs1:machine_id M-CS1)
-                        (eq ?m_cs2:machine_id M-CS2)
-                        (eq ?m_rs1:machine_id M-RS1)
-                        (eq ?m_rs2:machine_id M-RS2))
+                 (?m_rs2 machine_task_overview)) 
+                  (and (eq ?m_cs1:machine_id M-CS1)
+                    (eq ?m_cs2:machine_id M-CS2)
+                    (eq ?m_rs1:machine_id M-RS1)
+                    (eq ?m_rs2:machine_id M-RS2))
     (bind ?even FALSE)
     (if (eq (mod ?robot_id 2) 0) then
       (bind ?even TRUE)
@@ -212,14 +212,9 @@
         (modify ?order (ring-colors ?ring-colors))
       )
       (printout yellow "nexT color should be " (nth$ 1 ?ring-colors) " " (length$ ?ring-colors) " " crlf)
-      ; (if (eq (length$ ?ring-colors) 0) then 
-      ;   (bind ?ring-colors )
-      ; )
-      ; (modify (?order:ring-colors) ?ring-colors)
-
     )
+    (return ?target_color)
   )
-  (return ?target_color)
 )
 
 (deffunction check_order (?oid)
@@ -241,7 +236,6 @@
   (return ?target_machine)
 )
 
-
 (deffunction update_payment (?oid)
   (bind ?color (get_next_order_color ?oid FALSE))
   (bind ?target_machine (switch ?color
@@ -256,36 +250,29 @@
     (case BASE_SILVER then M-BS)
     (default M-DS)
   ))
-  (bind ?price_ring_green 0)
-  (bind ?price_ring_orange 0)
-  (bind ?price_ring_yellow 0)
-  (bind ?price_ring_blue 0)
-  
-  (do-for-all-facts ((?rs ring-spec)) TRUE
-    (switch ?rs:color
-    (case RING_GREEN then (bind ?price_ring_green ?rs:cost))  ; M-RS1
-    (case RING_ORANGE then (bind ?price_ring_orange ?rs:cost))  ; M-RS1
-    (case RING_YELLOW then (bind ?price_ring_yellow ?rs:cost))  ; M-RS2
-    (case RING_BLUE then (bind ?price_ring_blue ?rs:cost))  ; M-RS2
-    (default (bind ?price_ring_blue 0)))
-  )
 
-  (bind ?price (switch ?color
-    (case RING_GREEN then ?price_ring_green)  ; M-RS1
-    (case RING_ORANGE then ?price_ring_orange)  ; M-RS1
-    (case RING_YELLOW then ?price_ring_yellow)  ; M-RS2
-    (case RING_BLUE then ?price_ring_blue)  ; M-RS2
-    (case CAP_GREY then 30)  ; M-CS1
-    (case CAP_BLACK then 30)  ; M-CS2
-    (case BASE_BLACK then 50)  ; M-BS
-    (case BASE_RED then 50)  ; M-BS
-    (case BASE_SILVER then 50)  ; M-BS
-    (default 50)  ; M-DS
-  ))
-
-  (do-for-fact
-    ((?mto machine_task_overview ))
-    (eq ?mto:machine_id ?target_machine)
+  (do-for-fact ((?rs1 ring-spec)
+                (?rs2 ring-spec)
+                (?rs3 ring-spec)
+                (?rs4 ring-spec)
+                (?mto machine_task_overview ))
+                (and (eq ?rs1:color RING_GREEN)
+                  (eq ?rs2:color RING_ORANGE)
+                  (eq ?rs3:color RING_YELLOW)
+                  (eq ?rs4:color RING_BLUE)
+                  (eq ?mto:machine_id ?target_machine))
+    (bind ?price (switch ?color
+      (case RING_GREEN then ?rs1:cost)  ; M-RS1
+      (case RING_ORANGE then ?rs2:cost)  ; M-RS1
+      (case RING_YELLOW then ?rs3:cost)  ; M-RS2
+      (case RING_BLUE then ?rs4:cost)  ; M-RS2
+      (case CAP_GREY then 30)  ; M-CS1
+      (case CAP_BLACK then 30)  ; M-CS2
+      (case BASE_BLACK then 50)  ; M-BS
+      (case BASE_RED then 50)  ; M-BS
+      (case BASE_SILVER then 50)  ; M-BS
+      (default 50)  ; M-DS
+    ))
     (bind ?payment ?mto:payment)
     (bind ?mounted ?mto:mounted)
     
@@ -295,8 +282,8 @@
     (if (< ?price 5) then
       (modify ?mto (payment (- ?payment ?price)))
     )
-  )
   (printout yellow "Payment or mounting updated" crlf)
+  )
 )
 
 
