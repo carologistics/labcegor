@@ -87,8 +87,6 @@
   ?check_robot <- (check_robot (robot_id ?rid) (did_something TRUE) (is_assigned TRUE))
   ?order <- (order (id ?oid) (name ?order-name) (base-color ?base-color) (ring-colors $?ring-colors)); 
   ?assigned_order <- (assigned_order (order_id ?order_id) (robot_id ?rid))
-  ?mpi_one <- (machine_payment_info (machine_id M-RS1) (money ?m_one))
-  ?mpi_two <- (machine_payment_info (machine_id M-RS2) (money ?m_two))
   (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id ?rid) (ptr ?msg))
   ?machine_task_overview <- (machine_task_overview (machine_id M-BS) (machine_task ?task))
   =>

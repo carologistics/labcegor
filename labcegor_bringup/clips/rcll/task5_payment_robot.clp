@@ -114,7 +114,7 @@
         (if (and (or (eq ?mot M-CS1) (eq ?mot M-CS2)) (eq ?mounted FALSE) )then
           (modify ?tasks_overview (machine_target "Input"))
         )
-        
+
         (modify ?machine_task_overview (machine_task NOT-SET))
         (modify ?tasks_overview (can_move TRUE))
         (modify ?tasks_overview (can_retrieve FALSE))
@@ -135,7 +135,7 @@
           )
           else
           (if (and (or (eq ?mot M-RS1) (eq ?mot M-RS2)) (eq ?mat "Slide")) then
-            (modify ?machine_task_overview (payment (+ ?m_one 1)))
+            (modify ?machine_task_overview (payment (+ ?payment 1)))
           )
           (if (or (eq ?mot M-RS1) (eq ?mot M-RS2) (eq ?target NONE)) then
             (modify ?tasks_overview (move_target M-BS))
