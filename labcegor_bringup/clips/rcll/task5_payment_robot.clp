@@ -13,10 +13,15 @@
   ;Prepare Basestation PrepareMachine
   (if (eq ?robot_state IDLE) then 
     ; if (or (eq ?target M-RS1) (eq ?target M-RS2)) => then mounted == False
-    (if (and (eq ?mot M-BS) (not (or (eq ?target M-RS1) (eq ?target M-RS2)))) then
-      (assert (order_from_machine (machine_id ?mot) (order_id 0) (robot_id ?rid) (color BASE_BLACK) (position OUTPUT)))
-    )
+    (if (eq ?mot M-BS) then
+      (if (not (eq ?target (sym-cat M-RS (- ?rid 1)))) then
+        (assert (order_from_machine (machine_id ?mot) (order_id 0) (robot_id ?rid) (color BASE_BLACK) (position OUTPUT)))
+        else
+        (modify ?tasks_overview (move_target ?target))
+        (modify ?tasks_overview (machine_target "Shelf"))
+      )
     (send_move_to_cmd ?rid ?mot ?mat ?peer-id ?tid)
+    )
     (modify ?check_robot (did_something TRUE))
     (modify ?tasks_overview (state MOVING))
   )
@@ -34,10 +39,8 @@
   (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
   (machine (name ?mot) (state ?s))
   ?machine_task_overview <- (machine_task_overview (machine_id ?mot) (machine_task ?task) (payment ?payment) (mounted ?mounted))
-  ; (not (order_from_machine (robot_id ?rid) ))
   =>
   ; (printout red "ROBOT" ?rid " is in line 44 and should pickup at " ?mot " " ?mat " mounted:" ?mounted " " ?s crlf)
-
   (if (and (or (eq ?mot M-CS1) (eq ?mot M-CS2)) (eq ?mounted FALSE)) then
     (send_retrieve_from_cmd ?rid ?mot "Shelf" ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
@@ -127,17 +130,17 @@
       ; It Delivered somthing
       (if (and (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE)) then 
         ; (printout red "ROBOT" ?rid " is in line 139 and should delivered something to " ?mot " " ?mat " target " ?target " mounted? " ?mounted " payment:" ?payment crlf)
-        
+  
         (if (or (eq ?mot M-CS1) (eq ?mot M-CS2)) then
           (if (eq ?mounted FALSE) then 
             (assert (order_from_machine (machine_id ?mot) (order_id 0) (robot_id ?rid) (operation RETRIEVE_CAP)))
             (modify ?machine_task_overview (mounted TRUE))
           )
           else
-          (if (and (or (eq ?mot M-RS1) (eq ?mot M-RS2)) (eq ?mat "Slide")) then
+          (if (and (or (eq ?mot (sym-cat M-RS (- ?rid 1)) )) (eq ?mat "Slide")) then
             (modify ?machine_task_overview (payment (+ ?payment 1)))
           )
-          (if (or (eq ?mot M-RS1) (eq ?mot M-RS2) (eq ?target NONE)) then
+          (if (or (eq ?mot (sym-cat M-RS (- ?rid 1)) ) (eq ?target NONE)) then
             (modify ?tasks_overview (move_target M-BS))
           else
             (modify ?tasks_overview (move_target ?target))
