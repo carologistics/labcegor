@@ -80,7 +80,7 @@
   (if (and (eq ?robot_id ?rid) (eq ?task_id ?tid)) then
     (printout green "ROBOT" ?rid " task " ?tid " " ?cm " " ?cr " " ?cd " " ?mot " " ?mat " " ?target crlf)
     (if (eq ?successful TRUE) then
-    
+  
       ; It has moved without something in the gripper
       (if (and (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE)) then 
         ; (printout red "ROBOT" ?rid " is in line 98 and should have moved to " ?mot " " ?mat crlf)
@@ -136,9 +136,9 @@
           (if (and (or (eq ?mot M-RS1) (eq ?mot M-RS2)) (eq ?mat "Slide")) then
             (modify ?machine_task_overview (payment (+ ?payment 1)))
           )
-          (if (or (eq ?mot M-RS1) (eq ?mot M-RS2) (eq ?target NONE)) then
+          (if (eq ?target NONE) then
             (modify ?tasks_overview (move_target M-BS))
-          else
+            else
             (modify ?tasks_overview (move_target ?target))
           )
         )

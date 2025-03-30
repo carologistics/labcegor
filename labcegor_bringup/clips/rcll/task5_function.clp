@@ -154,19 +154,19 @@
     (if (eq (mod ?robot_id 2) 0) then
       (bind ?even TRUE)
     )
-    (printout warn "Does it work? " ?m_rs1:payment " " ?m_rs2:payment " " ?m_cs1:mounted " " ?m_cs2:mounted crlf)
+    
     (if (eq ?even TRUE) then
       (if (eq ?m_cs1:mounted FALSE) then
         (return M-CS1)
       )
-      (if(< ?m_rs1:payment 3) then
+      (if(<= ?m_rs1:payment 3) then
         (return M-RS1)
       )
     else
       (if (eq ?m_cs2:mounted FALSE) then
         (return M-CS2)
       )
-      (if(< ?m_rs2:payment 3)then
+      (if(<= ?m_rs2:payment 3)then
         (return M-RS2)
       )
     )
