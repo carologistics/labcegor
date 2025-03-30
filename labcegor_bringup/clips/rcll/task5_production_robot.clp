@@ -27,7 +27,7 @@
       (modify ?tasks_overview (state CARRY))
     )
     (if (or (eq ?mot M-RS1) (eq ?mot M-RS2)) then
-      (if(eq ?payment TRUE)) then
+      (if (eq ?payment TRUE) then
         (send_move_to_cmd ?rid ?mot ?mat ?peer-id ?tid)
         (modify ?check_robot (did_something TRUE))
         (modify ?tasks_overview (state CARRY))
