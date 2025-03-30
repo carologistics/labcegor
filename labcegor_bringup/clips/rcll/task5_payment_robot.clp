@@ -14,12 +14,10 @@
   (if (eq ?robot_state IDLE) then
     ; if (or (eq ?target M-RS1) (eq ?target M-RS2)) => then mounted == False
     (if (eq ?mot M-BS) then
-      (if (not (or (eq ?target M-RS1) (eq ?target M-RS2))) then
         (assert (order_from_machine (machine_id ?mot) (order_id 0) (robot_id ?rid) (color BASE_BLACK) (position OUTPUT)))
-        else
-        (modify ?tasks_overview (move_target ?target))
-        (modify ?tasks_overview (machine_target "Shelf"))
-      )
+    )
+    (if (or (eq ?mot M-CS1) (eq ?mot M-CS2)) then
+      (modify ?tasks_overview (machine_target "Shelf"))
     )
     (send_move_to_cmd ?rid ?mot ?mat ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
