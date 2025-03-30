@@ -157,7 +157,7 @@
           (modify ?tasks_overview (move_target ?target))
         )
         
-        (printout green "where should it go now? " ?target " " ?m_one " " ?m_two " soooo?: " (check_payment ?m_one ?m_two) crlf)
+        (printout green "where should it go now? " ?target " " ?m_one " " ?m_two " soooo?: " (check_payment ?m_one ?m_two ?rid) crlf)
       )
     )
   )
