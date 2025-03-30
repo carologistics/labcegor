@@ -86,7 +86,7 @@
   ; (bind ?target (get_target_for_payment ?m_one ?m_two ?cs_one ?cs_two ?rid))
 
   (if (and (eq ?robot_id ?rid) (eq ?task_id ?tid)) then
-    (printout green "ROBOT" ?rid " task " ?tid " suc:" (pb-field-value ?msg "successful") " " ?cm " " ?cr " " ?cd " " ?mot " " ?mat " " ?target crlf)
+    (printout green "ROBOT" ?rid " task " ?tid " " ?cm " " ?cr " " ?cd " " ?mot " " ?mat " " ?target crlf)
     (if (not (eq (pb-field-value ?msg "successful") NOT-SET)) then 
       (bind ?successful (pb-field-value ?msg "successful"))
 
