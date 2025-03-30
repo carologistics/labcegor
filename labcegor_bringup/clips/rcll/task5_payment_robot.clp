@@ -9,10 +9,11 @@
   (test (or (eq ?robot_state IDLE) (eq ?robot_state HOLDING)))
   =>
   (printout red "ROBOT" ?rid " is in line 13 and should move to " ?mot " " ?mat " " ?robot_state crlf)
-
+  (bind ?target (get_target_for_payment ?rid))
   ;Prepare Basestation PrepareMachine
   (if (eq ?robot_state IDLE) then 
-    (if (and (eq ?mot M-BS) (eq ?mounted TRUE)) then
+    ; if (or (eq ?target M-RS1) (eq ?target M-RS2)) => then mounted == False
+    (if (and (eq ?mot M-BS) (not (or (eq ?target M-RS1) (eq ?target M-RS2)))) then
       (assert (order_from_machine (machine_id ?mot) (order_id 0) (robot_id ?rid) (color BASE_BLACK) (position OUTPUT)))
     )
     (send_move_to_cmd ?rid ?mot ?mat ?peer-id ?tid)
@@ -80,7 +81,7 @@
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
   (bind ?successful (pb-field-value ?msg "successful"))
   ; (bind ?target (check_payment ?m_one ?m_two ?rid))
-  (bind ?target (get_target_for_payment ?m_one ?m_two ?cs_one ?cs_two ?rid))
+  (bind ?target (get_target_for_payment ?rid))
 
   (if (and (eq ?robot_id ?rid) (eq ?task_id ?tid)) then
     (printout green "ROBOT" ?rid " task " ?tid " " ?cm " " ?cr " " ?cd " " ?mot " " ?mat " " ?target crlf)
