@@ -258,11 +258,11 @@
   
   (do-for-all-facts ((?rs ring-spec))
     (switch ?rs:color
-    (case RING_GREEN then (modify ?price_ring_green ?rs:cost))  ; M-RS1
-    (case RING_ORANGE then (modify ?price_ring_orange ?rs:cost))  ; M-RS1
-    (case RING_YELLOW then (modify ?price_ring_yellow ?rs:cost))  ; M-RS2
-    (case RING_BLUE then (modify ?price_ring_blue ?rs:cost))  ; M-RS2
-    (default (modify ?price_ring_blue 0)))
+    (case RING_GREEN then (bind ?price_ring_green ?rs:cost))  ; M-RS1
+    (case RING_ORANGE then (bind ?price_ring_orange ?rs:cost))  ; M-RS1
+    (case RING_YELLOW then (bind ?price_ring_yellow ?rs:cost))  ; M-RS2
+    (case RING_BLUE then (bind ?price_ring_blue ?rs:cost))  ; M-RS2
+    (default (bind ?price_ring_blue 0)))
   )
 
   (bind ?price (switch ?color
