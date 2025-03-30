@@ -26,14 +26,10 @@
       (modify ?check_robot (did_something TRUE))
       (modify ?tasks_overview (state CARRY))
     )
-    (if (or (eq ?mot M-RS1) (eq ?mot M-RS2)) then
-      (if (eq ?payment TRUE) then
-        (send_move_to_cmd ?rid ?mot ?mat ?peer-id ?tid)
-        (modify ?check_robot (did_something TRUE))
-        (modify ?tasks_overview (state CARRY))
-      )
-      else
-      (if (or (eq ?mot M-CS1) (eq ?mot M-CS2)))
+    (if (and (or (eq ?mot M-CS1) (eq ?mot M-CS2)) (eq ?mounted TRUE)) then
+      (send_move_to_cmd ?rid ?mot ?mat ?peer-id ?tid)
+      (modify ?check_robot (did_something TRUE))
+      (modify ?tasks_overview (state CARRY))
     )
   )
   (if (and (eq ?robot_state IDLE) (eq ?cd FALSE) (not (eq ?mot M-BS))) then 
