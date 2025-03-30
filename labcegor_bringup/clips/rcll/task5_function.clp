@@ -154,7 +154,7 @@
     (if (eq (mod ?robot_id 2) 0) then
       (bind ?even TRUE)
     )
-
+    (printout warn "Does it work? " m_rs1:payment " " m_rs2:payment " " m_cs1:mounted " " m_cs2:mounted crlf)
     (if (eq ?even TRUE) then
       (if (eq ?m_cs1:mounted FALSE) then
         (return M-CS1)
