@@ -85,13 +85,13 @@
   (printout yellow "successful" (pb-field-value ?msg "successful") crlf)
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
-  (bind ?successful (pb-field-value ?msg "successful"))
   (bind ?target (check_payment ?m_one ?m_two ?rid))
 
   ; (bind ?target (get_target_for_payment ?m_one ?m_two ?cs_one ?cs_two ?rid))
   (if (and (eq ?robot_id ?rid) (eq ?task_id ?tid)) then
-    (printout green "ROBOT" ?rid " task " ?tid " suc:" ?successful " " ?cm " " ?cr " " ?cd " " ?mot " " ?mat " " ?target crlf)
-    (if (eq ?successful TRUE) then 
+    (printout green "ROBOT" ?rid " task " ?tid " suc:" (pb-field-value ?msg "successful") " " ?cm " " ?cr " " ?cd " " ?mot " " ?mat " " ?target crlf)
+    (if (not (eq (pb-field-value ?msg "successful") NOT-SET)) then 
+      (bind ?successful (pb-field-value ?msg "successful"))
       ; It has moved without something in the gripper
       (if (and (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE)) then 
         (printout red "ROBOT" ?rid " is in line 98 and should have moved to " ?mot " " ?mat crlf)
