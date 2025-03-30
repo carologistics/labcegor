@@ -143,12 +143,12 @@
           (if (and (or (eq ?mot M-RS1) (eq ?mot M-RS2)) (eq ?mat "Slide")) then
             (modify ?machine_task_overview (payment (+ ?m_one 1)))
           )
-          (if (eq ?target NONE) then
+          (if (or (eq ?mot M-RS1) (eq ?mot M-RS2) (eq ?target NONE)) then
             (modify ?tasks_overview (move_target M-BS))
           else
             (modify ?tasks_overview (move_target ?target))
           )
-        )        
+        )
         (modify ?tasks_overview (machine_target "Output"))
         (modify ?tasks_overview (task_id (+ ?task_id 1)))
         (modify ?check_robot (did_something FALSE))
