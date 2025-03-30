@@ -137,7 +137,7 @@
             (modify ?machine_task_overview (mounted TRUE))
           )
           else
-          (if (and (or (eq ?mot (sym-cat M-RS (- ?rid 1)) )) (eq ?mat "Slide")) then
+          (if (and (eq ?mot (sym-cat M-RS (- ?rid 1))) (eq ?mat "Slide")) then
             (modify ?machine_task_overview (payment (+ ?payment 1)))
           )
           (if (or (eq ?mot (sym-cat M-RS (- ?rid 1)) ) (eq ?target NONE)) then
