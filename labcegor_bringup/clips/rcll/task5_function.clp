@@ -153,25 +153,20 @@
     (if (eq (mod ?robot_id 2) 0) then
       (bind ?even TRUE)
     )
-    (printout green "machine" ?m:machine_id " " ?m:payment " " ?m:mounted  crlf)
-    (bind ?rs1_payment ?m:payment)
-    (bind ?rs2_payment ?m:payment)
-    (bind ?cs1_mount ?m:mounted)
-    (bind ?cs2_mount ?m:mounted)
 
-    (printout red "payment_status" ?rs1_payment " " ?rs2_payment " " ?cs1_mount " " ?cs2_mount crlf)
+    (printout red "payment_status" ?m_cs1:payment " " ?m_cs2:payment " " ?m_cs1:mount " " ?m_cs2:mount crlf)
     (if (eq ?even TRUE) then
-      (if (eq ?cs1_mount FALSE) then
+      (if (eq ?m_cs1:mount FALSE) then
         (return M-CS1)
       )
-      (if(< ?rs1_payment 3) then
+      (if(< ?m_cs1:payment 3) then
         (return M-RS1)
       )
     else
-      (if (eq ?cs2_mount FALSE) then
+      (if (eq ?m_cs2:mount FALSE) then
         (return M-CS2)
       )
-      (if(< ?rs2_payment 3)then
+      (if(< ?m_cs2:payment 3)then
         (return M-RS2)
       )
     )
