@@ -12,6 +12,13 @@
   (bind ?target (get_target_for_payment ?rid))
   ;Prepare Basestation PrepareMachine
   (if (eq ?robot_state IDLE) then
+    (if (eq ?target NONE) then
+      (modify ?tasks_overview (move_target M-BS))
+      (bind ?mot M-BS)
+      else
+      (modify ?tasks_overview (move_target ?target))
+      (bind ?mot ?target)
+    )
     ; if (or (eq ?target M-RS1) (eq ?target M-RS2)) => then mounted == False
     (if (eq ?mot M-BS) then
         (assert (order_from_machine (machine_id ?mot) (order_id 0) (robot_id ?rid) (color BASE_BLACK) (position OUTPUT)))
@@ -135,11 +142,6 @@
           else
           (if (and (or (eq ?mot M-RS1) (eq ?mot M-RS2)) (eq ?mat "Slide")) then
             (modify ?machine_task_overview (payment (+ ?payment 1)))
-          )
-          (if (eq ?target NONE) then
-            (modify ?tasks_overview (move_target M-BS))
-            else
-            (modify ?tasks_overview (move_target ?target))
           )
         )
 
