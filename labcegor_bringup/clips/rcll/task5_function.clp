@@ -165,14 +165,14 @@
   (bind ?cs2_mount FALSE)
 
   (do-for-all-facts ((?m machine_task_overview)) TRUE
-    (switch ?rs:machine_id
+    (switch ?m:machine_id
     (case M-CS1 then (bind ?rs1_payment ?m:payment))
     (case M-CS2 then (bind ?rs2_payment ?m:payment))
     (case M-RS1 then (bind ?cs1_mount ?m:mounted))
     (case M-RS2 then (bind ?cs2_mount ?m:mounted))
     (default))
   )
-  ;(printout blue "new target " ?even " " ?robot_id ".. " ?rs1_payment " " ?rs2_payment " " ?cs1_mount " " ?cs2_mount crlf)
+
   (if (eq ?even TRUE) then
     (if (eq ?cs1_mount FALSE) then
       (return M-CS1)
