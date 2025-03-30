@@ -126,7 +126,7 @@
 
       ; It Delivered somthing
       (if (and (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE)) then 
-        (printout red "ROBOT" ?rid " is in line 139 and should delivered something to " ?mot " " ?mat " target " ?target " mounted? " ?mounted crlf)
+        (printout red "ROBOT" ?rid " is in line 139 and should delivered something to " ?mot " " ?mat " target " ?target " mounted? " ?mounted " payment:" ?payment crlf)
         
         (if (or (eq ?mot M-CS1) (eq ?mot M-CS2)) then
           (if (eq ?mounted FALSE) then 

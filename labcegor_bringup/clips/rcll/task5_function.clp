@@ -66,19 +66,6 @@
   (printout blue "BufferStation: robot: " ?r_id " task " ?task_id crlf)
 )
 
-; Retrieve from Machine
-; (deffunction send_cmd_to_machine (?m_id ?operation ?peer-id)
-;   (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionCS")) 
-;   (pb-set-field ?prep-msg "operation" ?operation) ; "RETRIEVE_CAP")
-
-;   (bind ?msg (pb-create "llsf_msgs.PrepareMachine"))
-;   (pb-set-field ?msg "team_color" MAGENTA)
-;   (pb-set-field ?msg "machine" ?m_id)
-;   (pb-set-field ?msg "instruction_cs" ?prep-msg)
-;   (pb-broadcast ?peer-id ?msg)
-;   (pb-destroy ?msg)
-; )
-
 ; Prepare Machine
 (deffunction prepare_machine_BS (?m_id ?side ?color ?peer-id)
   (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionBS")) 
@@ -172,7 +159,7 @@
     (case M-RS2 then (bind ?cs2_mount ?m:mounted))
     (default))
   )
-
+  (printout red "payment_status" ?rs1_payment " " ?rs2_payment " " ?cs1_mount " " ?cs2_mount crlf)
   (if (eq ?even TRUE) then
     (if (eq ?cs1_mount FALSE) then
       (return M-CS1)
