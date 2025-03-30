@@ -15,9 +15,6 @@
     (if (eq ?mot M-BS) then
       (assert (order_from_machine (machine_id ?mot) (order_id 0) (robot_id ?rid) (color BASE_BLACK) (position OUTPUT)))
     )
-    ; (if (or (eq ?mot M-CS1) (eq ?mot M-CS2)) then
-    ;   (modify ?tasks_overview (machine_target "Input"))
-    ; )
     (send_move_to_cmd ?rid ?mot ?mat ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
     (modify ?tasks_overview (state MOVING))
@@ -82,7 +79,7 @@
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
   (bind ?target (check_payment ?m_one ?m_two ?rid))
-    (bind ?successful (pb-field-value ?msg "successful"))
+  (bind ?successful (pb-field-value ?msg "successful"))
   ; (bind ?target (get_target_for_payment ?m_one ?m_two ?cs_one ?cs_two ?rid))
 
   (if (and (eq ?robot_id ?rid) (eq ?task_id ?tid)) then
@@ -141,19 +138,21 @@
           (if (eq ?mounted FALSE) then 
             (assert (order_from_machine (machine_id ?mot) (order_id 0) (robot_id ?rid) (operation RETRIEVE_CAP)))
             (modify ?machine_task_overview (mounted TRUE))
-            (modify ?tasks_overview (machine_target "Output"))
-            (modify ?tasks_overview (task_id (+ ?task_id 1)))
-            (modify ?check_robot (did_something FALSE))
-            (modify ?tasks_overview (state IDLE))
           )
           else
-          (modify ?machine_task_overview (payment (+ ?m_one 1)))
+          (if (and (or (eq ?mot M-RS1) (eq ?mot M-RS2)) (eq ?mat "Slide")) then
+            (modify ?machine_task_overview (payment (+ ?m_one 1)))
+          )
           (if (eq ?target NONE) then
             (modify ?tasks_overview (move_target M-BS))
           else
             (modify ?tasks_overview (move_target ?target))
           )
         )        
+        (modify ?tasks_overview (machine_target "Output"))
+        (modify ?tasks_overview (task_id (+ ?task_id 1)))
+        (modify ?check_robot (did_something FALSE))
+        (modify ?tasks_overview (state IDLE))
       )
     )
   )
