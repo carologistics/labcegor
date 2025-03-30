@@ -26,10 +26,14 @@
       (modify ?check_robot (did_something TRUE))
       (modify ?tasks_overview (state CARRY))
     )
-    (if (and (or (eq ?mot M-CS1) (eq ?mot M-CS2)) (eq ?mounted TRUE)) then
-      (send_move_to_cmd ?rid ?mot ?mat ?peer-id ?tid)
-      (modify ?check_robot (did_something TRUE))
-      (modify ?tasks_overview (state CARRY))
+    (if (or (eq ?mot M-RS1) (eq ?mot M-RS2)) then
+      (if(eq ?payment TRUE)) then
+        (send_move_to_cmd ?rid ?mot ?mat ?peer-id ?tid)
+        (modify ?check_robot (did_something TRUE))
+        (modify ?tasks_overview (state CARRY))
+      )
+      else
+      (if (or (eq ?mot M-CS1) (eq ?mot M-CS2)))
     )
   )
   (if (and (eq ?robot_state IDLE) (eq ?cd FALSE) (not (eq ?mot M-BS))) then 
@@ -88,7 +92,7 @@
   ?order <- (order (id ?oid) (name ?order-name) (base-color ?base-color) (ring-colors $?ring-colors)); 
   ?assigned_order <- (assigned_order (order_id ?order_id) (robot_id ?rid))
   (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id ?rid) (ptr ?msg))
-  ?machine_task_overview <- (machine_task_overview (machine_id M-BS) (machine_task ?task))
+  ?machine_task_overview <- (machine_task_overview (machine_id ?mot) (payment ?payment) (mounted ?mounted))
   =>
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
@@ -137,8 +141,15 @@
 
       ; It delivered 
       (if (and (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE) (eq ?robot_state IDLE)) then
-        (update_payment ?oid)
         (bind ?color (get_next_order_color ?oid TRUE))
+
+        (if (or (eq ?mot M-RS1) (eq ?mot M-RS2)) then
+            (modify ?machine_task_overview (payment (- ?payment (get_cost ?color))))
+          else
+          (if (or (eq ?mot M-CS1) (eq ?mot M-CS2)) then
+            (modify ?machine_task_overview (mounted FALSE))
+          )
+        )
         (assert (order_from_machine (machine_id ?mot) (order_id ?oid) (robot_id ?rid) (color ?color) (operation MOUNT_CAP) (position ?mat)))
         (modify ?tasks_overview (machine_target "Output"))
         (modify ?tasks_overview (can_move TRUE))
