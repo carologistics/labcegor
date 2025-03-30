@@ -33,7 +33,6 @@ clips_manager:
         "clips/labcegor_bringup/rcll/task5_function.clp",
         "clips/labcegor_bringup/rcll/task5_assignment_n_machines.clp",
         "clips/labcegor_bringup/rcll/task5_production_robot.clp",
-        "clips/labcegor_bringup/rcll/task5_helper_robot.clp",
         "clips/labcegor_bringup/rcll/task5_payment_robot.clp",
        ]
     protobuf:
