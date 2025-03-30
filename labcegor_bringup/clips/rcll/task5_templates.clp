@@ -1,6 +1,3 @@
-; Here is my stuff
-(defglobal ?*global_task_id_base* = 0)
-
 (deftemplate tasks_overview
   (slot robot_id (type INTEGER))
   (slot robot_type (type SYMBOL) (allowed-values PRODUCTION PAYMENT HELPER FASTPRODUCTION))
@@ -18,11 +15,6 @@
   (slot machine_task (type SYMBOL))
   (slot payment (type INTEGER))
   (slot mounted (allowed-values FALSE TRUE))
-)
-
-(deftemplate machine_payment_info
-  (slot machine_id (type SYMBOL))
-  (slot money (type INTEGER))
 )
 
 (deftemplate check_robot
@@ -47,7 +39,6 @@
   (slot operation (type SYMBOL))
 )
 
-
 (deftemplate adjustable_order
   (slot id (type INTEGER))
   (slot name (type SYMBOL))
@@ -68,7 +59,7 @@
 )
 
 ; facts
-(deffacts robottasks
+(deffacts robot_tasks
   (tasks_overview (robot_id 1) (robot_type PRODUCTION) (task_id 1) (can_move TRUE) (can_retrieve FALSE) (can_deliver FALSE) (state IDLE) (move_target M-BS) (machine_target "Input" ))
   (tasks_overview (robot_id 2) (robot_type PAYMENT) (task_id 1) (can_move TRUE) (can_retrieve FALSE) (can_deliver FALSE) (state IDLE) (move_target M-CS1) (machine_target "Input" ))
   (tasks_overview (robot_id 3) (robot_type PAYMENT) (task_id 1) (can_move TRUE) (can_retrieve FALSE) (can_deliver FALSE) (state IDLE) (move_target M-CS2) (machine_target "Input" ))
@@ -88,8 +79,6 @@
   (machine_task_overview (machine_id M-DS) (machine_task NOT-SET) )
   (machine_task_overview (machine_id M-SS) (machine_task NOT-SET) )
   (machine_task_overview (machine_id M-BS) (machine_task NOT-SET) )
-  (machine_payment_info (machine_id M-RS1) (money 0))
-  (machine_payment_info (machine_id M-RS2) (money 0))
 )
 
 (deffacts order_facts
