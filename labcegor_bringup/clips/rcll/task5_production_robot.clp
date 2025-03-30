@@ -12,7 +12,6 @@
   (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
   ?machine_task_overview <- (machine_task_overview (machine_id ?mot) (machine_task ?task) (payment ?payment) (mounted ?mounted))
   =>
-  ; (printout blue "Robot " ?peer-name " robot-id " ?rid ?base-color crlf)
   ; Get Order
   ; Prepare Basestation PrepareMachine
   (if (and (eq ?robot_state IDLE) (eq ?cd FALSE) (eq ?mot M-BS)) then 
@@ -49,13 +48,10 @@
   ?assigned_order <- (assigned_order (order_id ?oid) (robot_id ?rid))
   ?order <- (order (id ?oid) (name ?order-name) (base-color ?base-color))
   (not (order_from_machine (robot_id ?rid)))
-  ; TODO make machine name dependent on move_target
   (machine (name ?machine-name&:(eq ?machine-name (sym-cat ?mot))) (state ?s))
   (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
   =>
-  ; (printout green ?peer-name " " ?mot " " ?mat " is in state " ?s " " ?oid  crlf)
   (if (eq ?s READY-AT-OUTPUT) then
-    ;  (printout red "just take it" crlf)
     (send_retrieve_from_cmd ?rid ?mot ?mat ?peer-id ?tid)
     (modify ?check_robot (did_something TRUE))
     (modify ?tasks_overview (state HOLDING))
@@ -64,9 +60,7 @@
     (modify ?tasks_overview (robot_id 1) (robot_type PRODUCTION) (can_move TRUE) (can_retrieve FALSE) (can_deliver FALSE) (state IDLE) (move_target M-BS) (machine_target "Input" ))
     (modify ?check_robot (robot_id 1) (did_something FALSE) (is_assigned TRUE) (go_to_next_step TRUE))
     (modify ?assigned_order (order_id (+ ?oid 1)) (robot_id 1) (ready_for_next_step FALSE))
-    ; (printout green "lets start over" crlf)
   )
-  ; (printout green "will it work? " ?mot crlf)
 )
 
 (defrule deliver_part_to_machine_order_based
@@ -79,9 +73,6 @@
   ?order <- (order (id ?oid) (name ?order-name) (base-color ?base-color))
   (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
   =>
-  ; (bind ?color (get_next_order_color ?oid))
-  ; instruct station to generate next color
-  ; (prepare_machine "M-BS" ?pos ?color ?refbox-id)
   (send_deliver_to_cmd ?rid ?mot ?mat ?peer-id ?tid)
   (modify ?check_robot (did_something TRUE))
   (modify ?tasks_overview (state IDLE))
@@ -90,9 +81,6 @@
 ; ==================================================================================
 ; CHECK STUFF
 ; ==================================================================================
-; ==========
-; ROBOTS orderbased
-; ==========
 (defrule check_progress_off_robot_with_order
   (game-state (phase PRODUCTION))
   ?tasks_overview <- (tasks_overview (robot_id ?rid) (robot_type PRODUCTION) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
@@ -106,65 +94,62 @@
   =>
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
-  (bind ?successful (pb-field-value ?msg "successful"))
 
-  ; (if (eq ?successful TRUE) then
-  ; (printout blue "Robot " ?rid " State: " ?robot_state " " ?tid " " ?cm " " ?cr " " ?cd " " ?mot " " ?mat crlf)
-  ; )
-  ; It moved
-  (if (and (eq ?task_id ?tid) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE) (eq ?robot_state MOVING) (eq ?successful TRUE) (eq ?mat "Input")) then
-    ;  (printout green "robot " ?rid " can now grab the base of color: " ?base-color " from order: " ?oid crlf)
-    (modify ?tasks_overview (can_move FALSE))
-    (modify ?tasks_overview (can_retrieve TRUE))
-    (modify ?tasks_overview (task_id (+ ?task_id 1)))
-    (modify ?check_robot (did_something FALSE))
-    (modify ?tasks_overview (state IDLE))
-  )
+  (if (and (eq ?task_id ?tid) (eq ?robot_id ?rid) (not (eq (pb-field-value ?msg "successful") NOT-SET)) )then
+    (bind ?successful (pb-field-value ?msg "successful"))
+    ; It moved
+    (if (eq ?successful TRUE) then
+      (if (and (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE) (eq ?robot_state MOVING) (eq ?mat "Input")) then
+        (modify ?tasks_overview (can_move FALSE))
+        (modify ?tasks_overview (can_retrieve TRUE))
+        (modify ?tasks_overview (task_id (+ ?task_id 1)))
+        (modify ?check_robot (did_something FALSE))
+        (modify ?tasks_overview (state IDLE))
+      )
 
-  (if (and (eq ?task_id ?tid) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE) (eq ?robot_state MOVING) (eq ?successful TRUE) (eq ?mat "Output")) then
-    (modify ?tasks_overview (can_move FALSE))
-    (modify ?tasks_overview (can_retrieve TRUE))
-    (modify ?tasks_overview (task_id (+ ?task_id 1)))
-    (modify ?check_robot (did_something FALSE))
-    (modify ?tasks_overview (state IDLE))
-  )
+      (if (and (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE) (eq ?robot_state MOVING) (eq ?mat "Output")) then
+        (modify ?tasks_overview (can_move FALSE))
+        (modify ?tasks_overview (can_retrieve TRUE))
+        (modify ?tasks_overview (task_id (+ ?task_id 1)))
+        (modify ?check_robot (did_something FALSE))
+        (modify ?tasks_overview (state IDLE))
+      )
 
-  ; It Grapped something
-  (if (and (eq ?task_id ?tid) (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cd FALSE) (eq ?robot_state HOLDING) (eq ?successful TRUE)) then
-    (bind ?target (check_order ?oid))
-    (modify ?tasks_overview (can_move TRUE))
-    (modify ?tasks_overview (can_retrieve FALSE))
-    (modify ?tasks_overview (can_deliver TRUE))
-    (modify ?tasks_overview (task_id (+ ?task_id 1)))
-    (modify ?tasks_overview (move_target ?target))
-    (modify ?check_robot (did_something FALSE))
-    (modify ?machine_task_overview (machine_task NOT-SET))
-    ; Todo get target based on order
-    (modify ?tasks_overview (machine_target "Input"))
-    ;  (printout green "Yippiiiiiiiiiieee" crlf)
-  )
+      ; It Grapped something
+      (if (and (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cd FALSE) (eq ?robot_state HOLDING)) then
+        (bind ?target (check_order ?oid))
+        (modify ?tasks_overview (can_move TRUE))
+        (modify ?tasks_overview (can_retrieve FALSE))
+        (modify ?tasks_overview (can_deliver TRUE))
+        (modify ?tasks_overview (task_id (+ ?task_id 1)))
+        (modify ?tasks_overview (move_target ?target))
+        (modify ?check_robot (did_something FALSE))
+        (modify ?machine_task_overview (machine_task NOT-SET))
+        (modify ?tasks_overview (machine_target "Input"))
+      )
 
-  ; It moved to deliver
-  (if (and (eq ?task_id ?tid) (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd TRUE) (eq ?robot_state CARRY) (eq ?successful TRUE)) then
-    (modify ?tasks_overview (can_move FALSE))
-    (modify ?tasks_overview (can_deliver TRUE))
-    (modify ?tasks_overview (task_id (+ ?task_id 1)))
-    (modify ?check_robot (did_something FALSE))
-    (modify ?tasks_overview (state HOLDING))
-  )
+      ; It moved to deliver
+      (if (and (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd TRUE) (eq ?robot_state CARRY)) then
+        (modify ?tasks_overview (can_move FALSE))
+        (modify ?tasks_overview (can_deliver TRUE))
+        (modify ?tasks_overview (task_id (+ ?task_id 1)))
+        (modify ?check_robot (did_something FALSE))
+        (modify ?tasks_overview (state HOLDING))
+      )
 
-  ; It delivered 
-  (if (and (eq ?task_id ?tid) (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE) (eq ?robot_state IDLE) (eq ?successful TRUE)) then
-    ; TODO check if difference between cm true or false for retrevial of product....
-    (update_payment ?oid)
-    (bind ?color (get_next_order_color ?oid TRUE))
-    (assert (order_from_machine (machine_id ?mot) (order_id ?oid) (robot_id ?rid) (color ?color) (operation MOUNT_CAP) (position ?mat)))
-    (modify ?tasks_overview (machine_target "Output")); TODO check if Symbls work also...
-    (modify ?tasks_overview (can_move TRUE))
-    (modify ?tasks_overview (can_retrieve FALSE))
-    (modify ?tasks_overview (can_deliver FALSE))
-    (modify ?tasks_overview (task_id (+ ?task_id 1)))
-    (modify ?check_robot (did_something FALSE))
-    (modify ?tasks_overview (state IDLE))
+      ; It delivered 
+      (if (and (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE) (eq ?robot_state IDLE)) then
+        (update_payment ?oid)
+        (bind ?color (get_next_order_color ?oid TRUE))
+        (assert (order_from_machine (machine_id ?mot) (order_id ?oid) (robot_id ?rid) (color ?color) (operation MOUNT_CAP) (position ?mat)))
+        (modify ?tasks_overview (machine_target "Output"))
+        (modify ?tasks_overview (can_move TRUE))
+        (modify ?tasks_overview (can_retrieve FALSE))
+        (modify ?tasks_overview (can_deliver FALSE))
+        (modify ?tasks_overview (task_id (+ ?task_id 1)))
+        (modify ?check_robot (did_something FALSE))
+        (modify ?tasks_overview (state IDLE))
+      )
+    )
   )
 )
