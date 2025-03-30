@@ -141,7 +141,14 @@
 )
 
 (deffunction get_target_for_payment (?robot_id)
-  (do-for-fact ((?m_cs1 machine_task_overview (machine_id M-CS1)) (?m_cs2 machine_task_overview (machine_id M-CS2)) (?m_rs1 machine_task_overview (machine_id M-RS1)) (?m_rs2 machine_task_overview (machine_id M-RS2))) TRUE
+  (do-for-fact ((?m_cs1 machine_task_overview)
+                 (?m_cs2 machine_task_overview)
+                 (?m_rs1 machine_task_overview)
+                 (?m_rs2 machine_task_overview)
+                ) (and (eq ?m_cs1:machine_id M-CS1)
+                        (eq ?m_cs2:machine_id M-CS2)
+                        (eq ?m_rs1:machine_id M-RS1)
+                        (eq ?m_rs2:machine_id M-RS2))
     (bind ?even FALSE)
     (if (eq (mod ?robot_id 2) 0) then
       (bind ?even TRUE)
