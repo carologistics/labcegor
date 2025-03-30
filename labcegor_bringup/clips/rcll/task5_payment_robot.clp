@@ -42,16 +42,16 @@
   ?machine_task_overview <- (machine_task_overview (machine_id ?mot) (machine_task ?task) (payment ?payment) (mounted ?mounted))
   =>
   (printout red "ROBOT" ?rid " is in line 44 and should pickup at " ?mot " " ?mat " mounted:" ?mounted " " ?s crlf)
-  (if (and (or (eq ?mot M-CS1) (eq ?mot M-CS2)) (eq ?mounted FALSE)) then
-    (send_retrieve_from_cmd ?rid ?mot "Shelf" ?peer-id ?tid)
-    (modify ?check_robot (did_something TRUE))
-    (modify ?tasks_overview (state HOLDING))
+  (if (or (eq ?mot M-CS1) (eq ?mot M-CS2)) then
+    (if (eq ?mounted FALSE) then 
+      (send_retrieve_from_cmd ?rid ?mot "Shelf" ?peer-id ?tid)
+    )
   )
   (if (eq ?s READY-AT-OUTPUT) then
     (send_retrieve_from_cmd ?rid ?mot ?mat ?peer-id ?tid)
-    (modify ?check_robot (did_something TRUE))
-    (modify ?tasks_overview (state HOLDING))
   )
+  (modify ?check_robot (did_something TRUE))
+  (modify ?tasks_overview (state HOLDING))
 )
 
 (defrule robot-payment-deliver-base
