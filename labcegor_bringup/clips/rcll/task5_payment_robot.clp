@@ -12,7 +12,7 @@
 
   ;Prepare Basestation PrepareMachine
   (if (eq ?robot_state IDLE) then 
-    (if (eq ?mot M-BS) then
+    (if (and (eq ?mot M-BS) (eq ?mounted TRUE)) then
       (assert (order_from_machine (machine_id ?mot) (order_id 0) (robot_id ?rid) (color BASE_BLACK) (position OUTPUT)))
     )
     (send_move_to_cmd ?rid ?mot ?mat ?peer-id ?tid)
