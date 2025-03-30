@@ -82,10 +82,12 @@
   ?machine_task_overview <- (machine_task_overview (machine_id ?mot) (machine_task ?task) (payment ?payment) (mounted ?mounted))
   (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id ?rid) (ptr ?msg))
   =>
+  (printout yellow "successful" (pb-field-value ?msg "successful") crlf)
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
   (bind ?successful (pb-field-value ?msg "successful"))
   (bind ?target (check_payment ?m_one ?m_two ?rid))
+
   ; (bind ?target (get_target_for_payment ?m_one ?m_two ?cs_one ?cs_two ?rid))
   (if (and (eq ?robot_id ?rid) (eq ?task_id ?tid)) then
     (printout green "ROBOT" ?rid " task " ?tid " suc:" ?successful " " ?cm " " ?cr " " ?cd " " ?mot " " ?mat " " ?target crlf)
