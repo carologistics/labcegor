@@ -69,10 +69,6 @@
 (defrule check_robot_payment
   (game-state (phase PRODUCTION))
   ?tasks_overview <- (tasks_overview (robot_id ?rid) (robot_type PAYMENT) (task_id ?tid) (can_move ?cm) (can_retrieve ?cr) (can_deliver ?cd) (state ?robot_state) (move_target ?mot) (machine_target ?mat))
-  ?mpi_one <- (machine_task_overview (machine_id M-RS1) (payment ?m_one))
-  ?mpi_two <- (machine_task_overview (machine_id M-RS2) (payment ?m_two))
-  ?mcs_one <- (machine_task_overview (machine_id M-CS1) (mounted ?cs_one))
-  ?mcs_two <- (machine_task_overview (machine_id M-CS2) (mounted ?cs_two))
   ?check_robot <- (check_robot (robot_id ?rid) (did_something TRUE))
   ?machine_task_overview <- (machine_task_overview (machine_id ?mot) (machine_task ?task) (payment ?payment) (mounted ?mounted))
   (protobuf-msg (type "llsf_msgs.AgentTask") (client-type PEER) (client-id ?rid) (ptr ?msg))
@@ -80,7 +76,6 @@
   (bind ?task_id (pb-field-value ?msg "task_id"))
   (bind ?robot_id (pb-field-value ?msg "robot_id"))
   (bind ?successful (pb-field-value ?msg "successful"))
-  ; (bind ?target (check_payment ?m_one ?m_two ?rid))
   (bind ?target (get_target_for_payment ?rid))
 
   (if (and (eq ?robot_id ?rid) (eq ?task_id ?tid)) then
@@ -109,20 +104,21 @@
       ; It has picked something up
       (if (and (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cd FALSE)) then 
         (printout red "ROBOT" ?rid " is in line 118 and should have picked somthing up at " ?mot " " ?mat crlf)
-        (modify ?machine_task_overview (machine_task NOT-SET))
-        (modify ?tasks_overview (can_move TRUE))
-        (modify ?tasks_overview (can_retrieve FALSE))
-        (modify ?tasks_overview (can_deliver TRUE))
         
         ; It carries a base
         (if (or (not (or (eq ?mot M-CS1) (eq ?mot M-CS2))) (eq ?mounted TRUE) )then
-          (modify ?tasks_overview (move_target ?target))
+          (modify ?tasks_overview (move_target (sym-cat M-RS (- ?rid 1)))) ; Robot2 is send to RS1 and robot3 is send to RS2
           (modify ?tasks_overview (machine_target "Slide"))
         )
         ; It carries a cap-carrier
         (if (and (or (eq ?mot M-CS1) (eq ?mot M-CS2)) (eq ?mounted FALSE) )then
           (modify ?tasks_overview (machine_target "Input"))
         )
+        
+        (modify ?machine_task_overview (machine_task NOT-SET))
+        (modify ?tasks_overview (can_move TRUE))
+        (modify ?tasks_overview (can_retrieve FALSE))
+        (modify ?tasks_overview (can_deliver TRUE))
         (modify ?tasks_overview (task_id (+ ?task_id 1)))
         (modify ?tasks_overview (state HOLDING))
         (modify ?check_robot (did_something FALSE))
@@ -131,9 +127,6 @@
       ; It Delivered somthing
       (if (and (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE)) then 
         (printout red "ROBOT" ?rid " is in line 139 and should delivered something to " ?mot " " ?mat " target " ?target " mounted? " ?mounted crlf)
-        (modify ?tasks_overview (can_move TRUE))
-        (modify ?tasks_overview (can_retrieve FALSE))
-        (modify ?tasks_overview (can_deliver FALSE))
         
         (if (or (eq ?mot M-CS1) (eq ?mot M-CS2)) then
           (if (eq ?mounted FALSE) then 
@@ -150,10 +143,14 @@
             (modify ?tasks_overview (move_target ?target))
           )
         )
-        (modify ?tasks_overview (machine_target "Output"))
+
+        (modify ?tasks_overview (can_move TRUE))
+        (modify ?tasks_overview (can_retrieve FALSE))
+        (modify ?tasks_overview (can_deliver FALSE))
         (modify ?tasks_overview (task_id (+ ?task_id 1)))
         (modify ?check_robot (did_something FALSE))
         (modify ?tasks_overview (state IDLE))
+        (modify ?tasks_overview (machine_target "Output"))
       )
     )
   )
