@@ -1,17 +1,12 @@
-(defrule robo_move
+(defrule robo_move ;create move instruction for robo
   ?ac <- (action (a_type "m") (id ?id) (machine ?wp) (io ?io) (task_id ?t-id) (wait ?w))
-  ;(done (done_t_id ?w))
   (protobuf-peer (name ?name) (peer-id ?peer-id))
   (test (eq ?name (sym-cat (str-cat "ROBOT" ?id))))
-  ;old;?lt <-(last_task (id ?id) (l_task_id ?last_t))
-  ;old;?do <- (do (id ?id) (task ?t-id))
   =>
-  ;TODO renew ;(assert (robo_busy (id ?id)))
   (retract ?ac)
   (bind ?msg (pb-create "llsf_msgs.AgentTask"))
   (pb-set-field ?msg "team_color" MAGENTA)
   (pb-set-field ?msg "task_id" ?t-id)
-  ; OLD (modify ?lt (l_task_id ?t-id)); UPdate fact (maybe in check funktion)
   (pb-set-field ?msg "robot_id" ?id)
   (bind ?move-msg (pb-create "llsf_msgs.Move")) 
   (pb-set-field ?move-msg "waypoint" ?wp)
@@ -21,22 +16,17 @@
   (pb-destroy ?msg)
 )
 
-(defrule robo_retrive
+(defrule robo_retrive ;create retrive instruction for robo
   ?ac <- (action (a_type "r") (id ?id) (machine ?wp) (io ?io) (task_id ?t-id))
-  ;(done (done_t_id ?w))
   (robo_status (id ?id) (pos ?wp) (pos_at_waypoint ?p_at_wp))
   (test (or (eq ?io ?p_at_wp) (and (eq ?p_at_wp INPUT) (eq ?io SHELF))))
   (protobuf-peer (name ?name) (peer-id ?peer-id))
   (test (eq ?name (sym-cat (str-cat "ROBOT" ?id))))
-  ;old;?lt <-(last_task (id ?id) (l_task_id ?last_t))
-  ;old;?do <- (do (id ?id) (task ?t-id))
   =>
   (retract ?ac)
-  ;TODO renew ;(assert (robo_busy (id ?id)))
   (bind ?msg (pb-create "llsf_msgs.AgentTask"))
   (pb-set-field ?msg "team_color" MAGENTA)
   (pb-set-field ?msg "task_id" ?t-id)
-  ; OLD (modify ?lt (l_task_id ?t-id)); UPdate fact (maybe in check funktion)
   (pb-set-field ?msg "robot_id" ?id)
   (bind ?retrieve-msg (pb-create "llsf_msgs.Retrieve")) 
   (pb-set-field ?retrieve-msg "machine_id" ?wp)
@@ -47,29 +37,22 @@
 )
 
 
-(defrule robo_deliver
+(defrule robo_deliver ;create deliver instruction for robo
   ?ac <- (action (a_type "d") (id ?id) (machine ?wp) (io ?io) (task_id ?t-id))
-  ;(done (done_t_id ?w))
   (robo_status (id ?id) (pos ?wp) (pos_at_waypoint ?p_at_wp))
   (test (or (eq ?io ?p_at_wp) (and (eq ?p_at_wp INPUT) (eq ?io SLIDE))))
   (protobuf-peer (name ?name) (peer-id ?peer-id))
   (test (eq ?name (sym-cat (str-cat "ROBOT" ?id))))
-  ;old;?pay_rs1 <- (payments (station 1) (total_in ?t_in1) (current_in ?c_in1))
-  ;old;?pay_rs2 <- (payments (station 2) (total_in ?t_in2) (current_in ?c_in2))
-  ;old;?lt <-(last_task (id ?id) (l_task_id ?last_t))
-  ;old;?do <- (do (id ?id) (task ?t-id))
   =>
   (retract ?ac)
-  ;TODO renew ;(assert (robo_busy (id ?id)))
   (bind ?msg (pb-create "llsf_msgs.AgentTask"))
   (pb-set-field ?msg "team_color" MAGENTA)
   (pb-set-field ?msg "task_id" ?t-id)
-  ; OLD (modify ?lt (l_task_id ?t-id)); UPdate fact (maybe in check funktion)
   (pb-set-field ?msg "robot_id" ?id)
   (bind ?deliver-msg (pb-create "llsf_msgs.Deliver")) 
   (pb-set-field ?deliver-msg "machine_id" ?wp)
   (pb-set-field ?deliver-msg "machine_point" ?io)
-  (if (eq SLIDE ?io)
+  (if (eq SLIDE ?io) ; if RS slide update payment
     then
       (printout red ?io crlf)
       (if(eq ?wp M-RS1)
@@ -85,15 +68,13 @@
   (pb-destroy ?msg)
 )
 
-(defrule machine-instruct
+(defrule machine-instruct ;create instruction for machine
   (protobuf-peer (name refbox-private) (peer-id ?peer-id))
   ?inst <- (instruct (machine ?m) (operation ?op) (color ?c) (task_id ?t-id) (wait ?w) (order_id ?o_id))
-  ;(test (member$ ?m (create$ M-BS M-CS1 M-CS2 M-BS) ))
   ?m_sate <- (machine_status (name ?m) (slide_shelf ?pay_in))
   (ring-spec (color ?ca) (cost ?ring_cost))
   (test (or (not (member$ ?c (create$ RING_BLUE RING_ORANGE RING_GEEEN RING_YELLOW)))
                   (eq ?c ?ca)))
-  ;(test ((>= ?pay_in ?ring_cost)))
   (machine (name ?m) (zone ~NOT-SET))
   (test (or (not (or (eq ?m M-RS1) (eq ?m M-RS2))) (>= ?pay_in ?ring_cost)) ) 
   =>
@@ -102,6 +83,7 @@
   (bind ?msg (pb-create "llsf_msgs.PrepareMachine"))
   (pb-set-field ?msg "team_color" MAGENTA)
   (pb-set-field ?msg "machine" ?m)
+  ;fitting Instruction basend on machine
   (if (or (eq ?m M-CS1) (eq ?m M-CS2))
     then
       (bind ?prep-msg (pb-create "llsf_msgs.PrepareInstructionCS")) 
@@ -123,11 +105,10 @@
       (pb-set-field ?msg "instruction_rs" ?prep-msg)
       (if (eq ?m M-RS1)
         then
-          (assert (update_rs (id 1) (payment (- 0 ?ring_cost))))
+          (assert (update_rs (id 1) (payment (- 0 ?ring_cost)))); subtract ring costs form saved paymend in machine status
         else
           (assert (update_rs (id 2) (payment (- 0 ?ring_cost))))
       )
-      
   )
   (if (eq ?op DELIVER)
     then
@@ -137,5 +118,4 @@
   )
   (pb-broadcast ?peer-id ?msg)
   (pb-destroy ?msg)
-  ;(printout green "message sent" crlf)
 )

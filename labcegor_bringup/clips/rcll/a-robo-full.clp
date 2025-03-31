@@ -1,6 +1,6 @@
 (deftemplate order_status
   (slot id (type INTEGER))
-  (slot state (type SYMBOL)); (allowed-values RC BS RS1 RS2 CS1 CS2 DE))
+  (slot state (type SYMBOL)); (values RC BS M-RS1 M-RS2 M-CS1 M-CS2 DE)) reset when delvierd to a machine - not used other than DE to see if order is already delivered
   (slot next_step (type SYMBOL) (allowed-values BASE RING_1 RING_2 RING_3 CAP DELIVER NONE))
   (slot complexity (type SYMBOL))
   (slot next_color (type SYMBOL) (default EMPTY))
@@ -11,18 +11,18 @@
 (deftemplate robo_status
   (slot id (type INTEGER)); robo-id
   (slot task (type INTEGER)) ;current task-id 0 = free
-  (slot order (type INTEGER)) ;odrder id of workpice in Hand 0=empty, 20 = hands full unassigned, 2X assigend to slide fo RSX
+  (slot order (type INTEGER)) ;odrder id of workpice in Hand 0=empty ;42,40 dummmy orders
   (slot pos (type SYMBOL)); waypoint
-  (slot pos_at_waypoint (type SYMBOL));if any
+  (slot pos_at_waypoint (type SYMBOL));if any INPUT/OUTPUT
   (slot des (type SYMBOL) (default EMPTY)); destination waypoint
   (slot des_at_waypoint (type SYMBOL) (default EMPTY));if any
 )
 (deftemplate machine_status
   (slot name (type SYMBOL))
-  (slot task (type INTEGER) (default 0)) ;0/1 ?
-  (slot order (type INTEGER) (default 0)) ; order id 0= emty, 20 full unassigend
+  (slot task (type INTEGER) (default 0)) ;0 noting, anything else busy
+  (slot order (type INTEGER) (default 0)) ; order id 0= empty
   (slot pos (type SYMBOL)(allowed-values INPUT inside OUTPUT empty) (default empty)) ; for CS especialy wp not cap
-  (slot slide_shelf (type INTEGER)) ; 0,1,2,3 (pay in for RS) (0,1,2 - pickup point fo CS) 
+  (slot slide_shelf (type INTEGER)) ; 0,1,2,3 (pay in for RS); self not needed anymore not changed in name sofar
 )
 (deftemplate request_task
   (slot id (type INTEGER));robo id
@@ -56,7 +56,7 @@
 (slot iteration (type INTEGER)))
 
 (deftemplate update_rs
-  (slot id (type INTEGER)) ;; rs1/RS2
+  (slot id (type INTEGER)) ;; RS1/RS2
   (slot payment (type INTEGER) (allowed-values 1 0 -1 -2)) ;1 for ring is added -1, -2 für payment for ring 0 as optional
 )
 
@@ -104,20 +104,20 @@
     (slot a_type (type STRING)) ;(m)ove,(r)etrive,(p)ut
     (slot machine (type SYMBOL)) ;can be movepoint for move
     (slot io (type SYMBOL)) ;(i)nput,(o)utput, left, center, right
-    (slot color (type SYMBOL) (default NONE) ) ;identifier or ""
+    (slot color (type SYMBOL) (default NONE) ) ;identifier or NONE
     (slot task_id (type INTEGER))
     (slot wait (type INTEGER) (default 0))
 )
 
 (deftemplate instruct
-    ;(slot a_type (type SYMBOL)) ;(m)ove,(r)etrive,(p)ut
-    (slot machine (type SYMBOL)) ;can be movepoint for move
-    (slot operation (type SYMBOL)) ;(i)nput,(o)utput, left, center, right
-    (slot color (type SYMBOL) (default NONE) ) ;identifier or ""
+    (slot machine (type SYMBOL)) ;name
+    (slot operation (type SYMBOL)) 
+    (slot color (type SYMBOL) (default NONE) ) ;identifier or NONE
     (slot task_id (type INTEGER))
     (slot wait (type INTEGER) (default 0))
     (slot order_id (type INTEGER))
 )
-(deftemplate processed_order
+
+(deftemplate processed_order ;was order already processed
 (slot id (type INTEGER)))
 
