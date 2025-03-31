@@ -13,7 +13,7 @@
   ;Prepare Basestation PrepareMachine
   (if (eq ?robot_state IDLE) then
     (if (eq ?mot M-BS) then
-      (if (eq (sym-cat M-CS (- ?rid 1)))then
+      (if (eq ?target (sym-cat M-CS (- ?rid 1))) then
         (modify ?tasks_overview (move_target ?target))
         (bind ?mot ?target)
         else
