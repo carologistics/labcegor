@@ -87,7 +87,7 @@
   
       ; It has moved without something in the gripper
       (if (and (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE)) then 
-        ; (printout red "ROBOT" ?rid " is in line 98 and should have moved to " ?mot " " ?mat crlf)
+        (printout red "ROBOT" ?rid " is in line 98 and should have moved to " ?mot " " ?mat crlf)
         (modify ?tasks_overview (can_move FALSE))
         (modify ?tasks_overview (can_retrieve TRUE))
         (modify ?tasks_overview (task_id (+ ?task_id 1)))
@@ -97,7 +97,7 @@
       
       ; It has moved while carring something
       (if (and (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd TRUE)) then 
-        ; (printout red "ROBOT" ?rid " is in line 108 and should have moved to " ?mot " " ?mat crlf)
+        (printout red "ROBOT" ?rid " is in line 108 and should have moved to " ?mot " " ?mat crlf)
         (modify ?tasks_overview (can_move FALSE))
         (modify ?tasks_overview (task_id (+ ?task_id 1)))
         (modify ?check_robot (did_something FALSE))
@@ -106,7 +106,7 @@
 
       ; It has picked something up
       (if (and (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cd FALSE)) then 
-        ; (printout red "ROBOT" ?rid " is in line 118 and should have picked somthing up at " ?mot " " ?mat crlf)
+        (printout red "ROBOT" ?rid " is in line 118 and should have picked somthing up at " ?mot " " ?mat crlf)
         
         ; It carries a base
         (if (or (not (or (eq ?mot M-CS1) (eq ?mot M-CS2))) (eq ?mounted TRUE) )then
