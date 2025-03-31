@@ -130,7 +130,7 @@
 
       ; It Delivered somthing
       (if (and (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE)) then 
-        ; (printout red "ROBOT" ?rid " is in line 139 and should delivered something to " ?mot " " ?mat " target " ?target " mounted? " ?mounted " payment:" ?payment crlf)
+        (printout red "ROBOT" ?rid " is in line 139 and should delivered something to " ?mot " " ?mat " target " ?target " mounted? " ?mounted " payment:" ?payment crlf)
   
         (if (or (eq ?mot M-CS1) (eq ?mot M-CS2)) then
           (if (eq ?mounted FALSE) then 
@@ -140,6 +140,7 @@
           else
           (if (and (or (eq ?mot M-RS1) (eq ?mot M-RS2)) (eq ?mat "Slide")) then
             (modify ?machine_task_overview (payment (+ ?payment 1)))
+            (modify ?tasks_overview (move_target M-BS))
           )
         )
 
