@@ -12,9 +12,8 @@
   (printout red "ROBOT" ?rid " is in line 13 and should move to " ?mot " " ?mat " " ?robot_state " " ?target crlf)
   ;Prepare Basestation PrepareMachine
   (if (eq ?robot_state IDLE) then
-    ; if (or (eq ?target M-RS1) (eq ?target M-RS2)) => then mounted == False
     (if (eq ?mot M-BS) then
-      (if (or (not (eq ?target NONE)) (eq ?target M-CS1) (eq ?target M-CS2))then
+      (if (eq (sym-cat M-CS (- ?rid 1)))then
         (modify ?tasks_overview (move_target ?target))
         (bind ?mot ?target)
         else
