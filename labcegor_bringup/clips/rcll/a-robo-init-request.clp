@@ -126,6 +126,7 @@
 (retract ?new_o)
 (assert (processed_order (id ?id)))
 (if(eq ?id 1);give order 1 a higher prio than order 2 
+then
     (assert (order_status (id ?id) (state RC) (next_step BASE) (complexity ?complexity) (start_d_time ?begin) (last_d_time ?end) (prio (+ ?end 1)))); possibly overspecified some values currently not needed afterwards
 else
     (assert (order_status (id ?id) (state RC) (next_step BASE) (complexity ?complexity) (start_d_time ?begin) (last_d_time ?end) (prio ?end)))
