@@ -15,7 +15,9 @@
     (if (eq ?mot M-BS) then
       (if (eq ?target (sym-cat M-CS (- ?rid 1))) then
         (modify ?tasks_overview (move_target ?target))
+        (modify ?tasks_overview (machine_target "Shelf"))
         (bind ?mot ?target)
+        (bind ?mot "Shelf")
         else
         (assert (order_from_machine (machine_id ?mot) (order_id 0) (robot_id ?rid) (color BASE_BLACK) (position OUTPUT)))
       )
