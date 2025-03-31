@@ -58,7 +58,7 @@
 
   (bind ?msg (pb-create "llsf_msgs.PrepareMachine"))
   (pb-set-field ?msg "team_color" MAGENTA)
-  (pb-set-field ?msg "machine" ?m_id)
+  (pb-set-field ?msg "machine" M-BS)
   (pb-set-field ?msg "instruction_bs" ?prep-msg)
   (pb-broadcast ?peer-id ?msg)
   (pb-destroy ?msg)
