@@ -149,7 +149,7 @@
         (modify ?tasks_overview (task_id (+ ?task_id 1)))
         (modify ?check_robot (did_something FALSE))
         (modify ?tasks_overview (state IDLE))
-        (if (and (eq (get_target_color_based ?color) M-DS)) then
+        (if (and (eq (get_target_color_based ?color) M-DS) (eq ?mot M-DS)) then
           (modify ?tasks_overview (robot_id 1) (robot_type PRODUCTION) (can_move TRUE) (can_retrieve FALSE) (can_deliver FALSE) (state IDLE) (move_target M-BS) (machine_target "Input" ))
           (modify ?check_robot (robot_id 1) (did_something FALSE) (is_assigned TRUE) (go_to_next_step TRUE))
           (modify ?assigned_order (order_id (+ ?oid 1)) (robot_id 1) (ready_for_next_step FALSE))
