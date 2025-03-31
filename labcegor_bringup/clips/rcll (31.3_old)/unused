@@ -1,0 +1,163 @@
+(defrule startOrder
+  ?order-f <- (order (id ?oid) (base-color ?base) (complexity ?c) (ring-colors $?ringColors))
+  (not (order-tasks (orderID ?oid)))
+  ?ringsToProduce-f <- (ringsToProduce (blue ?b) (green ?g) (yellow ?y) (orange ?o))
+  (not (order-tasks (orderID ?oid)))
+  ?ringsToProduce-f <- (ringsToProduce (blue ?b) (green ?g) (yellow ?y) (orange ?o))
+;wie multislot handhaben? ringsToProduce anpassen, dann weiter mit ringStationTasks
+=> 
+  (switch ?c
+  (case "0" then 
+    (assert (order-tasks (orderID ?oid)
+                        (complexity ?c)
+                        (product-to-ring-1 TRUE) 
+                        (place-product-1 TRUE)
+                        (instruct-ring-1 TRUE)
+                        (robot-to-output-1 TRUE)
+                        (get-product-1 TRUE)    
+                        (product-to-ring-2 TRUE) 
+                        (place-product-2 TRUE)
+                        (instruct-ring-2 TRUE)
+                        (robot-to-output-2 TRUE)
+                        (get-product-2 TRUE)    
+                        (product-to-ring-3 TRUE) 
+                        (place-product-3 TRUE)
+                        (instruct-ring-3 TRUE)
+                        (robot-to-output-3 TRUE)
+                        (get-product-3 TRUE))
+    )   
+  )
+  (case "1" then 
+    (assert (order-tasks (orderID ?oid)
+                        (complexity ?c)
+                        (product-to-ring-2 TRUE) 
+                        (place-product-2 TRUE)
+                        (instruct-ring-2 TRUE)
+                        (robot-to-output-2 TRUE)
+                        (get-product-2 TRUE)    
+                        (product-to-ring-3 TRUE) 
+                        (place-product-3 TRUE)
+                        (instruct-ring-3 TRUE)
+                        (robot-to-output-3 TRUE)
+                        (get-product-3 TRUE))
+    )    
+    (bind ?firstItem (nth$ 1 ?ringColors))
+    (if (eq ?firstItem BLUE) then (modify ?ringsToProduce-f (blue (+ ?b 1))))  
+    (if (eq ?firstItem GREEN) then (modify ?ringsToProduce-f (green (+ ?b 1))))  
+    (if (eq ?firstItem YELLOW) then (modify ?ringsToProduce-f (yellow (+ ?b 1))))
+    (if (eq ?firstItem ORANGE) then (modify ?ringsToProduce-f (orange (+ ?b 1))))  
+  )
+  (case "2" then 
+    (assert (order-tasks (orderID ?oid)
+                        (complexity ?c)
+                        (product-to-ring-3 TRUE) 
+                        (place-product-3 TRUE)
+                        (instruct-ring-3 TRUE)
+                        (robot-to-output-3 TRUE)
+                        (get-product-3 TRUE))
+    ) 
+    (bind ?firstItem (nth$ 1 ?ringColors))
+    (bind ?secondItem (nth$ 2 ?ringColors))
+    (if (eq ?firstItem BLUE) then (modify ?ringsToProduce-f (blue (+ ?b 1))))  
+    (if (eq ?firstItem GREEN) then (modify ?ringsToProduce-f (green (+ ?b 1))))  
+    (if (eq ?firstItem YELLOW) then (modify ?ringsToProduce-f (yellow (+ ?b 1))))  
+    (if (eq ?firstItem ORANGE) then (modify ?ringsToProduce-f (orange (+ ?b 1)))) 
+    (if (eq ?secondItem BLUE) then (modify ?ringsToProduce-f (blue (+ ?b 1))))  
+    (if (eq ?secondItem GREEN) then (modify ?ringsToProduce-f (green (+ ?b 1))))  
+    (if (eq ?secondItem YELLOW) then (modify ?ringsToProduce-f (yellow (+ ?b 1))))  
+    (if (eq ?secondItem ORANGE) then (modify ?ringsToProduce-f (orange (+ ?b 1))))     
+  )
+  (case "3" then 
+    (assert (order-tasks (orderID ?oid) (complexity ?c))) 
+    (bind ?firstItem (nth$ 1 ?ringColors))
+    (bind ?secondItem (nth$ 2 ?ringColors))
+    (bind ?thirdItem (nth$ 3 ?ringColors))
+    (if (eq ?firstItem BLUE) then (modify ?ringsToProduce-f (blue (+ ?b 1))))  
+    (if (eq ?firstItem GREEN) then (modify ?ringsToProduce-f (green (+ ?b 1))))  
+    (if (eq ?firstItem YELLOW) then (modify ?ringsToProduce-f (yellow (+ ?b 1))))  
+    (if (eq ?firstItem ORANGE) then (modify ?ringsToProduce-f (orange (+ ?b 1)))) 
+    (if (eq ?secondItem BLUE) then (modify ?ringsToProduce-f (blue (+ ?b 1))))  
+    (if (eq ?secondItem GREEN) then (modify ?ringsToProduce-f (green (+ ?b 1))))  
+    (if (eq ?secondItem YELLOW) then (modify ?ringsToProduce-f (yellow (+ ?b 1))))  
+    (if (eq ?secondItem ORANGE) then (modify ?ringsToProduce-f (orange (+ ?b 1))))   
+    (if (eq ?thirdItem BLUE) then (modify ?ringsToProduce-f (blue (+ ?b 1)))) 
+    (if (eq ?thirdItem GREEN) then (modify ?ringsToProduce-f (green (+ ?b 1))))  
+    (if (eq ?thirdItem YELLOW) then (modify ?ringsToProduce-f (yellow (+ ?b 1))))  
+    (if (eq ?thirdItem ORANGE) then (modify ?ringsToProduce-f (orange (+ ?b 1))))       
+  )
+  (default none)
+  )    
+  
+)
+
+TODOS 16.3:
+
+Reihenfolge in der die Bestellungen abgearbeitet werden anpassen? Nach endzeit einfügen
+Roboter mit Bestellung zu früh zu Cap Station gefahren? Bevor Cap gebuffert wurde?
+Was bringt Roboter 3 da zur Lieferstationß Die Base mit Cap?
+
+18.3
+Klappt das mit warten auf capPrepared ?? glaube schon
+Warum legt R1 stapel nicht immer bei CS ab?
+Warum hat R3 nach leere base von CS retrieven eine base mit cap oben drauf in der Hand? Aber nicht immer, erst ab dritter Runde oder so
+
+
+
+
+
+TODOS: 
+calculateFillMachine scheint nicht richtig zu funktionieren, jetzt vielleicht doch?
+Ab dem zweiten ring macht roboter blödsinn (Z.b. legt stapel nicht ab)/roboter fährt nict weiter
+currentlypayed nutzten -> maschine darf nicht überfüllt werden
+
+
+warum platziert rpbpter 2 die base nicht in der slide, wenn er angekommen ist?
+warum versucht roboter 1 den stapel zu retrieven, wenn er noch nicht fertig ist
+
+Farbe gelb wird nicht richtig berechnet blau auch nicht
+DONE: Roboter 1 bleibt in dauerschleife nach erster RS 
+Roboter 2 legt Base nicht in Slide
+maschine wird bei ring 2 nicht instructed
+
+
+Aktuell:
+Roboter fängt zu schnell an zu retrieven, nachdem machine instructed wurde(nach bezahlung) Klappt aber trotzdem?
+Roboter fährt nicht zu Cap Station ( wird garnicht erst assertet)
+Schauen in orders: war vorher switch case, jetzt if else, scheint nicht zu funktionieren
+Vieleicht klappt es jetzt?
+Roboter 2 muss vpn BS verschwinden, wenn gerade nichts zu tun ist
+
+
+
+
+
+(defrule instructCS-21
+  ?instructCS-f <- (instructCS ?oid ?capColor)
+  ?robot-f <- (robot (name ROBOT1) (currentOrder ?oid))
+  ?machineWaitingForInstruction-f <- (machineWaitingForInstruction M-CS) 
+  ?machine-f <- (machine (name M-CS) (state IDLE))
+
+  (protobuf-peer (name refbox-private) (peer-id ?peer-id))
+  (not (waitingFor (machine M-CS) (orderID ?oid)))
+=>
+
+  (bind ?msg (pb-create "llsf_msgs.PrepareMachine"))
+  (pb-set-field ?msg "team_color" MAGENTA)
+  (pb-set-field ?msg "machine" M-CS)
+  
+
+  (bind ?msgPrepare (pb-create "llsf_msgs.PrepareInstructionCS"))
+  ;(pb-set-field ?msgPrepare "side" "OUTPUT")
+  (pb-set-field ?msgPrepare "cap_color" ?capColor)
+  (pb-set-field ?msg "instruction_cs" ?msgPrepare)
+
+  (pb-broadcast ?peer-id ?msg)
+ 
+  (pb-destroy ?msg)
+  (assert (waitingFor (machine M-CS) (orderID ?oid)))
+  (printout green "instruct CS" crlf)  
+  (retract ?instructCS-f)
+  (retract ?machineWaitingForInstruction-f)
+  
+
+)

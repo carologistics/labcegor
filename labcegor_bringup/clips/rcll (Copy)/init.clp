@@ -8,6 +8,7 @@
   (assert (game-time 0.)) 
 
   (assert (taskID 1))
+  ;(assert (task "moveInput"))
   (assert (ringsToProduce (blue 0) (green 0) (yellow 0) (orange 0)))
   (assert (fillMachineWithBases (ringStation1 0) (ringStation2 0) (order 0)))
   (assert (robot (name ROBOT1)))

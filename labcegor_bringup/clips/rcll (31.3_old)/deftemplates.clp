@@ -24,7 +24,7 @@
    (slot rotation (type INTEGER))
    (slot state (type SYMBOL))
    (slot waitingFor (type SYMBOL) (default FALSE))
-   ;(slot capPrepared (type SYMBOL) (default NULL))
+   (slot capPrepared (type SYMBOL) (default NULL))
 )
 
 (deftemplate ring-assignment
@@ -89,13 +89,20 @@
   (slot robot-to-output-3 (type SYMBOL) (default FALSE)) ;17
   (slot get-product-3 (type SYMBOL) (default FALSE))   ;18
 
+  ;hier fehlt was 
   (slot robot-to-CS (type SYMBOL) (default FALSE)) ;19
   (slot place-product-CS (type SYMBOL) (default FALSE));20
-  ;
+  ;instruct CS to get Cap
+  ;robot to output
+  ;get cap
+  ;put cap in slide
+  ;then instruct machine
   (slot instruct-CS (type SYMBOL) (default FALSE)) ;21 CS anweisen irgend was zu tun
   
   
+  ;(slot instruct-CS (type SYMBOL) (default FALSE))
   (slot robot-to-output-CS (type SYMBOL) (default FALSE))
+  ;hier fehlt was
 
   (slot currentRobot (type INTEGER) (default 0)) ;current robot working on task
   (slot nextTaskToBeDone (type INTEGER) (default 1))
@@ -103,6 +110,7 @@
   (slot taskIDInProcess (type INTEGER) (default 0))
   (slot complexity (type INTEGER) (default 0))
   
+  ;ändern: anstatt pro task einen slot, nextTaskID mit vordefinierten zahlen für Tasks nutzen
 )
 
 
@@ -151,13 +159,4 @@
 
 (deftemplate taskRobot1
   (multislot list (type INTEGER)) ;list with task Ids that need to be finished for Robot3
-)
-
-(deftemplate disposeBase
-  (slot capStation (type SYMBOL) (default null))
-)
-
-
-(deftemplate capPrepared
-  (slot cs (type SYMBOL))
 )

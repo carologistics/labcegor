@@ -2,7 +2,7 @@ clips_manager:
   ros__parameters:
     environments: ["cx_rcll"]
     cx_rcll:
-      redirect_stdout_to_debug: false
+      redirect_stdout_to_debug: true  #wenn false: man sieht alle Regeln
       log_clips_to_file: true
       watch: ["facts", "rules"]
       plugins: ["executive",
@@ -30,6 +30,13 @@ clips_manager:
         "clips/labcegor_bringup/rcll/sim-comm-init.clp",
         "clips/labcegor_bringup/rcll/refbox-recv.clp",
         "clips/labcegor_bringup/rcll/sendMessage.clp",
+        "clips/labcegor_bringup/rcll/baseStationTasks.clp",
+        "clips/labcegor_bringup/rcll/fillMachine.clp",
+        "clips/labcegor_bringup/rcll/orders.clp",
+        "clips/labcegor_bringup/rcll/ringStationTasks.clp",
+        "clips/labcegor_bringup/rcll/sendMessage.clp",
+        "clips/labcegor_bringup/rcll/capStationTasks.clp",
+  
        ]
     protobuf:
       plugin: "cx::ProtobufPlugin"
