@@ -151,7 +151,6 @@
 
     (if (eq ?cap-color "Bring_it_home") then
       (bind ?target_color ?cap-color)
-      (printout green "should finish now " ?target_color crlf)
       (return ?target_color)
     )
 
@@ -160,6 +159,7 @@
       (if (eq ?delete_last_stage TRUE) then
         (bind ?cap-color "Bring_it_home") ; next delivery point should be the DS
         (modify ?order (cap-color ?cap-color))
+        (printout green "should finish now " ?target_color crlf)  
         (return "Bring_it_home")
       )
       (return ?target_color)
@@ -194,8 +194,6 @@
 (deffunction check_order (?oid)
   (bind ?color (get_next_order_color ?oid FALSE))
   (bind ?target_machine (get_target_color_based ?color))
-  (printout yellow "Target is " ?target_machine " because of " ?color crlf)
-
   (return ?target_machine)
 )
 

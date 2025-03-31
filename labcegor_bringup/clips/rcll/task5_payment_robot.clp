@@ -9,7 +9,7 @@
   (test (or (eq ?robot_state IDLE) (eq ?robot_state HOLDING)))
   =>
   (bind ?target (get_target_for_payment ?rid))
-  (printout red "ROBOT" ?rid " is in line 13 and should move to " ?mot " " ?mat " " ?robot_state " " ?target crlf)
+  ; (printout red "ROBOT" ?rid " is in line 13 and should move to " ?mot " " ?mat " " ?robot_state " " ?target crlf)
   ;Prepare Basestation PrepareMachine
   (if (eq ?robot_state IDLE) then
     (if (eq ?mot M-BS) then
@@ -42,7 +42,7 @@
   (machine (name ?mot) (state ?s))
   ?machine_task_overview <- (machine_task_overview (machine_id ?mot) (machine_task ?task) (payment ?payment) (mounted ?mounted))
   =>
-  (printout red "ROBOT" ?rid " is in line 44 and should pickup at " ?mot " " ?mat " mounted:" ?mounted " " ?s crlf)
+  ; (printout red "ROBOT" ?rid " is in line 44 and should pickup at " ?mot " " ?mat " mounted:" ?mounted " " ?s crlf)
   (if (or (eq ?mot M-CS1) (eq ?mot M-CS2)) then
     (if (eq ?mounted FALSE) then 
       (send_retrieve_from_cmd ?rid ?mot "Shelf" ?peer-id ?tid)
@@ -62,7 +62,7 @@
   (protobuf-peer (name ?peer-name&:(eq ?peer-name (sym-cat ROBOT ?rid))) (peer-id ?peer-id))
   =>
 
-  (printout red "ROBOT" ?rid " is in line 67 and should deliver to " ?mot " " ?mat " " ?robot_state crlf)
+  ; (printout red "ROBOT" ?rid " is in line 67 and should deliver to " ?mot " " ?mat " " ?robot_state crlf)
   (send_deliver_to_cmd ?rid ?mot ?mat ?peer-id ?tid)
   (modify ?check_robot (did_something TRUE))
   (modify ?tasks_overview (state IDLE))
@@ -84,12 +84,12 @@
   (bind ?target (get_target_for_payment ?rid))
 
   (if (and (eq ?robot_id ?rid) (eq ?task_id ?tid)) then
-    (printout green "ROBOT" ?rid " task " ?tid " " ?cm " " ?cr " " ?cd " " ?mot " " ?mat " " ?target crlf)
+    ; (printout green "ROBOT" ?rid " task " ?tid " " ?cm " " ?cr " " ?cd " " ?mot " " ?mat " " ?target crlf)
     (if (eq ?successful TRUE) then
   
       ; It has moved without something in the gripper
       (if (and (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd FALSE)) then 
-        (printout red "ROBOT" ?rid " is in line 98 and should have moved to " ?mot " " ?mat crlf)
+        ; (printout red "ROBOT" ?rid " is in line 98 and should have moved to " ?mot " " ?mat crlf)
         (modify ?tasks_overview (can_move FALSE))
         (modify ?tasks_overview (can_retrieve TRUE))
         (modify ?tasks_overview (task_id (+ ?task_id 1)))
@@ -99,7 +99,7 @@
       
       ; It has moved while carring something
       (if (and (eq ?cm TRUE) (eq ?cr FALSE) (eq ?cd TRUE)) then 
-        (printout red "ROBOT" ?rid " is in line 108 and should have moved to " ?mot " " ?mat crlf)
+        ; (printout red "ROBOT" ?rid " is in line 108 and should have moved to " ?mot " " ?mat crlf)
         (modify ?tasks_overview (can_move FALSE))
         (modify ?tasks_overview (task_id (+ ?task_id 1)))
         (modify ?check_robot (did_something FALSE))
@@ -108,7 +108,7 @@
 
       ; It has picked something up
       (if (and (eq ?cm FALSE) (eq ?cr TRUE) (eq ?cd FALSE)) then 
-        (printout red "ROBOT" ?rid " is in line 118 and should have picked somthing up at " ?mot " " ?mat crlf)
+        ; (printout red "ROBOT" ?rid " is in line 118 and should have picked somthing up at " ?mot " " ?mat crlf)
         
         ; It carries a base
         (if (or (not (or (eq ?mot M-CS1) (eq ?mot M-CS2))) (eq ?mounted TRUE) )then
@@ -131,7 +131,7 @@
 
       ; It Delivered somthing
       (if (and (eq ?cm FALSE) (eq ?cr FALSE) (eq ?cd TRUE)) then 
-        (printout red "ROBOT" ?rid " is in line 139 and should delivered something to " ?mot " " ?mat " target " ?target " mounted? " ?mounted " payment:" ?payment crlf)
+        ; (printout red "ROBOT" ?rid " is in line 139 and should delivered something to " ?mot " " ?mat " target " ?target " mounted? " ?mounted " payment:" ?payment crlf)
   
         (if (or (eq ?mot M-CS1) (eq ?mot M-CS2)) then
           (if (eq ?mounted FALSE) then 
