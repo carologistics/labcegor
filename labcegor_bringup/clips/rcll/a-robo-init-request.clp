@@ -744,12 +744,7 @@
                         (modify ?pay_it (iteration (+ ?it 1)))
                         (retract ?station)
                         )
-                    )
-                    (if (eq ?station-free FALSE)
-                        then
-                        (modify ?lc (c_time ?ros-time-float))
-                        (assert (request_task (id 3) (last_task ?last_robo_task) (robo_order ?last_robo_order) (machine_order ?last_machine_order)))
-                    )    
+                    )   
                     else
                     (if (< ?rs2_slide 2)
                     then
@@ -760,18 +755,18 @@
                         (modify ?pay_it (iteration (+ ?it 1)))
                         (retract ?station)
                         )
-                    )
-                    (if (eq ?station-free FALSE)
-                        then
-                        (modify ?lc (c_time ?ros-time-float))
-                        (assert (request_task (id 3) (last_task ?last_robo_task) (robo_order ?last_robo_order) (machine_order ?last_machine_order)))
-                    )    
+                    )   
                     else
                         (modify ?lc (c_time ?ros-time-float))
                         (assert (request_task (id 3) (last_task ?last_robo_task) (robo_order ?last_robo_order)))
                     )
+
                 )
-                   
+                (if (eq ?station-free FALSE)
+                    then
+                    (modify ?lc (c_time ?ros-time-float))
+                    (assert (request_task (id 3) (last_task ?last_robo_task) (robo_order ?last_robo_order) (machine_order ?last_machine_order)))
+                ) 
                 )
 
             (case 5 then ; deliver
