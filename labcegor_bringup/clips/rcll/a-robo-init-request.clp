@@ -125,12 +125,14 @@
 =>
 (retract ?new_o)
 (assert (processed_order (id ?id)))
-(if(eq ?id 1);give order 1 a higher prio than order 2 
-then
-    (assert (order_status (id ?id) (state RC) (next_step BASE) (complexity ?complexity) (start_d_time ?begin) (last_d_time ?end) (prio (+ ?end 1)))); possibly overspecified some values currently not needed afterwards
-else
-    (assert (order_status (id ?id) (state RC) (next_step BASE) (complexity ?complexity) (start_d_time ?begin) (last_d_time ?end) (prio ?end)))
-)
+;---removed to preven blocking DS when dilivery window is not reached jet
+;(if(eq ?id 1);give order 1 a higher prio than order 2 
+;then
+;    (assert (order_status (id ?id) (state RC) (next_step BASE) (complexity ?complexity) (start_d_time ?begin) (last_d_time ?end) (prio (+ ?end 1)))); possibly overspecified some values currently not needed afterwards
+;else
+;    (assert (order_status (id ?id) (state RC) (next_step BASE) (complexity ?complexity) (start_d_time ?begin) (last_d_time ?end) (prio ?end)))
+;)
+(assert (order_status (id ?id) (state RC) (next_step BASE) (complexity ?complexity) (start_d_time ?begin) (last_d_time ?end) (prio (- 100 ?id)))); possibly overspecified, work orders in order of ids for now
 (assert (order_colors (id ?id) (base ?base) (cap ?cap)))
 (if (not (eq ?complexity C0)) ; if rings ar pressent same them in the corresponding color fact 
  then 
@@ -160,7 +162,7 @@ else
 (test (> (- ?ros-time-float ?check_time) 1))
 ?init_it <- (init_it (id ?robo_id) (iteration ?it));initializaion itterations
 (test (or (eq ?robo_id 1) (< ?it 8))); init passed or robo 1
-?hp_o <- (order_status (id ?hp_oid) (state ?hp_ostate&:(not (eq ?hp_ostate DE))) (next_step ?hp_next) (start_d_time ?hp_start) (last_d_time ?hp_last) (prio ?hp_prio) (complexity ?hp_compex)) ;order with highest prio again overspecified - not simplified to aviod unpredictable bugs
+?hp_o <- (order_status (id ?hp_oid) (state ?hp_ostate&:(not (eq ?hp_ostate DE)))) (next_step ?hp_next) (start_d_time ?hp_start) (last_d_time ?hp_last) (prio ?hp_prio) (complexity ?hp_compex)) ;order with highest prio again overspecified - not simplified to aviod unpredictable bugs; posssiblityto add a selection prefering orders with open time window
 (not (order_status (prio ?prio_1&:(< ?hp_prio ?prio_1)) (state ?hp_ostate1&:(not (eq ?hp_ostate1 DE))) )) ;wich is not delivered jet
 (order (id ?hp_oid) (base-color ?hp_base) (ring-colors $?hp_colors) (cap-color ?hp_cap)) ;corresponding order fact - lagecy possible intercangable with order_color
 ?machine_s <- (machine_status (name ?m_name) (task ?m_task) (order ?m_order) (pos ?m_pos)) ;machine robo is or wants to go
@@ -398,12 +400,13 @@ else
                             else ; just deliverd - instruct, then move to out (if not DS)
                                 (if(or (eq ?pos M-RS1) (eq ?pos M-RS2))
                                     then
+                                        (modify ?machine_s (pos INPUT))
                                         (assert (instruct (machine ?pos) (operation RING) (color ?r_next_c) (task_id 42) (order_id ?m_order)))
                                     else ;CS or DS
                                         (if(eq ?pos M-DS)
                                         then
                                             (assert (instruct (machine M-DS) (operation DELIVER) (task_id 42) (order_id ?m_order)))
-                                            (modify ?hp_o (state DE))
+                                            (modify ?r_o (state DE))
                                             (assert (request_task (id ?robo_id) (last_task (+ ?last_robo_task 1)) (robo_order ?last_robo_order) (machine_order ?last_machine_order)));new untestet
                                         else
                                             (assert (instruct (machine ?pos) (operation MOUNT_CAP) (task_id  42) (order_id ?m_order)))
