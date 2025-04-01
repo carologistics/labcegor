@@ -126,7 +126,7 @@
 (retract ?new_o)
 (assert (processed_order (id ?id)))
 ;---removed to preven blocking DS when dilivery window is not reached jet
-;(if(eq ?id 1);give order 1 a higher prio than order 2 
+(;if(eq ?id 1);give order 1 a higher prio than order 2 
 ;then
 ;    (assert (order_status (id ?id) (state RC) (next_step BASE) (complexity ?complexity) (start_d_time ?begin) (last_d_time ?end) (prio (+ ?end 1)))); possibly overspecified some values currently not needed afterwards
 ;else
@@ -158,12 +158,14 @@
 (defrule request_task_main
 ?rt <- (request_task (id ?robo_id) (last_task ?last_robo_task) (robo_order ?last_robo_order) (machine_order ?last_machine_order)) ;robo requesting a task
 ?lc <- (last_checked (id ?robo_id) (c_time ?check_time));backof-time check
+(game-time ?game-time)
 (time ?ros-time-float)
 (test (> (- ?ros-time-float ?check_time) 1))
 ?init_it <- (init_it (id ?robo_id) (iteration ?it));initializaion itterations
 (test (or (eq ?robo_id 1) (< ?it 8))); init passed or robo 1
-?hp_o <- (order_status (id ?hp_oid) (state ?hp_ostate&:(not (eq ?hp_ostate DE)))) (next_step ?hp_next) (start_d_time ?hp_start) (last_d_time ?hp_last) (prio ?hp_prio) (complexity ?hp_compex)) ;order with highest prio again overspecified - not simplified to aviod unpredictable bugs; posssiblityto add a selection prefering orders with open time window
-(not (order_status (prio ?prio_1&:(< ?hp_prio ?prio_1)) (state ?hp_ostate1&:(not (eq ?hp_ostate1 DE))) )) ;wich is not delivered jet
+?hp_o <- (order_status (id ?hp_oid) (state ?hp_ostate&:(not (eq ?hp_ostate DE))) (next_step ?hp_next) (start_d_time ?hp_start) (last_d_time ?hp_last) (prio ?hp_prio) (complexity ?hp_compex));order with highest prio again overspecified - not simplified to aviod unpredictable
+; posssiblity to add a selection prefering orders with open time window low enougth &:(or (> (- ?hp_start ?game-time) 1) (eq ?hp_oid 1)) not working so fallback with dong orders in order
+(not (order_status (prio ?prio_1&:(< ?hp_prio ?prio_1)) (state ?hp_ostate1&:(not (eq ?hp_ostate1 DE) )))) ;wich is not delivered jet
 (order (id ?hp_oid) (base-color ?hp_base) (ring-colors $?hp_colors) (cap-color ?hp_cap)) ;corresponding order fact - lagecy possible intercangable with order_color
 ?machine_s <- (machine_status (name ?m_name) (task ?m_task) (order ?m_order) (pos ?m_pos)) ;machine robo is or wants to go
 ?robo_s <- (robo_status (id ?robo_id) (task ?r_task) (order ?r_order) (pos ?pos) (pos_at_waypoint ?pos_wp) (des ?des))
