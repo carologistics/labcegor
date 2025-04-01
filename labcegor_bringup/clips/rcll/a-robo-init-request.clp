@@ -292,7 +292,7 @@
                             (assert (action (id 1) (a_type "m") (machine M-BS) (io OUTPUT) (task_id (+ ?last_robo_task 1))))
                             (modify ?robo_s (task (+ ?last_robo_task 1)) (des M-BS) (des_at_waypoint OUTPUT) (order ?hp_oid))
                             (modify ?hp_o (state BS))
-                            (if (eq ?hp_compex C0) then (modify ?hp_o (next_step DELIVER)) else (modify ?hp_o (next_step RING_1)))
+                            (if (eq ?hp_compex C0) then (modify ?hp_o (next_step CAP)) else (modify ?hp_o (next_step RING_1)))
                             (assert (station-free (name M-DS)))
                                         )
                         )
